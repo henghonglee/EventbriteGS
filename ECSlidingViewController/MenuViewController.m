@@ -1,7 +1,7 @@
 #import "MenuViewController.h"
 #import "MapNavViewController.h"
-#import "DealsLayout.h"
-#import "DealsViewController.h"
+
+
 #import "MapSlidingViewController.h"
 #import "GeoScrollViewController.h"
 @interface MenuViewController()

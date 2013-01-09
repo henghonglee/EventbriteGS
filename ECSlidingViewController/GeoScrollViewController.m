@@ -64,194 +64,34 @@
         
         NSString * dbFile = [[NSBundle mainBundle] pathForResource:@"lovesgfood" ofType:@"json"];
         NSString * contents = [NSString stringWithContentsOfFile:dbFile encoding:NSASCIIStringEncoding error:nil];
-        
         NSData* filedata = [contents dataUsingEncoding:NSUTF8StringEncoding];
-        
-        [self processData:filedata];
-        
+//        
+//        [self processData:filedata];
+//        
         dbFile = [[NSBundle mainBundle] pathForResource:@"ladyic" ofType:@"json"];
         contents = [NSString stringWithContentsOfFile:dbFile encoding:NSASCIIStringEncoding error:nil];
-        
         filedata = [contents dataUsingEncoding:NSUTF8StringEncoding];
         
         [self processData:filedata];
-        
-        dbFile = [[NSBundle mainBundle] pathForResource:@"ieat" ofType:@"json"];
-        contents = [NSString stringWithContentsOfFile:dbFile encoding:NSASCIIStringEncoding error:nil];
-        
-        filedata = [contents dataUsingEncoding:NSUTF8StringEncoding];
-        
-        [self processData:filedata];
+//
+//        dbFile = [[NSBundle mainBundle] pathForResource:@"ieat" ofType:@"json"];
+//        contents = [NSString stringWithContentsOfFile:dbFile encoding:NSASCIIStringEncoding error:nil];
+//        
+//        filedata = [contents dataUsingEncoding:NSUTF8StringEncoding];
+//        
+//        [self processData:filedata];
 
-        dbFile = [[NSBundle mainBundle] pathForResource:@"testing" ofType:@"json"];
-        contents = [NSString stringWithContentsOfFile:dbFile encoding:NSASCIIStringEncoding error:nil];
-        
-        filedata = [contents dataUsingEncoding:NSUTF8StringEncoding];
-        
-        [self processData:filedata];
+//        dbFile = [[NSBundle mainBundle] pathForResource:@"testing" ofType:@"json"];
+//        contents = [NSString stringWithContentsOfFile:dbFile encoding:NSASCIIStringEncoding error:nil];
+//        
+//        filedata = [contents dataUsingEncoding:NSUTF8StringEncoding];
+//        
+//        [self processData:filedata];
         
         [self prepareDataForDisplay];
         
     });
 }
-/*-(void)processData:(id)data
-{
-    if (data==nil)return;
-        NSMutableArray* dataArray = [[NSMutableArray alloc]initWithArray:data];
-    
-    
-        for (NSDictionary* dataObject in dataArray) {
-            GSObject *gsObject = [[GSObject alloc] init];
-            
-            if ([[dataObject objectForKey:@"name"] isEqual:[NSNull null]])
-            {
-                continue;
-            }
-            else
-            {
-                gsObject.objectID = [dataObject objectForKey:@"id"];
-                gsObject.title = [dataObject objectForKey:@"name"];
-                gsObject.shopScore = [dataObject objectForKey:@"score_shop"];
-                gsObject.dealCount = [dataObject objectForKey:@"deal_count"];
-                CGSize s = [gsObject.title sizeWithFont:[UIFont systemFontOfSize:25.0f] constrainedToSize:CGSizeMake(273, 999) lineBreakMode:NSLineBreakByWordWrapping];
-                gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + 10)];
-                gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + 14.75)];
-                gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + MAX(30,s.height))];
-                gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + 2)];//padding btw title and subtitle;
-            }
-            
-            if ([[dataObject objectForKey:@"description"] isEqual:[NSNull null]])
-            {
-                continue;
-            }
-            else
-            {
-                gsObject.description = [dataObject objectForKey:@"description"];
-                
-            }
-            if ([[dataObject objectForKey:@"logo"] isEqual:[NSNull null]])
-            {
-                continue;
-            }
-            else
-            {
-                NSDictionary* logodict = [dataObject objectForKey:@"logo"];
-                gsObject.logourl = [logodict objectForKey:@"url"];
-                NSDictionary* coverdict = [dataObject objectForKey:@"cover"];
-                gsObject.coverurl = [coverdict objectForKey:@"url"];
-                
-            }
-            gsObject.addressString = [NSString stringWithFormat:@"%@ %@ %@",[dataObject objectForKey:@"fb_location_street"],[dataObject objectForKey:@"fb_location_city"],[dataObject objectForKey:@"fb_location_zip"]];
-            if (![[dataObject objectForKey:@"fb_phone"] isEqual:[NSNull null]]) {
-                gsObject.phoneNumber = [dataObject objectForKey:@"fb_phone"];    
-            }else{
-                gsObject.phoneNumber = @"";
-            }
-            
-
-//TODO: uncomment and uncrash
-            NSString* monday = [[NSString alloc]init];
-            NSString* tuesday = [[NSString alloc]init];
-            NSString* wednesday = [[NSString alloc]init];
-            NSString* thursday = [[NSString alloc]init];
-            NSString* friday = [[NSString alloc]init];
-            NSString* saturday = [[NSString alloc]init];
-            NSString* sunday = [[NSString alloc]init];
-            
-            
-            if ([[dataObject objectForKey:@"fb_hours_mon1open"] isEqual:[NSNull null]] || [[dataObject objectForKey:@"fb_hours_mon1close"] isEqual:[NSNull null]]){
-                monday = @"Mon: Closed";
-            }else{
-                monday = @"Mon: Closed";
-//                monday = [NSString stringWithFormat:@"Mon: %@-%@",[dataObject objectForKey:@"fb_hours_mon1open"],[dataObject objectForKey:@"fb_hours_mon1close"]];
-            }
-            if ([[dataObject objectForKey:@"fb_hours_tue1open"] isEqual:[NSNull null]] || [[dataObject objectForKey:@"fb_hours_tue1close"] isEqual:[NSNull null]]){
-                tuesday = @"Tues: Closed";
-            }else{
-                tuesday = [NSString stringWithFormat:@"Tues: %@-%@",[dataObject objectForKey:@"fb_hours_tue1open"],[dataObject objectForKey:@"fb_hours_tue1close"]];
-            }
-            if ([[dataObject objectForKey:@"fb_hours_wed1open"] isEqual:[NSNull null]] || [[dataObject objectForKey:@"fb_hours_wed1close"] isEqual:[NSNull null]]){
-                wednesday = @"Wed: Closed";
-            }else{
-                wednesday = [NSString stringWithFormat:@"Wed: %@-%@",[dataObject objectForKey:@"fb_hours_wed1open"],[dataObject objectForKey:@"fb_hours_wed1close"]];
-            }
-            if ([[dataObject objectForKey:@"fb_hours_thu1open"] isEqual:[NSNull null]] || [[dataObject objectForKey:@"fb_hours_thu1close"] isEqual:[NSNull null]]){
-                thursday = @"Thurs: Closed";
-            }else{
-                thursday = [NSString stringWithFormat:@"Thurs: %@-%@",[dataObject objectForKey:@"fb_hours_thu1open"],[dataObject objectForKey:@"fb_hours_thu1close"]];
-            }
-            if ([[dataObject objectForKey:@"fb_hours_fri1open"] isEqual:[NSNull null]] || [[dataObject objectForKey:@"fb_hours_fri1close"] isEqual:[NSNull null]]){
-                friday = @"Fri: Closed";
-            }else{
-                friday = [NSString stringWithFormat:@"Fri: %@-%@",[dataObject objectForKey:@"fb_hours_fri1open"],[dataObject objectForKey:@"fb_hours_fri1close"]];
-            }
-
-            if ([[dataObject objectForKey:@"fb_hours_sat1open"] isEqual:[NSNull null]] || [[dataObject objectForKey:@"fb_hours_sat1close"] isEqual:[NSNull null]]){
-                saturday= @"Sat: Closed";
-            }else{
-                saturday = [NSString stringWithFormat:@"Sat: %@-%@",[dataObject objectForKey:@"fb_hours_sat1open"],[dataObject objectForKey:@"fb_hours_sat1close"]];
-            }
-            
-            if ([[dataObject objectForKey:@"fb_hours_sun1open"] isEqual:[NSNull null]] || [[dataObject objectForKey:@"fb_hours_sun1close"] isEqual:[NSNull null]]){
-                sunday = @"Sun: Closed";
-            }else{
-                sunday = [NSString stringWithFormat:@"Sun: %@-%@",[dataObject objectForKey:@"fb_hours_sun1open"],[dataObject objectForKey:@"fb_hours_sun1close"]];
-            }
-            
-            gsObject.openingHoursString = [NSString stringWithFormat:@" %@\n %@\n %@\n %@\n %@\n %@\n %@",monday,tuesday,wednesday,thursday,friday,saturday,sunday];
-
-          
-            if ([[dataObject objectForKey:@"fb_category"] isEqual:[NSNull null]])
-            {
-                continue;
-            }
-            else
-            {
-                gsObject.subTitle = [NSString stringWithFormat:@"%@",[dataObject objectForKey:@"fb_category"]];
-                
-                CGSize subTitleSize = CGSizeMake(273, 30);
-                gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + subTitleSize.height)];
-                gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + 2)];
-            }
-            if ([[dataObject objectForKey:@"fb_likes"] isEqual:[NSNull null]])
-            {
-                continue;
-            }
-            else
-            {
-                gsObject.likes = [NSNumber numberWithInt:[[dataObject objectForKey:@"fb_likes"] intValue]];
-            }
-            if ([[dataObject objectForKey:@"latitude"] isEqual:[NSNull null]] || [[dataObject objectForKey:@"longitude"] isEqual:[NSNull null]])
-            {
-                continue;
-            }
-              
-            gsObject.latitude =[NSNumber numberWithDouble: [[dataObject objectForKey:@"latitude"] doubleValue]];
-            gsObject.longitude =[NSNumber numberWithDouble:[[dataObject objectForKey:@"longitude"] doubleValue]];
-            
-            
-            [self.loadedGSObjectArray addObject:gsObject];
-        }
-        
-        
-
-        oldRegion = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView.visibleMapRect;
-        
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-            self.tableView.frame = self.view.bounds;
-            [self.tableView reloadData];
-//            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
-//                    NSMutableArray* indexArray = [[NSMutableArray alloc]init];
-//                    for (int i = 0 ; i<[GSObjectArray count]+1; i++) {
-//                        NSIndexPath* newIndex = [NSIndexPath indexPathForRow:i inSection:0];
-//                        [indexArray addObject:newIndex];
-//                    }
-//            [self.tableView insertRowsAtIndexPaths:indexArray withRowAnimation:UITableViewRowAnimationBottom];
-
-        });
-    
-    
-}*/
 
 -(void)prepareDataForDisplay
 {
@@ -260,12 +100,17 @@
         [self sortLoadedArray:self.loadedGSObjectArray ByVariable:@"distanceInMeters" IntoArray:self.GSObjectArray ascending:YES];
     }
     NSLog(@"%d entries",self.loadedGSObjectArray.count);
-//    MKCoordinateRegion region = ((UnderMapViewController*)self.slidingViewController.underLeftViewController).mapView.region;
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         self.tableView.frame = self.view.bounds;
         [self.tableView reloadData];
-        
+        int64_t delayInSeconds = 2.0;
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            
+            MKCoordinateRegion region = ((UnderMapViewController*)self.slidingViewController.underLeftViewController).mapView.region;
+            [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:@"" IntoArray:self.GSObjectArray WithRefresh:YES];
+        });
     });
 
 }

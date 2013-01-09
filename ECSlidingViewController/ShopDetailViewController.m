@@ -11,7 +11,7 @@
 
 #import "AFNetworking.h"
 #import "UIImage+Resize.h"
-#import "ColCel.h"
+
 #define kCouponWidth 280.0f
 #define kBottomPadding 10.0f
 #define kdescriptionheight 30.0f
@@ -42,12 +42,10 @@
             NSLog(@"viewdidload");
     _subtitleLabel.text = gsObject.subTitle;
     _titleLabel.text = gsObject.title;
-    _descriptionTextView.text = gsObject.description;
     NSString *cssString = @"<style type='text/css'>img {width:300px; height: auto;}</style>";
     NSString *htmlString = [NSString stringWithFormat:@"%@%@",cssString,gsObject.descriptionhtml];
     [_descriptionWebView loadHTMLString:htmlString baseURL:nil];
     self.navigationItem.title = gsObject.source;
-    [_collectionView registerClass:[ColCel class] forCellWithReuseIdentifier:@"gsobject"];
         
 }
 -(void)viewWillAppear:(BOOL)animated
@@ -66,20 +64,20 @@
 
     [super viewDidUnload];
 }
-
--(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
-{
-    return [gsObject.imageArray count];
-}
-- (NSInteger)numberOfSectionsInCollectionView: (UICollectionView *)collectionView {
-    return 1;
-}
--(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
-{
-    ColCel *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"gsobject" forIndexPath:indexPath];
-    [cell.foodImageView setImageWithURL:[NSURL URLWithString:((NSString*)[gsObject.imageArray objectAtIndex:indexPath.row])]];
-    return cell;
-}
+//
+//-(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
+//{
+//    return [gsObject.imageArray count];
+//}
+//- (NSInteger)numberOfSectionsInCollectionView: (UICollectionView *)collectionView {
+//    return 1;
+//}
+//-(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    ColCel *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"gsobject" forIndexPath:indexPath];
+//    [cell.foodImageView setImageWithURL:[NSURL URLWithString:((NSString*)[gsObject.imageArray objectAtIndex:indexPath.row])]];
+//    return cell;
+//}
 
 
 @end

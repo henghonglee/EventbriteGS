@@ -23,18 +23,15 @@
 		2750E7AF14CF1306007727A0 /* UIImage+ImageWithUIView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2750E7AD14CF1306007727A0 /* UIImage+ImageWithUIView.m */; };
 		27FC94E014D0C14E0000B18C /* InitialSlidingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 27FC94DF14D0C14E0000B18C /* InitialSlidingViewController.m */; };
 		27FC94E314D105C60000B18C /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27FC94E214D105C60000B18C /* QuartzCore.framework */; };
-		EF1A77DC168598E6007C9C67 /* DealsLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = EF1A77DB168598E5007C9C67 /* DealsLayout.m */; };
 		EF4278AE169BEB4D0016E6FB /* ieat.json in Resources */ = {isa = PBXBuildFile; fileRef = EF4278AD169BEB4D0016E6FB /* ieat.json */; };
 		EF4278B1169BEBEF0016E6FB /* lovesgfood.json in Resources */ = {isa = PBXBuildFile; fileRef = EF4278B0169BEBEF0016E6FB /* lovesgfood.json */; };
 		EF44BD46168B3ADB00F7BCB5 /* ShopDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF44BD42168B3AD800F7BCB5 /* ShopDetailViewController.m */; };
 		EF44BD47168B3ADB00F7BCB5 /* ShopDetailViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = EF44BD43168B3AD900F7BCB5 /* ShopDetailViewController.xib */; };
-		EF44BD48168B3ADB00F7BCB5 /* ColCel.m in Sources */ = {isa = PBXBuildFile; fileRef = EF44BD45168B3ADA00F7BCB5 /* ColCel.m */; };
 		EF61B62A169D406C00213CFB /* testing.json in Resources */ = {isa = PBXBuildFile; fileRef = EF61B629169D406C00213CFB /* testing.json */; };
 		EF9D891D167A44A8002B352D /* CrumbPath.m in Sources */ = {isa = PBXBuildFile; fileRef = EF9D891A167A44A8002B352D /* CrumbPath.m */; };
 		EF9D891E167A44A8002B352D /* CrumbPathView.m in Sources */ = {isa = PBXBuildFile; fileRef = EF9D891C167A44A8002B352D /* CrumbPathView.m */; };
 		EFC526DE169A9D5B00D9DFBF /* CrumbObj.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC526DD169A9D5B00D9DFBF /* CrumbObj.m */; };
 		EFC5AFEA169AC07D0021238E /* ladyic.json in Resources */ = {isa = PBXBuildFile; fileRef = EFC5AFE9169AC07C0021238E /* ladyic.json */; };
-		EFD1B3711685B2DB00E70629 /* DealsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EFD1B36E1685B0BF00E70629 /* DealsViewController.m */; };
 		EFE28F401677060B00095554 /* UIImage+Resize.m in Sources */ = {isa = PBXBuildFile; fileRef = EFE28F3B1677060B00095554 /* UIImage+Resize.m */; };
 		EFE28F411677060B00095554 /* UIImage+Alpha.m in Sources */ = {isa = PBXBuildFile; fileRef = EFE28F3D1677060B00095554 /* UIImage+Alpha.m */; };
 		EFE28F421677060B00095554 /* UIImage+RoundedCorner.m in Sources */ = {isa = PBXBuildFile; fileRef = EFE28F3F1677060B00095554 /* UIImage+RoundedCorner.m */; };
@@ -136,15 +133,11 @@
 		27FC94DE14D0C14E0000B18C /* InitialSlidingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InitialSlidingViewController.h; sourceTree = "<group>"; };
 		27FC94DF14D0C14E0000B18C /* InitialSlidingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InitialSlidingViewController.m; sourceTree = "<group>"; };
 		27FC94E214D105C60000B18C /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		EF1A77DA168598E5007C9C67 /* DealsLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DealsLayout.h; sourceTree = "<group>"; };
-		EF1A77DB168598E5007C9C67 /* DealsLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DealsLayout.m; sourceTree = "<group>"; };
 		EF4278AD169BEB4D0016E6FB /* ieat.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ieat.json; sourceTree = "<group>"; };
 		EF4278B0169BEBEF0016E6FB /* lovesgfood.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = lovesgfood.json; sourceTree = "<group>"; };
 		EF44BD41168B3AD800F7BCB5 /* ShopDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShopDetailViewController.h; sourceTree = "<group>"; };
 		EF44BD42168B3AD800F7BCB5 /* ShopDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShopDetailViewController.m; sourceTree = "<group>"; };
 		EF44BD43168B3AD900F7BCB5 /* ShopDetailViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ShopDetailViewController.xib; sourceTree = "<group>"; };
-		EF44BD44168B3AD900F7BCB5 /* ColCel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ColCel.h; sourceTree = "<group>"; };
-		EF44BD45168B3ADA00F7BCB5 /* ColCel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ColCel.m; sourceTree = "<group>"; };
 		EF61B629169D406C00213CFB /* testing.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = testing.json; sourceTree = "<group>"; };
 		EF9D8919167A44A8002B352D /* CrumbPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CrumbPath.h; sourceTree = "<group>"; };
 		EF9D891A167A44A8002B352D /* CrumbPath.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CrumbPath.m; sourceTree = "<group>"; };
@@ -153,8 +146,6 @@
 		EFC526DC169A9D5B00D9DFBF /* CrumbObj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CrumbObj.h; sourceTree = "<group>"; };
 		EFC526DD169A9D5B00D9DFBF /* CrumbObj.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CrumbObj.m; sourceTree = "<group>"; };
 		EFC5AFE9169AC07C0021238E /* ladyic.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ladyic.json; sourceTree = "<group>"; };
-		EFD1B36D1685B0BE00E70629 /* DealsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DealsViewController.h; sourceTree = "<group>"; };
-		EFD1B36E1685B0BF00E70629 /* DealsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DealsViewController.m; sourceTree = "<group>"; };
 		EFE28F3A1677060B00095554 /* UIImage+Resize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Resize.h"; sourceTree = "<group>"; };
 		EFE28F3B1677060B00095554 /* UIImage+Resize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Resize.m"; sourceTree = "<group>"; };
 		EFE28F3C1677060B00095554 /* UIImage+Alpha.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Alpha.h"; sourceTree = "<group>"; };
@@ -368,17 +359,9 @@
 				27498DD414E96EEF005C043E /* SampleTableViewController.m */,
 				2750E79814CDB99A007727A0 /* SecondTopViewController.h */,
 				2750E79914CDB99A007727A0 /* SecondTopViewController.m */,
-				EF1A77DA168598E5007C9C67 /* DealsLayout.h */,
-				EF1A77DB168598E5007C9C67 /* DealsLayout.m */,
-				EFD1B36D1685B0BE00E70629 /* DealsViewController.h */,
-				EFD1B36E1685B0BF00E70629 /* DealsViewController.m */,
 				EF44BD41168B3AD800F7BCB5 /* ShopDetailViewController.h */,
 				EF44BD42168B3AD800F7BCB5 /* ShopDetailViewController.m */,
 				EF44BD43168B3AD900F7BCB5 /* ShopDetailViewController.xib */,
-				EF44BD44168B3AD900F7BCB5 /* ColCel.h */,
-				EF44BD45168B3ADA00F7BCB5 /* ColCel.m */,
-				EFC526DC169A9D5B00D9DFBF /* CrumbObj.h */,
-				EFC526DD169A9D5B00D9DFBF /* CrumbObj.m */,
 				EF9D8917167A4496002B352D /* Overlay */,
 				EFE28F751677078100095554 /* Geoscroll */,
 				EFE28FE5167708B400095554 /* HUDS */,
@@ -406,6 +389,8 @@
 		EF9D8917167A4496002B352D /* Overlay */ = {
 			isa = PBXGroup;
 			children = (
+				EFC526DC169A9D5B00D9DFBF /* CrumbObj.h */,
+				EFC526DD169A9D5B00D9DFBF /* CrumbObj.m */,
 				EF9D8919167A44A8002B352D /* CrumbPath.h */,
 				EF9D891A167A44A8002B352D /* CrumbPath.m */,
 				EF9D891B167A44A8002B352D /* CrumbPathView.h */,
@@ -658,7 +643,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EFD1B3711685B2DB00E70629 /* DealsViewController.m in Sources */,
 				2750E77D14CDB0DF007727A0 /* main.m in Sources */,
 				2750E78114CDB0DF007727A0 /* AppDelegate.m in Sources */,
 				2750E79414CDB93A007727A0 /* MenuViewController.m in Sources */,
@@ -700,9 +684,7 @@
 				EFE28FEB167708C500095554 /* SVProgressHUD.m in Sources */,
 				EF9D891D167A44A8002B352D /* CrumbPath.m in Sources */,
 				EF9D891E167A44A8002B352D /* CrumbPathView.m in Sources */,
-				EF1A77DC168598E6007C9C67 /* DealsLayout.m in Sources */,
 				EF44BD46168B3ADB00F7BCB5 /* ShopDetailViewController.m in Sources */,
-				EF44BD48168B3ADB00F7BCB5 /* ColCel.m in Sources */,
 				EFC526DE169A9D5B00D9DFBF /* CrumbObj.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -778,7 +760,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ECSlidingViewController/ECSlidingViewController-Prefix.pch";
 				INFOPLIST_FILE = "ECSlidingViewController/ECSlidingViewController-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "F7A0768D-FC12-426E-9118-99CC69592F63";
@@ -800,7 +782,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ECSlidingViewController/ECSlidingViewController-Prefix.pch";
 				INFOPLIST_FILE = "ECSlidingViewController/ECSlidingViewController-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "F7A0768D-FC12-426E-9118-99CC69592F63";

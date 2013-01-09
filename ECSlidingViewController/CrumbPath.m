@@ -95,8 +95,8 @@
 
 - (CLLocationCoordinate2D)coordinate
 {
-//    return MKCoordinateForMapPoint(points[0]);
-    return MKCoordinateForMapPoint(((CrumbObj*)[pointsArray objectAtIndex:0]).mapPoint);
+    return MKCoordinateForMapPoint(points[0]);
+//    return MKCoordinateForMapPoint(((CrumbObj*)[pointsArray objectAtIndex:0]).mapPoint);
 }
 
 - (MKMapRect)boundingMapRect
