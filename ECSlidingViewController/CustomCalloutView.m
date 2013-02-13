@@ -11,15 +11,15 @@
 @synthesize detailImageView,detailSubtitleLabel,detailTitleLabel,gsObject,containerView,detailButton,starview;
 
 #define kContainerPadding 5.0f
-#define kPaddingBetweenElements 5.0f
+#define kPaddingBetweenElements 10.0f
 #define kPaddingTop 5.0f
-#define kPaddingRight 10.0f
+#define kPaddingRight 5.0f
 #define kPaddingLeft 20.0f
 #define kPaddingBottom 30.0f
 #define kColorBarWidth 15.0f
 #define kCloseButtonWidthHeight 25.0f
-#define kImageViewSizeWidth 32.0f
-#define kImageViewSizeHeight 32.0f
+#define kImageViewSizeWidth 50.0f
+#define kImageViewSizeHeight 50.0f
 #define kPinPoint 140.0f
 #define kCalloutArrowHeight 12.0f
 #define kCalloutArrowWidth 10.0f
@@ -34,14 +34,15 @@
         [self setUserInteractionEnabled:YES];
         self.opaque = NO;
         
-        starview = [[HHStarView alloc]initWithFrame:CGRectMake(kPaddingLeft,kPaddingTop + kImageViewSizeHeight+kPaddingBetweenElements, 80+14.75+15, 14.75) andRating:0.0f animated:NO];
+      //  starview = [[HHStarView alloc]initWithFrame:CGRectMake(kPaddingLeft,kPaddingTop + kImageViewSizeHeight+kPaddingBetweenElements, 80+14.75+15, 14.75) andRating:0.0f animated:NO];
         
         
-        detailSubtitleLabel = [[UILabel alloc]initWithFrame:CGRectMake(kPaddingLeft, kPaddingTop + kImageViewSizeHeight+kPaddingBetweenElements+kStarViewHeight, self.bounds.size.width-kPaddingLeft-kPaddingRight, self.bounds.size.height-kPaddingTop-kPaddingBottom-kImageViewSizeHeight)];
+      //  detailSubtitleLabel = [[UILabel alloc]initWithFrame:CGRectMake(kPaddingLeft, kPaddingTop + kImageViewSizeHeight+kPaddingBetweenElements+kStarViewHeight, self.bounds.size.width-kPaddingLeft-kPaddingRight, self.bounds.size.height-kPaddingTop-kPaddingBottom-kImageViewSizeHeight)];
 
         detailTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(kImageViewSizeWidth+kPaddingLeft+kPaddingBetweenElements, kPaddingTop, self.bounds.size.width-kPaddingRight-kPaddingLeft-kImageViewSizeWidth-kPaddingBetweenElements, kImageViewSizeHeight)];
         detailImageView = [[UIImageView alloc] initWithFrame:CGRectMake(kPaddingLeft,kPaddingTop,kImageViewSizeWidth , kImageViewSizeHeight)];
-
+        [detailImageView setContentMode:UIViewContentModeScaleAspectFill];
+        [detailImageView setClipsToBounds:YES];
 
         containerView = [[UIView alloc]initWithFrame:CGRectMake(0, 0,kColorBarWidth, self.bounds.size.height-kCalloutArrowHeight)];
         containerView.backgroundColor = [UIColor redColor];
@@ -52,7 +53,7 @@
         maskLayer.path = maskPath.CGPath;
         containerView.layer.mask = maskLayer;
         
-        [detailTitleLabel setFont:[UIFont systemFontOfSize:17.0f]];
+        [detailTitleLabel setFont:[UIFont systemFontOfSize:15.0f]];
         [detailTitleLabel setTextColor:[UIColor whiteColor]];
         [detailTitleLabel setNumberOfLines:0];
         [detailTitleLabel setOpaque:YES];
@@ -64,10 +65,10 @@
         [detailSubtitleLabel setTextColor:[UIColor whiteColor]];
         [detailSubtitleLabel setBackgroundColor:[UIColor clearColor]];
         
-        [self addSubview:starview];
+//        [self addSubview:starview];
         [self addSubview:detailImageView];
         [self addSubview:detailTitleLabel];
-        [self addSubview:detailSubtitleLabel];
+//        [self addSubview:detailSubtitleLabel];
         [self addSubview:containerView];
 
     }

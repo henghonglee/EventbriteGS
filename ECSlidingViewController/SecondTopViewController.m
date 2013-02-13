@@ -14,19 +14,23 @@
 {
   [super viewWillAppear:animated];
   
-  if (![self.slidingViewController.underLeftViewController isKindOfClass:[MenuViewController class]]) {
+  if (![self.slidingViewController.underLeftViewController isKindOfClass:[UINavigationController class]]) {
     self.slidingViewController.underLeftViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"Menu"];
   }
   self.slidingViewController.underRightViewController = nil;
   self.slidingViewController.anchorLeftPeekAmount     = 0;
   self.slidingViewController.anchorLeftRevealAmount   = 0;
-  
   [self.view addGestureRecognizer:self.slidingViewController.panGesture];
 }
 
 - (IBAction)revealMenu:(id)sender
 {
-  [self.slidingViewController anchorTopViewTo:ECRight];
+    if (self.slidingViewController.underLeftShowing) {
+        [self.slidingViewController anchorTopViewTo:ECLeft];
+    }else{
+        [self.slidingViewController anchorTopViewTo:ECRight];
+    }
+
 }
 
 @end

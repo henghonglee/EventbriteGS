@@ -1,5 +1,8 @@
+#import "SVWebViewController.h"
+#import "SearchViewController.h"
 #import "GeoScrollViewController.h"
 #import <CoreLocation/CoreLocation.h>
+#import "CrumbObj.h"
 #import "GSObject.h"
 #import "GScursor.h"
 #import "SorterCell.h"
@@ -14,17 +17,20 @@
 #import "ViewController.h"
 #import "CircleLayout.h"
 #import "ShopDetailViewController.h"
+
 #define kMainFont [UIFont systemFontOfSize:25.0f]
 #define kCellHeightConstraint 260
+#define kCellSubtitleHeightConstraint 220
 #define kCellPaddingLeft 3
 #define kCellPaddingTop 3
 #define kCellColorBarWidth 11
 #define kStarLeftPadding 37
 #define kStarTopPadding 10+2
 #define kStarHeight 14.75
-#define kCellCornerRad 20.0
+#define kCellCornerRad 0.0
+#define IS_IPHONE_5 ( [ [ UIScreen mainScreen ] bounds ].size.height > 500 )
 @implementation GeoScrollViewController
-@synthesize  GSObjectArray, loadedGSObjectArray,currentSearch;
+@synthesize  scopedGSObjectArray,GSObjectArray, loadedGSObjectArray,currentSearch,userLocation;
 
 #pragma mark view load up and data preparation methods
 
@@ -40,88 +46,196 @@
 -(void)viewDidLoad
 {
     NSLog(@"viewdidload for geoscroll");
-   // [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(topDidAnchorRight ) name:ECSlidingViewTopDidAnchorRight object:nil];
-    
+    self.boolhash = [[NSMutableDictionary alloc] init];
     self.GSObjectArray = [[NSMutableArray alloc] init];
     self.loadedGSObjectArray = [[NSMutableArray alloc] init];
+    self.scopedGSObjectArray = [[NSMutableArray alloc] init];
     self.tableView = [[UITableView alloc]initWithFrame:self.view.bounds];
+    self.tableView.autoresizesSubviews = YES;
+    [self.tableView setAutoresizingMask:UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleLeftMargin];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     self.tableView.scrollsToTop = YES;
+    
     [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
     [self.tableView setBackgroundColor:[UIColor clearColor]];
+//    [self.tableView setBackgroundColor:[UIColor greenColor]];
     [self.view addSubview:self.tableView];
-    [self LoadData];
+    
+    
 }
--(void)LoadData
+
+-(void)viewDidAppear:(BOOL)animated
 {
-    [((UnderMapViewController*)self.slidingViewController.underRightViewController) dismissCallout];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         
-        //    dispatch_async(dispatch_get_current_queue(), ^{
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(topDidAnchorRight ) name:ECSlidingViewTopDidAnchorRight object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underLeftWillDisappear) name:ECSlidingViewUnderLeftWillDisappear object:nil];
-        
-        NSString * dbFile = [[NSBundle mainBundle] pathForResource:@"lovesgfood" ofType:@"json"];
-        NSString * contents = [NSString stringWithContentsOfFile:dbFile encoding:NSASCIIStringEncoding error:nil];
-        NSData* filedata = [contents dataUsingEncoding:NSUTF8StringEncoding];
-//        
-//        [self processData:filedata];
-//        
-        dbFile = [[NSBundle mainBundle] pathForResource:@"ladyic" ofType:@"json"];
-        contents = [NSString stringWithContentsOfFile:dbFile encoding:NSASCIIStringEncoding error:nil];
-        filedata = [contents dataUsingEncoding:NSUTF8StringEncoding];
-        
-        [self processData:filedata];
-//
-//        dbFile = [[NSBundle mainBundle] pathForResource:@"ieat" ofType:@"json"];
-//        contents = [NSString stringWithContentsOfFile:dbFile encoding:NSASCIIStringEncoding error:nil];
-//        
-//        filedata = [contents dataUsingEncoding:NSUTF8StringEncoding];
-//        
-//        [self processData:filedata];
-
-//        dbFile = [[NSBundle mainBundle] pathForResource:@"testing" ofType:@"json"];
-//        contents = [NSString stringWithContentsOfFile:dbFile encoding:NSASCIIStringEncoding error:nil];
-//        
-//        filedata = [contents dataUsingEncoding:NSUTF8StringEncoding];
-//        
-//        [self processData:filedata];
-        
-        [self prepareDataForDisplay];
+        [self LoadData];
         
     });
+}
+
+-(void)didRefreshTable:(id)sender
+{
+    
+//,@"DANIEL'S FOOD DIARY",@"KEROPOKMAN"
+        NSArray* menuItems = [NSArray arrayWithObjects:@"IEATISHOOTIPOST",@"LADY IRON CHEF",@"LOVE SG FOOD",@"SGFOODONFOOT",@"DANIEL FOOD DIARY", nil];
+
+        NSMutableArray* delarray = [[NSMutableArray alloc]init];
+        for (NSString* blog in menuItems) {
+
+            
+            if([[[NSUserDefaults standardUserDefaults] objectForKey:blog] isEqualToString:@"Enabled"])
+            {
+                if (![[self.boolhash objectForKey:blog] isEqualToString:@"Enabled"])
+                {
+                            [self retrieveAndProcessDataFromCacheOrServerForBlog:blog];
+                            [self.boolhash setObject:@"Enabled" forKey:blog];
+                            [self prepareDataForDisplay];                            
+                }
+                
+            }else{
+                
+                if ([[self.boolhash objectForKey:blog] isEqualToString:@"Enabled"])
+                {
+                    
+                    for (GSObject* gsobj in self.loadedGSObjectArray) {
+                        if ([gsobj.source isEqualToString:blog]) {
+                            [delarray addObject:gsobj];
+                        }
+                    }
+                    [self.boolhash setObject:@"Disabled" forKey:blog];
+                    for (GSObject* delgs in delarray) {
+                        [self.loadedGSObjectArray removeObject:delgs];
+                    }
+                    [self prepareDataForDisplay];
+                }
+            }
+        }
+
+
+    
+}
+
+-(void)retrieveAndProcessDataFromCacheOrServerForBlog:(NSString*)blog
+{
+
+ 
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        NSString *yourArrayFileName = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.dat",blog]];
+        NSError* error = nil;
+        NSData* data = [NSData dataWithContentsOfFile:yourArrayFileName options:NSDataReadingMappedIfSafe error:&error];
+        if (error)
+        {
+            NSLog(@"error = %@",error);
+            //if error get from main bundle .. means first launch
+            NSString* dbFile = [[NSBundle mainBundle] pathForResource:[NSString stringWithFormat:@"%@",blog] ofType:@"dat"];
+            NSData* filedata = [NSData dataWithContentsOfFile:dbFile options:NSDataReadingMappedIfSafe error:&error];
+            NSArray *archivedArray = [NSKeyedUnarchiver unarchiveObjectWithData:filedata];
+            [self processData:archivedArray];
+        }
+        else
+        {
+            NSArray *archivedArray = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+            NSLog(@"got data from file %@",yourArrayFileName);
+            [self processData:archivedArray];
+            
+        }
+        
+        
+        
+        
+            NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://tastebudsapp.herokuapp.com/items?source=%@",[blog stringByReplacingOccurrencesOfString:@" " withString:@"%20"]]];
+                          NSLog(@"url = %@",url);
+            NSURLRequest *request = [NSURLRequest requestWithURL:url];
+            AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+                NSLog(@"recieved response json");
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+                    NSString *dataArrayName;
+                    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+                    NSString *documentsDirectory = [paths objectAtIndex:0];
+                    dataArrayName = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.dat",blog]];
+                                        
+                    NSData *retrieveddata = [NSKeyedArchiver archivedDataWithRootObject:JSON];
+                    if (![retrieveddata isEqualToData:data]){
+                        [retrieveddata writeToFile:yourArrayFileName atomically:YES];
+                        [[self class]addSkipBackupAttributeToItemAtURL:[NSURL fileURLWithPath:dataArrayName]];
+                        NSLog(@"wrotedata to file %@",dataArrayName);
+                        
+                    }else{
+                        NSLog(@"data is duplicate, not saved");
+                    }
+                });
+                
+            } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+                NSLog(@"failed with error = %@",error);
+                
+            }];
+            [operation start];
+         
+}
+
+
+-(void)LoadData
+{
+        
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(topDidAnchorRight ) name:ECSlidingViewTopDidAnchorRight object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underLeftWillDisappear) name:ECSlidingViewUnderLeftWillDisappear object:nil];
+    
+        [self didRefreshTable:nil];
+    
 }
 
 -(void)prepareDataForDisplay
 {
-    if(userLocation)
-    {
-        [self sortLoadedArray:self.loadedGSObjectArray ByVariable:@"distanceInMeters" IntoArray:self.GSObjectArray ascending:YES];
+    @synchronized(self.loadedGSObjectArray) {
+        NSLog(@"runnign");
+        if(userLocation)
+        {
+            self.loadedGSObjectArray = [self sortLoadedArray:self.loadedGSObjectArray ByVariable:@"distanceInMeters" ascending:YES];
+        }
+        MKCoordinateRegion region = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView.region;
+        [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:currentSearch IntoArray:self.GSObjectArray WithRefresh:YES];
     }
-    NSLog(@"%d entries",self.loadedGSObjectArray.count);
 
+   
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         self.tableView.frame = self.view.bounds;
         [self.tableView reloadData];
-        int64_t delayInSeconds = 2.0;
-        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
-        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-            
-            MKCoordinateRegion region = ((UnderMapViewController*)self.slidingViewController.underLeftViewController).mapView.region;
-            [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:@"" IntoArray:self.GSObjectArray WithRefresh:YES];
-        });
+        if ([[UIDevice currentDevice] systemVersion].floatValue < 6.0) {
+            int64_t delayInSeconds = 2.0;
+            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+            dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+                MKCoordinateRegion region = ((UnderMapViewController*)self.slidingViewController.underLeftViewController).mapView.region;
+                
+                    [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:@"" IntoArray:self.GSObjectArray WithRefresh:YES];
+                       NSLog(@"loading completed");
+                    if(userLocation)
+                    {
+                        self.GSObjectArray = [self sortLoadedArray:self.GSObjectArray ByVariable:@"distanceInMeters" ascending:YES];
+                    }
+                    [self.tableView reloadData];
+                    MTStatusBarOverlay *overlay = [MTStatusBarOverlay sharedInstance];
+                    [overlay postImmediateFinishMessage:[NSString stringWithFormat:@"Found %d Entries",self.loadedGSObjectArray.count] duration:2.0 animated:YES];
+                    [self updateOverlay];
+                
+            });
+        }
+        else
+        {
+            MTStatusBarOverlay *overlay = [MTStatusBarOverlay sharedInstance];
+            [overlay postImmediateFinishMessage:[NSString stringWithFormat:@"Found %d Entries",self.loadedGSObjectArray.count] duration:2.0 animated:YES];
+            [self updateOverlay];
+        }
+        
     });
+
 
 }
 -(void)processData:(id)data
 {
     if (data==nil)return;
-    NSMutableArray* dataArray = [[NSMutableArray alloc]init];
-    dataArray = [NSJSONSerialization
-                 JSONObjectWithData:data
-                 options:kNilOptions
-                 error:nil];
+    NSMutableArray* dataArray = [[NSMutableArray alloc]initWithArray:data];
     
     for (NSDictionary* dataObject in dataArray) {
         GSObject *gsObject = [[GSObject alloc] init];
@@ -136,14 +250,15 @@
             
             gsObject.title = [dataObject objectForKey:@"title"];
             gsObject.subTitle = [dataObject objectForKey:@"subtitle"];
+            gsObject.locationString = [dataObject objectForKey:@"location"];
+            gsObject.link = [dataObject objectForKey:@"link"];
+            gsObject.itemId = [NSNumber numberWithInt:[[dataObject objectForKey:@"id"] intValue]];
             CGSize s = [gsObject.title sizeWithFont:[UIFont systemFontOfSize:25.0f] constrainedToSize:CGSizeMake(kCellHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
             
-            gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + 10)];
-            gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + 10)];//padding btw star
             gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + MAX(30,s.height))];
             
             gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + 2)];//padding btw title and subtitle;
-            CGSize x = [gsObject.subTitle sizeWithFont:[UIFont systemFontOfSize:12.0f] constrainedToSize:CGSizeMake(kCellHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
+            CGSize x = [gsObject.subTitle sizeWithFont:[UIFont systemFontOfSize:12.0f] constrainedToSize:CGSizeMake(kCellSubtitleHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
             
             gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + MAX(30,x.height))];
             gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + 10)];
@@ -151,38 +266,44 @@
             gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + 2)];//padding btw title and subtitle;
             gsObject.descriptionhtml = [dataObject objectForKey:@"descriptionHTML"];
             gsObject.source = [dataObject objectForKey:@"source"];
-            if ([[dataObject objectForKey:@"source"] isEqualToString:@"Lady Iron Chef"]) {
+            if ([[dataObject objectForKey:@"source"] isEqualToString:@"LADY IRON CHEF"]) {
                 gsObject.cursorColor = [UIColor blueColor]; //lady iron chef
-            }else if ([[dataObject objectForKey:@"source"] isEqualToString:@"ieatishootipost"]) {
+            }else if ([[dataObject objectForKey:@"source"] isEqualToString:@"IEATISHOOTIPOST"]) {
                 gsObject.cursorColor = [UIColor redColor];//ieat
+            }else if ([[dataObject objectForKey:@"source"] isEqualToString:@"DANIEL FOOD DIARY"]){
+                gsObject.cursorColor = [UIColor magentaColor];
+            }else if ([[dataObject objectForKey:@"source"] isEqualToString:@"KEROPOKMAN"]){
+                gsObject.cursorColor = [UIColor greenColor];
+            }else if ([[dataObject objectForKey:@"source"] isEqualToString:@"LOVE SG FOOD"]){
+                    gsObject.cursorColor = [UIColor cyanColor];
             }else{
-                gsObject.cursorColor = [UIColor blackColor]; //lovesgfood                
+                gsObject.cursorColor = [UIColor darkTextColor]; //lovesgfood
+                
+            }            
+        }
+
+        if ([[dataObject objectForKey:@"images"] isEqual:[NSNull null]])
+        {
+            gsObject.imageArray = [NSArray array];
+        }
+        else
+        {
+            if (![[dataObject objectForKey:@"images"] isKindOfClass:[NSString class]]) {
+                gsObject.imageArray = [NSArray arrayWithArray:[dataObject objectForKey:@"images"]];
+            }else{
+                 gsObject.imageArray = [NSArray array];
             }
             
 
-            
         }
-        if ([[dataObject objectForKey:@"image"] isEqual:[NSNull null]])
+        
+        if ([[dataObject objectForKey:@"foodtype"] isKindOfClass:[NSString class]])
         {
-            continue;
-        }
-        else
-        {
-            gsObject.imageArray = [NSArray arrayWithArray:[dataObject objectForKey:@"image"]];
-        }
-        if ([[dataObject objectForKey:@"description"] isEqual:[NSNull null]])
-        {
-            continue;
+            gsObject.foodTypeArray = [NSArray array];
         }
         else
         {
-            NSString* descarray = [[NSString alloc]init];
-            for (NSString* desc in [dataObject objectForKey:@"description"]) {
-                descarray = [descarray stringByAppendingString:[NSString stringWithFormat:@"%@\n",desc]];
-            }
-            gsObject.description = descarray;
-            
-            
+            gsObject.foodTypeArray = [NSArray arrayWithArray:[dataObject objectForKey:@"foodtype"]];
         }
         
         if ([[dataObject objectForKey:@"latitude"] isEqual:[NSNull null]] || [[dataObject objectForKey:@"longitude"] isEqual:[NSNull null]])
@@ -193,7 +314,6 @@
         
         gsObject.latitude =[NSNumber numberWithDouble: [[dataObject objectForKey:@"latitude"] doubleValue]];
         gsObject.longitude =[NSNumber numberWithDouble:[[dataObject objectForKey:@"longitude"] doubleValue]];
-        
         [self.loadedGSObjectArray addObject:gsObject];
     }
         
@@ -237,6 +357,8 @@
             for (GSObject* gsObj in loadedArray)
             {
                 CLLocation *gsLoc = [[CLLocation alloc] initWithLatitude:gsObj.latitude.doubleValue longitude:gsObj.longitude.doubleValue];
+#warning check this
+//                NSLog(@"user loc = %@, %@",userLocation,userLocation.location);
                 CLLocationDistance meters = [gsLoc distanceFromLocation:userLocation.location];
                 [gsObj setDistanceInMeters:[NSNumber numberWithDouble:meters]];
             }
@@ -257,25 +379,27 @@
     //adjust points to scope
     MKCoordinateRegion region = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView.region;
     [self recalculateScopeFromLoadedArray:loadedArray WithRegion:region AndSearch:currentSearch IntoArray:resultArray WithRefresh:YES];
+
 }
 
 //sorts both loaded and display arrays by gsobject variable
--(void)sortLoadedArray:(NSMutableArray*)loadedArray andArray:(NSMutableArray*)resultArray ByVariable:(NSString*)variable  ascending:(BOOL)ascending
+-(NSMutableArray*) sortLoadedArray:(NSMutableArray*)loadedArray ByVariable:(NSString*)variable  ascending:(BOOL)ascending
 {
     if ([variable isEqualToString:@"distanceInMeters"]) {
         currentScopeType = kScopeTypeDistance;
-        if (userLocation) {
+        if (userLocation ) {
             for (GSObject* gsObj in loadedArray)
             {
+//                NSLog(@"gsObj.distanceInMeters.doubleValue = %f",gsObj.distanceInMeters.doubleValue);
+                if (!(gsObj.distanceInMeters.doubleValue > 0)) {
                 CLLocation *gsLoc = [[CLLocation alloc] initWithLatitude:gsObj.latitude.doubleValue longitude:gsObj.longitude.doubleValue];
-                CLLocationDistance meters = [gsLoc distanceFromLocation:userLocation.location];
-                [gsObj setDistanceInMeters:[NSNumber numberWithDouble:meters]];
-            }
-            for (GSObject* gsObj in resultArray)
-            {
-                CLLocation *gsLoc = [[CLLocation alloc] initWithLatitude:gsObj.latitude.doubleValue longitude:gsObj.longitude.doubleValue];
-                CLLocationDistance meters = [gsLoc distanceFromLocation:userLocation.location];
-                [gsObj setDistanceInMeters:[NSNumber numberWithDouble:meters]];
+//                    if (![gsLoc isEqual:[NSNull null]] && ![userLocation.location isEqual:[NSNull null]]) {
+//                        CLLocationDistance meters = [gsLoc distanceFromLocation:userLocation.location];
+//                        [gsObj setDistanceInMeters:[NSNumber numberWithDouble:meters]];
+//                    }else{
+                        [gsObj setDistanceInMeters:[NSNumber numberWithDouble:99999]];
+//                    }
+                }
             }
         }
     }else if([variable isEqualToString:@"likes"]){
@@ -288,14 +412,8 @@
     [[NSSortDescriptor alloc] initWithKey:variable
                                 ascending:ascending] ;
     NSArray * descriptors = [NSArray arrayWithObjects:frequencyDescriptor, nil];
-    NSArray * sortedArray = [loadedArray sortedArrayUsingDescriptors:descriptors];
-    [loadedArray removeAllObjects];
-    [loadedArray addObjectsFromArray:sortedArray];
-    
-    NSArray * sortedResultArray = [resultArray sortedArrayUsingDescriptors:descriptors];
-    [resultArray removeAllObjects];
-    [resultArray addObjectsFromArray:sortedResultArray];
-    //adjust points to scope
+   return [NSMutableArray arrayWithArray:[loadedArray sortedArrayUsingDescriptors:descriptors]];
+
     
 }
 
@@ -303,7 +421,7 @@
 //calculates scope and updates loaded array into display array , when region is omitted, all data is used.
 -(void)recalculateScopeFromLoadedArray:(NSMutableArray*)loadedArray WithRegion:(MKCoordinateRegion)region AndSearch:(NSString*)search IntoArray:(NSMutableArray*)resultArray WithRefresh:(BOOL)refresh
 {
-
+    self.random = NO;
         [resultArray removeAllObjects];
         MKMapView* map = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
         if (search.length > 0){//remove all annotations
@@ -325,12 +443,12 @@
                     {
                         //NOOP
                     }else{
-                        [map removeAnnotation:annnote];  // remove any annotations that exist
+                     //   [map removeAnnotation:annnote];  // remove any annotations that exist
                     }
                 }
             }
         }
-    @synchronized(loadedArray){
+//    @synchronized(loadedArray){
         if (refresh) {
             if (((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs){
             [map removeOverlays:map.overlays];
@@ -339,45 +457,48 @@
             }
         }
     
+        
+        
         for (GSObject* gsObj in loadedArray)
         {
             if (search.length > 0)
             {
-                
-                if([search caseInsensitiveCompare:gsObj.title] == NSOrderedSame || [gsObj.title rangeOfString:search options:NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch].location != NSNotFound)
+                //first find out if its a location
+                NSArray* searchterms = [search componentsSeparatedByString:@"+"];
+
+                for (NSString* term in searchterms)
                 {
-                    if([self coordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) ContainedinRegion:region])
+                    if ([term rangeOfString:@"addr="].location!=NSNotFound)
                     {
-                        [resultArray addObject:gsObj];
+                        if (searchterms.count == 1)
+                        {
+                            //address is the only one found , as long as entries are within just add them to the gsobjectarray
+                            [self updateCrumbsWithGsObject:gsObj IntoResultArray:resultArray withMap:map andRegion:region];
+                            continue;
+                        }
                     }
                     
-                    if (!((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs)
+                    //find gsobjects which match searches
+                    if(([term caseInsensitiveCompare:gsObj.title] == NSOrderedSame || [gsObj.title rangeOfString:term options:NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch].location != NSNotFound))
                     {
-                        ((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs = [[CrumbPath alloc] initWithCenterCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue)];
-                        [map addOverlay:((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs];
-                        
+                        [self updateCrumbsWithGsObject:gsObj IntoResultArray:resultArray withMap:map andRegion:region];
                     }
-                    if (map.overlays.count == 0) {
-                        [map addOverlay:((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs];
-                    }
-                    MKMapRect updateRect = [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs addCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) withColor:gsObj.cursorColor];
+                    else 
+                    {
+                        if ([gsObj.foodTypeArray containsObject:term]) {
+                            [self updateCrumbsWithGsObject:gsObj IntoResultArray:resultArray withMap:map andRegion:region];                            
+                        }
                     
-                    if (!MKMapRectIsNull(updateRect))
-                    {
-                        MKZoomScale currentZoomScale = (CGFloat)(map.bounds.size.width / map.visibleMapRect.size.width);
-                        CGFloat lineWidth = MKRoadWidthAtZoomScale(currentZoomScale);
-                        updateRect = MKMapRectInset(updateRect, -lineWidth, -lineWidth);
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbView setNeedsDisplayInMapRect:updateRect];
-                        });
                     }
                 }
             }
             else
             {
+
                 if (refresh)
                 {
-                    if (!((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs)
+
+                        if (!((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs)
                         {
                             NSLog(@"alloc crumbpath");
                             ((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs = [[CrumbPath alloc] initWithCenterCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue)];
@@ -388,6 +509,7 @@
                             NSLog(@"adding overlay");
                             [map addOverlay:((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs];
                         }
+                    
                         MKMapRect updateRect = [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs addCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) withColor:gsObj.cursorColor];
                         
                         if (!MKMapRectIsNull(updateRect))
@@ -399,35 +521,63 @@
                             CGFloat lineWidth = MKRoadWidthAtZoomScale(currentZoomScale);
                             updateRect = MKMapRectInset(updateRect, -lineWidth, -lineWidth);
                             // Ask the overlay view to update just the changed area.
-                            dispatch_async(dispatch_get_main_queue(), ^{
-                            [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbView setNeedsDisplayInMapRect:updateRect];
-                                
-                                
+                                dispatch_async(dispatch_get_main_queue(), ^
+                                {
+                                        [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbView setNeedsDisplayInMapRect:updateRect];
+                                        // move the map alittle
+                                        MKMapView* underMapView = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
+                                        [underMapView setVisibleMapRect:MKMapRectInset([underMapView visibleMapRect], [underMapView visibleMapRect].size.width*0.005, [underMapView visibleMapRect].size.height*0.005) animated:YES];
                                 });
                         }
                 }
+
                 if([self coordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) ContainedinRegion:region])
                 {
-                    [resultArray addObject:gsObj];
                     
+                    [resultArray addObject:gsObj];
                 }
             
             }
         }
-            if (refresh||search.length>0) {
-                int64_t delayInSeconds = 0.0;
-                dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
-                dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-                    //MKCoordinateRegion currentRegion= MKCoordinateRegionForMapRect(map.visibleMapRect);
-                    
-                    MKCoordinateRegion targetRegion= MKCoordinateRegionForMapRect(MKMapRectInset(map.visibleMapRect, map.visibleMapRect.size.width*0.005, map.visibleMapRect.size.height*0.005));
-                    
-                    //MKZoomScale currentZoomScale = (CGFloat)(map.bounds.size.width / map.visibleMapRect.size.width);
-                    //NSLog(@"current zoom scale = %f",currentZoomScale);
-                    [map setRegion:targetRegion animated:NO];
-                });
-            }
+    dispatch_async(dispatch_get_main_queue(), ^
+    {
+        NSLog(@"dismissing progress hud");
+        [SVProgressHUD dismiss];
+    });
+}
 
+-(void)updateCrumbsWithGsObject:(GSObject*)gsObj IntoResultArray:(NSMutableArray*)resultArray withMap:(MKMapView*)map andRegion:(MKCoordinateRegion)region
+{
+    if (![resultArray containsObject:gsObj]) {
+        if([self coordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) ContainedinRegion:region])
+        {
+            [resultArray addObject:gsObj];
+        }
+        [scopedGSObjectArray addObject:gsObj];
+        
+        //if crumbs not present, add one
+        if (!((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs)
+        {
+            ((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs = [[CrumbPath alloc] initWithCenterCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue)];
+            [map addOverlay:((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs];
+            
+        }
+        
+        if (map.overlays.count == 0) {
+            [map addOverlay:((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs];
+        }
+        
+        MKMapRect updateRect = [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs addCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) withColor:gsObj.cursorColor];
+        
+        if (!MKMapRectIsNull(updateRect))
+        {
+            MKZoomScale currentZoomScale = (CGFloat)(map.bounds.size.width / map.visibleMapRect.size.width);
+            CGFloat lineWidth = MKRoadWidthAtZoomScale(currentZoomScale);
+            updateRect = MKMapRectInset(updateRect, -lineWidth, -lineWidth);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbView setNeedsDisplayInMapRect:updateRect];
+            });
+        }
     }
 }
 
@@ -492,13 +642,13 @@
 }
 -(void)topDidAnchorLeft
 {
-    NSLog(@"top did anchor left");
+
     MKMapView* underMapView = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
     for (id annnote in underMapView.annotations) {
         if ([annnote isKindOfClass:[MKUserLocation class]] || [annnote isKindOfClass:[GScursor class]]) {
             //NOOP
         }else{
-            NSLog(@"selecting annotation");
+
             [underMapView selectAnnotation:annnote animated:YES];
         }
     }
@@ -526,8 +676,17 @@
 }
 -(void)underLeftWillDisappear
 {
-//    NSLog(@"underLeftWillDisAppear");
-//    
+    NSLog(@"underLeftWillDisAppear");
+    if (self.selectionChanged) {
+        self.selectionChanged=NO;
+        [self didRefreshTable:nil];
+    }
+    
+
+
+    
+    
+    
 //    for (UIGestureRecognizer* gr in self.view.gestureRecognizers) {
 //        [self.view removeGestureRecognizer:gr];
 //    }
@@ -558,14 +717,8 @@
             oldRegion = newRegion;
             //TODO: here we still need to crawl more data
         }
-        for (id annnote in underMapView.annotations) {
-            if ([annnote isKindOfClass:[MKUserLocation class]] || [annnote isKindOfClass:[GScursor class]]) {
-                //NOOP
-            }else{
-                [underMapView deselectAnnotation:annnote animated:YES];
-                
-            }
-        }
+        
+
         
         
         //here we recalculate using span and find out which data sets sit in the map enclosed.
@@ -573,16 +726,14 @@
             
             MKCoordinateRegion region = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView.region;
             [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:currentSearch IntoArray:self.GSObjectArray WithRefresh:NO];
-            
-            
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            dispatch_async(dispatch_get_main_queue(), ^{
                 [self.tableView reloadData];
-                MKMapView* underMapView = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
                 for (id annnote in underMapView.annotations) {
+                    NSLog(@"annotate = %@, %@",NSStringFromClass([annnote class]),((GSObject*)annnote).title);
                     if ([annnote isKindOfClass:[MKUserLocation class]] || [annnote isKindOfClass:[GScursor class]]) {
                         //NOOP
                     }else{
-                        //keep focus on the prev selected object
+                        //[underMapView deselectAnnotation:annnote animated:YES];
                         if ([self.GSObjectArray containsObject:annnote]) {
                             [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:[self.GSObjectArray indexOfObject:annnote]+1 inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
                             for (UITableViewCell* tablecell in [self.tableView visibleCells]) {
@@ -592,12 +743,18 @@
                             [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
                             
                         }
+                        
                     }
+                    
                 }
-                
+                    MTStatusBarOverlay *overlay = [MTStatusBarOverlay sharedInstance];
+                    [overlay postImmediateFinishMessage:[NSString stringWithFormat:@"Found %d Entries",self.GSObjectArray.count] duration:2.0 animated:YES];
+                    [self updateOverlay];
             });
             
         });
+        
+        
    
     }
 //    else{
@@ -611,7 +768,9 @@
 
 -(void)didScrollToEntryAtIndex:(int)idx
 {
-    
+    if (self.random) {
+        idx = self.randomIndex;
+    }
     MKMapView* underMapView = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
     for (id annnote in underMapView.annotations) {
         if ([annnote isKindOfClass:[MKUserLocation class]] || [annnote isKindOfClass:[GScursor class]]) {
@@ -621,6 +780,7 @@
         }
     }
     [underMapView addAnnotation:[self.GSObjectArray objectAtIndex:idx]];
+    [((UnderMapViewController*)self.slidingViewController.underRightViewController) willAnimateRotationToInterfaceOrientation:self.interfaceOrientation duration:0];
 }
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView
@@ -634,79 +794,222 @@
     NSLog(@"shoudl scroll to top");
     return YES;
 }
+
+-(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{
+    [self scrollViewDidEndDecelerating:scrollView];
+}
+-(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    //TODO: animate pin here!
+    MKMapView* underMapView = ((MKMapView*)((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView);
+    for (id annote in underMapView.annotations) {
+        if ([annote isKindOfClass:[GSObject class]]) { //should only have one
+            MKAnnotationView*annView = [underMapView viewForAnnotation:annote];
+            [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                CATransform3D zRotation;
+                zRotation = CATransform3DMakeRotation(M_PI/10, 0, 0, 1.0);
+                annView.layer.transform = zRotation;
+                
+            }completion:^(BOOL finished) {
+                [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                    CATransform3D zRotation;
+                    zRotation = CATransform3DMakeRotation(-M_PI/10, 0, 0, 1.0);
+                    annView.layer.transform = zRotation;
+                    
+                }completion:^(BOOL finished) {
+                    [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                        CATransform3D zRotation;
+                        zRotation = CATransform3DMakeRotation(M_PI/12, 0, 0, 1.0);
+                        annView.layer.transform = zRotation;
+                        
+                    }completion:^(BOOL finished) {
+                        [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                            CATransform3D zRotation;
+                            zRotation = CATransform3DMakeRotation(-M_PI/12, 0, 0, 1.0);
+                            annView.layer.transform = zRotation;
+                            
+                        }completion:^(BOOL finished) {
+                            [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                                CATransform3D zRotation;
+                                zRotation = CATransform3DMakeRotation(0, 0, 0, 1.0);
+                                annView.layer.transform = zRotation;
+                                
+                            }completion:^(BOOL finished) {
+                                
+                            }];
+                        }];
+                    }];
+                }];
+            }];
+            
+        }
+    }
+    
+}
+
+
+
 #pragma mark - Search Bar Delegates
 
--(void)searchBar:(UISearchBar *)searchBar selectedScopeButtonIndexDidChange:(NSInteger)selectedScope
-{
-    if (selectedScope == kScopeTypeDistance)
-    {
-        [self sortLoadedArray:self.loadedGSObjectArray andArray:self.GSObjectArray ByVariable:@"distanceInMeters" ascending:YES];
-        [self.tableView reloadData];
-        if ([self.GSObjectArray count]>0)
-        {
-            [self didScrollToEntryAtIndex:0];
-        }
-    }else if(selectedScope == kScopeTypeLikes){
-        [self sortLoadedArray:self.loadedGSObjectArray andArray:self.GSObjectArray ByVariable:@"likes" ascending:NO];
-        [self.tableView reloadData];
-        if ([self.GSObjectArray count]>0)
-        {
-            [self didScrollToEntryAtIndex:0];
-        }
 
-    }else if(selectedScope == kScopeTypeDeals){
-        [self sortLoadedArray:self.loadedGSObjectArray andArray:self.GSObjectArray ByVariable:@"dealCount" ascending:NO];
-        [self.tableView reloadData];
-        if ([self.GSObjectArray count]>0)
-        {
-            [self didScrollToEntryAtIndex:0];
-        }
-        
-    }
-}
--(void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
+
+-(BOOL)textFieldShouldBeginEditing:(UITextField *)textField
 {
-    [searchBar resignFirstResponder];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        currentSearch = searchBar.text;
+        self.random = NO;
+        SearchViewController * searchViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"Search"];
+        searchViewController.delegate = self;
+        searchViewController.dataArray = self.loadedGSObjectArray;
         MKCoordinateRegion region = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView.region;
-        [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:currentSearch IntoArray:self.GSObjectArray WithRefresh:YES];
-        //TODO: should zoom to a level to contain all searches
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.tableView reloadData];
-            if ([self.GSObjectArray count]>0) {[self didScrollToEntryAtIndex:0];}
-        });
-        
-    });
-}
+        searchViewController.searchRegion = region;
+        [searchViewController.underMapView setRegion:region animated:NO];
+        [self.navigationController pushViewController:searchViewController animated:YES];
+        return NO;
 
-- (void)searchBarCancelButtonClicked:(UISearchBar *) aSearchBar
+}
+-(void)searchViewControllerDidFinishWithSearchString:(NSString *)searchString
 {
-    currentSearch = @"";
-    aSearchBar.text = @"";
-    [aSearchBar resignFirstResponder];
-	MKCoordinateRegion region = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView.region;
-//    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:currentSearch IntoArray:self.GSObjectArray WithRefresh:YES];
+    NSLog(@"searchString = %@",searchString);
+    ((SorterCell*)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]]).searchTextField.text = searchString;
+    [self textFieldShouldReturn:((SorterCell*)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]]).searchTextField];
+}
+-(BOOL)textFieldShouldReturn:(UITextField *)textField{
+    [scopedGSObjectArray removeAllObjects];
+    if (textField.text.length > 0) {
+        MTStatusBarOverlay *overlay = [MTStatusBarOverlay sharedInstance];
+        overlay.progress = 1.0;
+        [overlay postMessage:[NSString stringWithFormat:@"Current Search: %@",textField.text] animated:YES];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            currentSearch = textField.text;
+            
+            if (currentSearch.length>0) {
+                NSArray* searchterms = [currentSearch componentsSeparatedByString:@"+"];
+                
+                for (NSString* term in searchterms) {
+                    NSLog(@"term - %@",term);
+                    if ([term rangeOfString:@"addr="].location!=NSNotFound) {
+                        //reverse geocode
+                        if (!self.geocoder) {
+                            self.geocoder = [[CLGeocoder alloc] init];
+                        }
+                        NSString* searchaddress;
+                        searchaddress = [[term stringByReplacingOccurrencesOfString:@"addr=" withString:@""] stringByAppendingString:@" Singapore"];
+                        NSLog(@"found addr %@",searchaddress);
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            textField.text = @"";
+                            currentSearch = @"";
+                            MTStatusBarOverlay *overlay = [MTStatusBarOverlay sharedInstance];
+                            overlay.animation = MTStatusBarOverlayAnimationFallDown;
+                            
+                            [overlay postImmediateFinishMessage:@"Cleared" duration:1.0 animated:YES];
+                            
+                        });
+                        [self.geocoder geocodeAddressString:searchaddress completionHandler:^(NSArray *placemarks, NSError *error) {
+                            NSLog(@"geocoder returned");
+                            if ([placemarks count] > 0) {
+                                CLPlacemark *placemark = [placemarks objectAtIndex:0];
+                                NSLog(@"found geocode at %@",placemark);
+
+                                //remember and apply at end
+                                self.shouldZoomToLocation = [[CLLocation alloc]initWithLatitude:placemark.location.coordinate.latitude longitude:placemark.location.coordinate.longitude];
+                                [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:MKCoordinateRegionMake(self.shouldZoomToLocation.coordinate, MKCoordinateSpanMake(0.005, 0.005)) AndSearch:currentSearch IntoArray:self.GSObjectArray WithRefresh:YES];
+
+                                dispatch_async(dispatch_get_main_queue(), ^{
+
+                                    [((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView setRegion:MKCoordinateRegionMake(self.shouldZoomToLocation.coordinate, MKCoordinateSpanMake(0.005, 0.005)) animated:YES];
+                                    
+                                    [self.tableView reloadData];
+                                    
+                                    
+                                    if ([self.GSObjectArray count]>0) {[self didScrollToEntryAtIndex:0];}
+                                    MTStatusBarOverlay *overlay = [MTStatusBarOverlay sharedInstance];
+                                    [overlay postImmediateFinishMessage:[NSString stringWithFormat:@"Found %d Entries",self.GSObjectArray.count] duration:2.0 animated:YES];
+                                    [self updateOverlay];
+                                    
+                                });
+
+                                
+                            }else{
+                                NSLog(@"couldnt find location");
+                                UIAlertView* alert = [[UIAlertView alloc]initWithTitle:@"Sorry!" message:[NSString stringWithFormat:@"We couldn't find %@",searchaddress] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                                [alert show];
+
+                            }
+                        }];
+                    }else{
+                        MKCoordinateRegion region = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView.region;
+                        [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:currentSearch IntoArray:self.GSObjectArray WithRefresh:YES];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (self.scopedGSObjectArray.count == 1) {
+                                MKMapView* underMapView = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
+                                for (GSObject* gsObj in scopedGSObjectArray) {
+                                    [underMapView setRegion:MKCoordinateRegionMake(CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue), MKCoordinateSpanMake(0.05, 0.05)) animated:YES];
+                                }
+                                [self.GSObjectArray removeAllObjects];
+                                [self.GSObjectArray addObjectsFromArray:self.scopedGSObjectArray];
+                            }
+                            [self.tableView reloadData];
+                            
+                            
+                            if ([self.GSObjectArray count]>0) {[self didScrollToEntryAtIndex:0];}
+                            MTStatusBarOverlay *overlay = [MTStatusBarOverlay sharedInstance];
+                            [overlay postImmediateFinishMessage:[NSString stringWithFormat:@"Found %d Entries",self.GSObjectArray.count] duration:2.0 animated:YES];
+                            [self updateOverlay];
+                            
+                        });
+                    }
+                }
+            }
+            
+        });
+
+    }else{
+        currentSearch = @"";
+        textField.text = @"";
+
+        [textField resignFirstResponder];
+        MTStatusBarOverlay *overlay = [MTStatusBarOverlay sharedInstance];
+        overlay.animation = MTStatusBarOverlayAnimationFallDown;
+        
+        [overlay postImmediateFinishMessage:@"Cleared" duration:1.0 animated:YES];
+        
+        MKCoordinateRegion region = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView.region;
+        [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:@"" IntoArray:self.GSObjectArray WithRefresh:YES];
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.tableView reloadData];
             if ([self.GSObjectArray count]>0) {[self didScrollToEntryAtIndex:0];}
+            
+            MTStatusBarOverlay *overlay = [MTStatusBarOverlay sharedInstance];
+            [overlay postImmediateFinishMessage:[NSString stringWithFormat:@"Found %d Entries",self.GSObjectArray.count] duration:2.0 animated:YES];
+            [self updateOverlay];
         });
-    //});
-}
 
+    }
+    return YES;
+}
 #pragma mark - Table View
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
 
     if ([GSObjectArray count]>0) {
+        if (self.random) {
+            return 3;
+        }
         return [GSObjectArray count]+2;
     }
     return 2;
     
 }
-
+-(void)calculateRandom
+{
+    self.random = !self.random;
+    self.randomIndex = rand() % self.GSObjectArray.count;
+    [self.tableView reloadData];
+    if (self.random) {
+        [self scrollViewDidEndDecelerating:self.tableView];
+    }
+}
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if(indexPath.row == 0){
@@ -724,8 +1027,18 @@
     return ((GSObject*)[GSObjectArray objectAtIndex:indexPath.row-1]).cellHeight.intValue;
 }
 
+-(void)showMap
+{
+    [self.slidingViewController anchorTopViewTo:ECLeft];
+}
+
+-(void)showMenu
+{
+    [self.slidingViewController.slidingViewController anchorTopViewTo:ECRight];
+}
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    
     if(indexPath.row == 0){
         static NSString *SorterCellIdentifier = @"SorterCell";
         SorterCell* cell = (SorterCell*) [tableView dequeueReusableCellWithIdentifier:SorterCellIdentifier];
@@ -735,21 +1048,38 @@
                 if([currentObject isKindOfClass:[UITableViewCell class]]){
                     cell = (SorterCell*)currentObject;
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
-                    
+
                 }
             }
         }
-        cell.searchBar.selectedScopeButtonIndex = currentScopeType;
-        cell.searchBar.text = currentSearch;
-        cell.parentViewController = self;
-        cell.searchBar.delegate = self;
-
-        cell.sorterBackgroundView.layer.cornerRadius = 20;
+        //cell.searchBar.selectedScopeButtonIndex = currentScopeType;
+//        UIButton* MenuButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+//        MenuButton.frame = CGRectMake(0,0, 44, 44);
+//        [MenuButton setTitle:@"Menu" forState:UIControlStateNormal];
+//        [MenuButton addTarget:self action:@selector(showMenu) forControlEvents:UIControlEventTouchUpInside];
+//        UIButton* MapButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+//        MapButton.frame = CGRectMake(cell.bounds.size.width-44,0, 44, 44);
+//        [MapButton addTarget:self action:@selector(showMap)  forControlEvents:UIControlEventTouchUpInside];
+//
+        if (self.GSObjectArray.count >2) {
+            [cell.randomButton addTarget:self action:@selector(calculateRandom) forControlEvents:UIControlEventTouchUpInside];
+            cell.randomButton.hidden = NO;
+        }else{
+            cell.randomButton.hidden = YES;
+        }
+        
+//        [cell.navView addSubview:MenuButton];
+//        [cell.navView addSubview:MapButton];
+        cell.searchTextField.text = currentSearch;
+        cell.searchTextField.delegate = self;
+        cell.sorterBackgroundView.layer.cornerRadius = 0;
+        
+        
         
         return cell;
     
     }
-    if(indexPath.row == [GSObjectArray count]+1){
+    if((self.random && indexPath.row==2) ||(!self.random && indexPath.row == [GSObjectArray count]+1)){
         static NSString *EndCellIdentifier = @"EndTableCell";
         EndTableCell* endcell = (EndTableCell*) [tableView dequeueReusableCellWithIdentifier:EndCellIdentifier];
         if (endcell == nil) {
@@ -758,16 +1088,23 @@
                 if([currentObject isKindOfClass:[UITableViewCell class]]){
                     endcell = (EndTableCell*)currentObject;
                     endcell.selectionStyle = UITableViewCellSelectionStyleNone;
+
+
                 }
             }
         }
-        endcell.endTableBackgroundView.layer.cornerRadius = 20;
+        endcell.endTableBackgroundView.layer.cornerRadius = 0;
         
         return endcell;
     }
-    GSObject* gsObj = [self.GSObjectArray objectAtIndex:indexPath.row-1];
+    GSObject* gsObj;
+    if (self.random) {
+        gsObj = [self.GSObjectArray objectAtIndex:self.randomIndex];
+    }else{
+        gsObj = [self.GSObjectArray objectAtIndex:indexPath.row-1];
+    }
     CGSize s = [gsObj.title sizeWithFont:kMainFont constrainedToSize:CGSizeMake(kCellHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
-    CGSize subTitleSize = [gsObj.subTitle sizeWithFont:[UIFont systemFontOfSize:12.0f] constrainedToSize:CGSizeMake(kCellHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
+    CGSize subTitleSize = [gsObj.subTitle sizeWithFont:[UIFont systemFontOfSize:12.0f] constrainedToSize:CGSizeMake(kCellSubtitleHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
     NSString *FromCellIdentifier = [NSString stringWithFormat:@"%@,%d,%d",gsObj.source,(int)s.height,(int)subTitleSize.height];
     
     RotatingTableCell *cell = [tableView dequeueReusableCellWithIdentifier:FromCellIdentifier];
@@ -775,22 +1112,36 @@
     if (cell == nil)
     {
         CGSize s = [gsObj.title sizeWithFont:kMainFont constrainedToSize:CGSizeMake(kCellHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
-        CGSize subTitleSize = [gsObj.subTitle sizeWithFont:[UIFont systemFontOfSize:12.0f] constrainedToSize:CGSizeMake(kCellHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
+        CGSize subTitleSize = [gsObj.subTitle sizeWithFont:[UIFont systemFontOfSize:12.0f] constrainedToSize:CGSizeMake(kCellSubtitleHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
         cell = [[RotatingTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:FromCellIdentifier];
+
+
         cell.mainCellView = [[UIView alloc]initWithFrame:CGRectMake(kCellPaddingLeft, kCellPaddingTop, cell.bounds.size.width-2*kCellPaddingLeft, gsObj.cellHeight.intValue-kCellPaddingTop*2)];
         [cell.contentView addSubview:cell.mainCellView];
         cell.colorBarView = [[UIView alloc]initWithFrame:CGRectMake(kCellPaddingLeft, kCellPaddingTop, kCellColorBarWidth, gsObj.cellHeight.intValue-kCellPaddingTop*2)];
         [cell.colorBarView setBackgroundColor:gsObj.cursorColor];
         [cell.contentView addSubview:cell.colorBarView];
-        cell.starview = [[HHStarView alloc]initWithFrame:CGRectMake(kStarLeftPadding,kStarTopPadding+s.height+5, 80+kStarHeight+15, kStarHeight) andRating:0.0f animated:NO];
+       // cell.starview = [[HHStarView alloc]initWithFrame:CGRectMake(kStarLeftPadding,kStarTopPadding+s.height+5, 80+kStarHeight+15, kStarHeight) andRating:0.0f animated:NO];
         [cell.contentView addSubview:cell.starview];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(kStarLeftPadding,10,kCellHeightConstraint,s.height)];
         [cell.contentView addSubview:cell.titleLabel];
 
         
-        cell.subTitleLabel = [[UILabel alloc]initWithFrame:CGRectMake(kStarLeftPadding,kStarTopPadding + s.height+ kStarHeight+10 ,kCellHeightConstraint,subTitleSize.height)];
+        cell.subTitleLabel = [[UILabel alloc]initWithFrame:CGRectMake(kStarLeftPadding,kStarTopPadding + s.height+5 ,kCellSubtitleHeightConstraint,subTitleSize.height)];
         [cell.contentView addSubview:cell.subTitleLabel];
+        
+        
+        cell.distanceLabel = [[UILabel alloc]initWithFrame:CGRectMake(cell.titleLabel.frame.origin.x +cell.titleLabel.frame.size.width-40,kStarTopPadding + s.height ,40,30)];
+        cell.distanceLabel.backgroundColor = [UIColor clearColor];
+        cell.distanceLabel.textColor = [UIColor whiteColor];
+        [cell.distanceLabel setFont:[UIFont systemFontOfSize:12.0f]];
+        [cell.distanceLabel setTextAlignment:NSTextAlignmentRight];
+        [cell.distanceLabel setNumberOfLines:0];
+        cell.distanceLabel.shadowColor = [UIColor blackColor];
+        cell.distanceLabel.shadowOffset = CGSizeMake(1, 1);
+        [cell.contentView addSubview:cell.distanceLabel];
+        
     }
    
     cell.mainCellView.alpha = 0.3;
@@ -820,22 +1171,23 @@
     cell.subTitleLabel.shadowOffset = CGSizeMake(1, 1);
 
     
+
     
-//    UILabel* dealCountLabel = [[UILabel alloc]initWithFrame:CGRectMake(subTitleLabel.frame.size.width+kStarLeftPadding,kStarTopPadding + s.height+ kStarHeight ,70,subTitleSize.height)];
-//    dealCountLabel.text = [NSString stringWithFormat:@"%d Deals",gsObj.dealCount.intValue];
-//    dealCountLabel.backgroundColor = [UIColor clearColor];
-//    dealCountLabel.textColor = [UIColor whiteColor];
-//    [dealCountLabel setFont:[UIFont systemFontOfSize:12.0f]];
-//    [dealCountLabel setTextAlignment:NSTextAlignmentRight];
-//    [dealCountLabel setNumberOfLines:0];
-//    dealCountLabel.shadowColor = [UIColor blackColor];
-//    dealCountLabel.shadowOffset = CGSizeMake(1, 1);
-//    [cell.contentView addSubview:dealCountLabel];
+    CLLocation *gsLoc = [[CLLocation alloc] initWithLatitude:gsObj.latitude.doubleValue longitude:gsObj.longitude.doubleValue];
+    CLLocationDistance meters = [gsLoc distanceFromLocation:userLocation.location];
+    [gsObj setDistanceInMeters:[NSNumber numberWithDouble:meters]];
+    if (gsObj.distanceInMeters.intValue<1000) {
+     cell.distanceLabel.text = [NSString stringWithFormat:@"%d m",gsObj.distanceInMeters.intValue];
+    }else if (gsObj.distanceInMeters.intValue>1000) {
+     cell.distanceLabel.text = [NSString stringWithFormat:@"%.01f km",gsObj.distanceInMeters.floatValue/1000.0f];
+    }else if (gsObj.distanceInMeters.intValue>100000) {
+        cell.distanceLabel.text = [NSString stringWithFormat:@""];
+    }
     
     
     
-	[cell.starview rating:gsObj.shopScore.floatValue/10.0f withAnimation:NO];
-    cell.mainCellView.layer.cornerRadius = 20;
+	//[cell.starview rating:gsObj.shopScore.floatValue/10.0f withAnimation:NO];
+    cell.mainCellView.layer.cornerRadius = 0;
     UIBezierPath* maskPath = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(1, 2, 12, (gsObj.cellHeight.intValue - 10)) byRoundingCorners:UIRectCornerTopLeft|UIRectCornerBottomLeft cornerRadii:CGSizeMake(kCellCornerRad, kCellCornerRad)];
     CAShapeLayer *maskLayer = [CAShapeLayer layer];
     maskLayer.frame = cell.colorBarView.layer.bounds;
@@ -846,25 +1198,22 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.row == 0 || indexPath.row == [self.GSObjectArray count]+1) {
+    if (indexPath.row == 0 || indexPath.row == [self.GSObjectArray count]+1)
+    {
         return;
     }
-    NSLog(@"did select row ");
-        GSObject* selectedGSObj = [self.GSObjectArray objectAtIndex:indexPath.row-1];
+    GSObject* selectedGSObj;
+    if (self.random) {
+        selectedGSObj   = [self.GSObjectArray objectAtIndex:self.randomIndex];
+    }else{
+      selectedGSObj   = [self.GSObjectArray objectAtIndex:indexPath.row-1];
+    }
+
+    NSURL *URL = [NSURL URLWithString:[NSString stringWithFormat:@"%@",selectedGSObj.link]];
+	SVWebViewController *webViewController = [[SVWebViewController alloc] initWithURL:URL];
+    webViewController.gsobj = selectedGSObj;
+	[self.navigationController pushViewController:webViewController animated:YES];
     
-//        CircleLayout* customLayout = [[CircleLayout alloc]init];
-//
-//        ViewController* viewController = [[ViewController alloc]initWithCollectionViewLayout:customLayout];
-//        viewController.gsObject = selectedGSObj;
-    ShopDetailViewController* viewController = [[ShopDetailViewController alloc]initWithNibName:@"ShopDetailViewController" bundle:nil];
-    viewController.gsObject = selectedGSObj;
-        [self.navigationController pushViewController:viewController animated:YES];
-    
-    //pin should not be moving on clicked
-   // menuViewController.shouldShowPinAnimation = NO;
-   // [self updateMapZoomLocation:CLLocationCoordinate2DMake(selectedGSObj.latitude.doubleValue, selectedGSObj.longitude.doubleValue) WithZoom:YES];
-   // [self.slidingViewController anchorTopViewTo:ECRight];
-   // [self.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
 }
 
 
@@ -905,6 +1254,34 @@
     } else {
         // iOS version is below 5.0, no need to do anything
         return YES;
+    }
+}
+
+-(void)updateOverlay
+{
+    if (currentSearch.length > 0)
+    {
+        int64_t delayInSeconds = 1.5;
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            MTStatusBarOverlay *overlay = [MTStatusBarOverlay sharedInstance];
+            overlay.progress = 1.0;
+            [overlay postMessage:[NSString stringWithFormat:@"Current Search: %@",currentSearch] animated:YES];
+        });
+    }
+}
+
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    if (toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft ||
+        toInterfaceOrientation == UIInterfaceOrientationLandscapeRight)
+    {
+
+        [self.slidingViewController setAnchorLeftPeekAmount:160.0f];
+    }
+    else
+    {
+        [self.slidingViewController setAnchorLeftPeekAmount:50.0f];
     }
 }
 

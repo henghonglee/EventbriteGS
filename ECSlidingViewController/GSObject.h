@@ -28,12 +28,17 @@
     NSNumber *longitude;
     UIColor* cursorColor;
     NSArray* imageArray;
-    
+    NSArray* foodTypeArray;
+    NSString* link;
+    NSNumber* itemId;    
 }
+@property (nonatomic, strong)  NSNumber* itemId;
+@property (nonatomic, strong) NSString* link;
 @property (nonatomic, strong)  NSString* source;
 @property (nonatomic, strong)  NSString* descriptionhtml;
 @property (nonatomic, strong)  UIColor* cursorColor;
 @property (nonatomic, strong)  NSArray* imageArray;
+@property (nonatomic, strong)  NSArray* foodTypeArray;
 @property (nonatomic, strong)  NSNumber* distanceInMeters;
 @property (nonatomic, strong)  NSNumber *likes;
 @property (nonatomic, strong)  NSNumber *shopScore;
@@ -43,6 +48,7 @@
 @property (nonatomic, strong)  NSNumber *dealCount;
 @property (nonatomic, strong)  NSString*title;
 @property (nonatomic, strong)  NSString*logourl;
+@property (nonatomic, strong)  NSString* locationString;
 @property (nonatomic, strong)  NSString*subTitle;
 @property (nonatomic, strong)  NSString*description;
 @property (nonatomic, strong)  NSString*coverurl;

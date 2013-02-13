@@ -12,6 +12,9 @@
 
 @interface SorterCell : UITableViewCell
 @property (weak, nonatomic) IBOutlet UIView *sorterBackgroundView;
-@property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
+@property (weak, nonatomic) IBOutlet UIView *navView;
+
+@property (weak, nonatomic) IBOutlet UITextField *searchTextField;
 @property (nonatomic, retain) FirstTopViewController* parentViewController;
+@property (weak, nonatomic) IBOutlet UIButton *randomButton;
 @end

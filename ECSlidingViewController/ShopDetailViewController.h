@@ -11,10 +11,8 @@
 #import "GSObject.h"
 @interface ShopDetailViewController : UIViewController
 
-@property (weak, nonatomic) IBOutlet UIWebView *descriptionWebView;
+@property (strong, nonatomic) UIWebView *descriptionWebView;
 @property (strong,nonatomic) GSObject* gsObject;
-@property (weak, nonatomic) IBOutlet UILabel *subtitleLabel;
-@property (weak, nonatomic) IBOutlet UILabel *titleLabel;
 
 
 @end

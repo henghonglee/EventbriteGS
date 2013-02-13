@@ -8,9 +8,13 @@
 #import "GeoScrollViewController.h"
 #import "ShopDetailViewController.h"
 #import "MapSlidingViewController.h"
+#import <SDWebImage/UIImageView+WebCache.h>
+
+
 #define kCalloutShadowRadius 10.0f
 #define kCalloutShadowOpacity 0.9f
 #define kShadowInset 0.05f
+#define IS_IPHONE_5 ( [ [ UIScreen mainScreen ] bounds ].size.height > 500 )
 @interface UnderMapViewController()
 
 @end
@@ -22,17 +26,28 @@ static dispatch_once_t onceToken;
 - (void)viewDidLoad
 {
   [super viewDidLoad];
+    self.view.backgroundColor = [UIColor blackColor];
+    [self.shop1 setContentMode:UIViewContentModeScaleAspectFill];
+    [self.shop2 setContentMode:UIViewContentModeScaleAspectFill];
+    self.shop1.layer.borderColor = [UIColor blackColor].CGColor;
+    self.shop1.layer.borderWidth = 2.0f;
+    self.shop1.clipsToBounds =YES;
+    self.shop2.layer.borderColor = [UIColor blackColor].CGColor;
+    self.shop2.layer.borderWidth = 2.0f;
+    self.shop2.clipsToBounds =YES;
     self.cursorImage  = [UIImage imageNamed:@"cursor.png"];
     shouldShowPinAnimation = YES;
     onceToken = 0;
     self.peekLeftAmount = 40.0f;
     [self.slidingViewController setAnchorLeftPeekAmount:self.peekLeftAmount];
        self.slidingViewController.underRightWidthLayout = ECFullWidth;
+
 }
 
 -(void)viewWillAppear:(BOOL)animated
 {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dismissCallout) name:@"SHOWMENU" object:nil];
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dismissCallout) name:@"SHOWMENU" object:nil];
+
 }
 -(void)viewWillDisappear:(BOOL)animated
 {
@@ -43,6 +58,11 @@ static dispatch_once_t onceToken;
     [self setAllButton:nil];
     [self setCategoryButtons:nil];
     [self setCategorySelectionButton:nil];
+    [self setShop1:nil];
+    [self setShop1:nil];
+    [self setShop2:nil];
+    [self setShop1LoadingIndicator:nil];
+    [self setShop2LoadingIndicator:nil];
     [super viewDidUnload];
 }
 
@@ -80,7 +100,7 @@ static dispatch_once_t onceToken;
                                                                            reuseIdentifier:pinIdentifier];
             
             
-            customPinView.image = [UIImage imageNamed:@"flag.png"];
+            customPinView.image = [UIImage imageNamed:@"pin.png"];
             customPinView.layer.anchorPoint = CGPointMake(0.6, 1.0);
             customPinView.centerOffset = CGPointMake(3,-2);
             customPinView.canShowCallout = NO;
@@ -138,46 +158,47 @@ static dispatch_once_t onceToken;
         
         return;
     }else if([view.annotation isKindOfClass:[GSObject class]]){
-        if (!callout) {
-            callout = [[CustomCalloutView alloc]initWithFrame:CGRectMake(0, -15, 240, 100)];
-            
-            GSObject* selectedGSObj = view.annotation;
-            
-            callout.alpha = 0;
-            [callout.starview rating:selectedGSObj.shopScore.floatValue/10.0f withAnimation:YES];
-            callout.detailTitleLabel.text = selectedGSObj.title;
-            callout.detailSubtitleLabel.text = selectedGSObj.subTitle;
-            callout.gsObject = selectedGSObj;
-            
-            //adding shadows
-            callout.layer.shadowColor = [UIColor blackColor].CGColor;
-            callout.layer.shadowOpacity = kCalloutShadowOpacity;
-            callout.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
-            callout.layer.shadowRadius = kCalloutShadowRadius;
-            UIBezierPath *path = [UIBezierPath bezierPathWithRect:CGRectInset(callout.bounds, callout.bounds.size.width*kShadowInset, callout.bounds.size.height*kShadowInset)];
-            callout.layer.shadowPath = path.CGPath;
-        
-            UIButton* newButton = [UIButton buttonWithType:UIButtonTypeCustom];
-            newButton.frame = CGRectMake(0, 0, 240, 100);
-            UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]
-                                           initWithTarget:self action:@selector(showDetail:)];
-            tap.numberOfTapsRequired = 1;
-            [newButton addGestureRecognizer:tap];
-            [callout addSubview:newButton];
-            
-            [callout.detailImageView setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://api.pouch.sg%@",selectedGSObj.logourl]]];
-            [view addSubview:callout];
-            [UIView animateWithDuration:0.3
-                                  delay:0.2
-                                options: UIViewAnimationCurveEaseOut
-                             animations:^{
-                                 callout.alpha = 1;
-                             } 
-                             completion:^(BOOL finished){
-                                 
-                             }];
-        
-        }
+//        if (!callout) {
+//            callout = [[CustomCalloutView alloc]initWithFrame:CGRectMake(0, 15, 240, 73)];
+//            
+//            GSObject* selectedGSObj = view.annotation;
+//            
+//            callout.alpha = 0;
+//            [callout.starview rating:selectedGSObj.shopScore.floatValue/10.0f withAnimation:YES];
+//            callout.detailTitleLabel.text = selectedGSObj.title;
+//            callout.detailSubtitleLabel.text = selectedGSObj.subTitle;
+//            callout.gsObject = selectedGSObj;
+//            callout.containerView.backgroundColor = selectedGSObj.cursorColor;
+//            //adding shadows
+//            callout.layer.shadowColor = [UIColor blackColor].CGColor;
+//            callout.layer.shadowOpacity = kCalloutShadowOpacity;
+//            callout.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
+//            callout.layer.shadowRadius = kCalloutShadowRadius;
+//            UIBezierPath *path = [UIBezierPath bezierPathWithRect:CGRectInset(callout.bounds, callout.bounds.size.width*kShadowInset, callout.bounds.size.height*kShadowInset)];
+//            callout.layer.shadowPath = path.CGPath;
+//        
+//            UIButton* newButton = [UIButton buttonWithType:UIButtonTypeCustom];
+//            newButton.frame = CGRectMake(0, 0, 240, 100);
+//            UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]
+//                                           initWithTarget:self action:@selector(showDetail:)];
+//            tap.numberOfTapsRequired = 1;
+//            [newButton addGestureRecognizer:tap];
+//            [callout addSubview:newButton];
+//            if(selectedGSObj.imageArray.count>0){
+//            [callout.detailImageView setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@",[selectedGSObj.imageArray objectAtIndex:0]]]];
+//            }
+//            [view addSubview:callout];
+//            [UIView animateWithDuration:0.3
+//                                  delay:0.2
+//                                options: UIViewAnimationCurveEaseOut
+//                             animations:^{
+//                                 callout.alpha = 1;
+//                             } 
+//                             completion:^(BOOL finished){
+//                                 
+//                             }];
+//        
+//        }
     }
     
     
@@ -185,7 +206,7 @@ static dispatch_once_t onceToken;
 
 -(void)mapView:(MKMapView *)mapView didDeselectAnnotationView:(MKAnnotationView *)view
 {
-    NSLog(@"diddeselectannotation");
+
 //    [self hideCallout];
 }
 
@@ -201,47 +222,48 @@ didAddAnnotationViews:(NSArray *)annotationViews
         CGRect endFrame = annView.frame;
         annView.layer.anchorPoint = CGPointMake(0.6, 1.0);
         annView.frame = CGRectMake(annView.frame.origin.x+annView.frame.size.width*0.6, annView.frame.origin.y+annView.frame.size.height,0.0f, 0.0f);
-        [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationCurveEaseIn
-                         animations:^{ annView.frame = endFrame;
-                             
-                         }completion:^(BOOL finished) {
-                             [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationCurveEaseOut animations:^{
-                                 CATransform3D zRotation;
-                                 zRotation = CATransform3DMakeRotation(M_PI/10, 0, 0, 1.0);
-                                 annView.layer.transform = zRotation;
-                                 
-                             }completion:^(BOOL finished) {
-                                 [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationCurveEaseOut animations:^{
-                                     CATransform3D zRotation;
-                                     zRotation = CATransform3DMakeRotation(-M_PI/10, 0, 0, 1.0);
-                                     annView.layer.transform = zRotation;
-                                     
-                                 }completion:^(BOOL finished) {
-                                     [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationCurveEaseOut animations:^{
-                                         CATransform3D zRotation;
-                                         zRotation = CATransform3DMakeRotation(M_PI/12, 0, 0, 1.0);
-                                         annView.layer.transform = zRotation;
-                                         
-                                     }completion:^(BOOL finished) {
-                                         [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationCurveEaseOut animations:^{
-                                             CATransform3D zRotation;
-                                             zRotation = CATransform3DMakeRotation(-M_PI/12, 0, 0, 1.0);
-                                             annView.layer.transform = zRotation;
-                                             
-                                         }completion:^(BOOL finished) {
-                                             [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationCurveEaseOut animations:^{
-                                                 CATransform3D zRotation;
-                                                 zRotation = CATransform3DMakeRotation(0, 0, 0, 1.0);
-                                                 annView.layer.transform = zRotation;
-                                                 
-                                             }completion:^(BOOL finished) {
-                                                 
-                                             }];
-                                         }];
-                                     }];
-                                 }];
-                             }];
-                         }];
+        annView.frame = endFrame;
+//        [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationCurveEaseIn
+//                         animations:^{
+//                             
+//                         }completion:^(BOOL finished) {
+//                             [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationCurveEaseOut animations:^{
+//                                 CATransform3D zRotation;
+//                                 zRotation = CATransform3DMakeRotation(M_PI/10, 0, 0, 1.0);
+//                                 annView.layer.transform = zRotation;
+//                                 
+//                             }completion:^(BOOL finished) {
+//                                 [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationCurveEaseOut animations:^{
+//                                     CATransform3D zRotation;
+//                                     zRotation = CATransform3DMakeRotation(-M_PI/10, 0, 0, 1.0);
+//                                     annView.layer.transform = zRotation;
+//                                     
+//                                 }completion:^(BOOL finished) {
+//                                     [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationCurveEaseOut animations:^{
+//                                         CATransform3D zRotation;
+//                                         zRotation = CATransform3DMakeRotation(M_PI/12, 0, 0, 1.0);
+//                                         annView.layer.transform = zRotation;
+//                                         
+//                                     }completion:^(BOOL finished) {
+//                                         [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationCurveEaseOut animations:^{
+//                                             CATransform3D zRotation;
+//                                             zRotation = CATransform3DMakeRotation(-M_PI/12, 0, 0, 1.0);
+//                                             annView.layer.transform = zRotation;
+//                                             
+//                                         }completion:^(BOOL finished) {
+//                                             [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationCurveEaseOut animations:^{
+//                                                 CATransform3D zRotation;
+//                                                 zRotation = CATransform3DMakeRotation(0, 0, 0, 1.0);
+//                                                 annView.layer.transform = zRotation;
+//                                                 
+//                                             }completion:^(BOOL finished) {
+//                                                 
+//                                             }];
+//                                         }];
+//                                     }];
+//                                 }];
+//                             }];
+//                         }];
         }
     }
 }
@@ -249,25 +271,25 @@ didAddAnnotationViews:(NSArray *)annotationViews
 
 -(void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
 {
-    if (self.slidingViewController.underRightShowing) {
-        self.locationButton.hidden = NO;
-
-        if (_isCalloutHidden) {
-            NSLog(@"callout was hidden");
-        }else{
-            [self showCallout];
-        }
-        [UIView animateWithDuration:0.3
-                              delay:0.2
-                            options: UIViewAnimationCurveEaseOut
-                         animations:^{
-                             self.slidingViewController.topViewController.view.frame = CGRectMake(-280, 0, 320, 460);
-                         }
-                         completion:^(BOOL finished){
-                             
-                         }];
-        
-    }
+//    if (self.slidingViewController.underRightShowing) {
+//        self.locationButton.hidden = NO;
+//
+//        if (_isCalloutHidden) {
+//            NSLog(@"callout was hidden");
+//        }else{
+//            [self showCallout];
+//        }
+//        [UIView animateWithDuration:0.3
+//                              delay:0.2
+//                            options: UIViewAnimationCurveEaseOut
+//                         animations:^{
+//                             self.slidingViewController.topViewController.view.frame = CGRectMake(-280, 0, 320, 460);
+//                         }
+//                         completion:^(BOOL finished){
+//                             
+//                         }];
+//        
+//    }
 
     if(animated){
         [[NSNotificationCenter defaultCenter] postNotificationName:@"regionDidChangeAnimated" object:nil];
@@ -278,71 +300,61 @@ didAddAnnotationViews:(NSArray *)annotationViews
 
 -(void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
 {
-    if (callout.alpha == 0.0f) {
-        _isCalloutHidden = YES;
-    }else{
-        _isCalloutHidden = NO;
-        [self hideCallout];
-    }
-    
-    [self hideCategoryButtons];
-    self.locationButton.hidden = YES;
-
-    if (self.slidingViewController.underRightShowing) {
-    [UIView animateWithDuration:0.1
-                          delay:0.0
-                        options: UIViewAnimationCurveEaseOut
-                     animations:^{
-                         self.slidingViewController.topViewController.view.frame = CGRectMake(-320, 0, 320, 460);
-                     }
-                     completion:^(BOOL finished){
-                         
-                     }];
-    }
-    if(animated)
-        NSLog(@"regionwillchange, animated = true");
-    else
-    {
-        for (UIView* views in self.view.subviews) {
-            if ([views isKindOfClass:[CustomCalloutView class]]) {
-                [UIView animateWithDuration:0.3
-                                      delay:0.2
-                                    options: UIViewAnimationCurveEaseOut
-                                 animations:^{
-                                     views.alpha =0;
-                                 }
-                                 completion:^(BOOL finished){
-                                     [views removeFromSuperview];
-                                 }];
-
-            }
-        }
-    }
+//    if (callout.alpha == 0.0f) {
+//        _isCalloutHidden = YES;
+//    }else{
+//        _isCalloutHidden = NO;
+//        [self hideCallout];
+//    }
+//    
+//    [self hideCategoryButtons];
+//    self.locationButton.hidden = YES;
+//
+//    if (self.slidingViewController.underRightShowing) {
+//    [UIView animateWithDuration:0.1
+//                          delay:0.0
+//                        options: UIViewAnimationCurveEaseOut
+//                     animations:^{
+//                         self.slidingViewController.topViewController.view.frame = CGRectMake(-320, 0, 320, 460);
+//                     }
+//                     completion:^(BOOL finished){
+//                         
+//                     }];
+//    }
+//    if(animated)
+//        NSLog(@"regionwillchange, animated = true");
+//    else
+//    {
+//        for (UIView* views in self.view.subviews) {
+//            if ([views isKindOfClass:[CustomCalloutView class]]) {
+//                [UIView animateWithDuration:0.3
+//                                      delay:0.2
+//                                    options: UIViewAnimationCurveEaseOut
+//                                 animations:^{
+//                                     views.alpha =0;
+//                                 }
+//                                 completion:^(BOOL finished){
+//                                     [views removeFromSuperview];
+//                                 }];
+//
+//            }
+//        }
+//    }
 }
 
 #pragma mark Custom Methods
 - (IBAction)zoomToLoc:(id)sender
 {
-    for (UIView* views in self.view.subviews) {
-        if ([views isKindOfClass:[CustomCalloutView class]]) {
-            [UIView animateWithDuration:0.3
-                                  delay:0.2
-                                options: UIViewAnimationCurveEaseOut
-                             animations:^{
-                                 views.alpha =0;
-                             }
-                             completion:^(BOOL finished){
-                                 [views removeFromSuperview];
-                             }];
-            
-        }
-    }
+//    [self.mapView setUserTrackingMode:MKUserTrackingModeFollowWithHeading];
     MKCoordinateRegion region;
     region.center.latitude = [self.mapView userLocation].coordinate.latitude;
     region.center.longitude = [self.mapView userLocation].coordinate.longitude;
     region.span.latitudeDelta = 0.01;
     region.span.longitudeDelta = 0.01;
     [mapView setRegion:region animated:YES];
+    
+    
+    
 }
 
 - (IBAction)zoomToAll:(id)sender
@@ -376,7 +388,9 @@ didAddAnnotationViews:(NSArray *)annotationViews
 
 - (IBAction)showDetail:(id)sender
 {
-    ShopDetailViewController* viewController = [[ShopDetailViewController alloc]initWithNibName:@"ShopDetailViewController" bundle:nil];
+    ShopDetailViewController* viewController = [self.storyboard instantiateViewControllerWithIdentifier:@"ShopDetail"];
+    
+    
     viewController.gsObject = callout.gsObject;
     [self.navigationController pushViewController:viewController animated:YES];
 }
@@ -445,7 +459,7 @@ didAddAnnotationViews:(NSArray *)annotationViews
 }
 -(void)dismissCallout
 {
-    NSLog(@"dismissing callout");
+
     for (id annote in self.mapView.annotations) {
         if ([annote isKindOfClass:[GSObject class]]) {
             for (UIView* view in ((MKAnnotationView*)[mapView viewForAnnotation:annote]).subviews) {
@@ -510,5 +524,36 @@ didAddAnnotationViews:(NSArray *)annotationViews
 -(void)resetOverlay
 {
     
+}
+
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    if (toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft ||
+        toInterfaceOrientation == UIInterfaceOrientationLandscapeRight)
+    {
+        for (id annote in self.mapView.annotations) {
+            if ([annote isKindOfClass:[GSObject class]]) {
+                if (((GSObject*)annote).imageArray.count>0) {
+                [self.shop1 setImageWithURL:[((GSObject*)annote).imageArray objectAtIndex:0]];
+                    [self.shop1LoadingIndicator startAnimating];
+                }else{
+                    [self.shop1LoadingIndicator stopAnimating];
+                    [self.shop1 setImageWithURL:[NSURL URLWithString:@""]];
+                }
+                if (((GSObject*)annote).imageArray.count>1) {
+                [self.shop2 setImageWithURL:[((GSObject*)annote).imageArray objectAtIndex:1]];
+                    [self.shop2LoadingIndicator startAnimating];
+                }else{
+                    [self.shop2LoadingIndicator stopAnimating];
+                    [self.shop2 setImageWithURL:[NSURL URLWithString:@""]];
+                }
+
+            }
+        }
+    }
+    else
+    {
+     
+    }
 }
 @end

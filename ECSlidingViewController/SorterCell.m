@@ -25,5 +25,9 @@
 
     // Configure the view for the selected state
 }
+- (IBAction)cancelSearch:(id)sender {
+    self.searchTextField.text = @"";
+    [self.searchTextField.delegate textFieldShouldReturn:self.searchTextField];
+}
 
 @end

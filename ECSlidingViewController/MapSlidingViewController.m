@@ -14,11 +14,11 @@
     category = 6;
   UIStoryboard *storyboard;
     self.view.backgroundColor = [UIColor blackColor];
-  if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+//  if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
     storyboard = [UIStoryboard storyboardWithName:@"iPhone" bundle:nil];
-  } else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-    storyboard = [UIStoryboard storyboardWithName:@"iPad" bundle:nil];
-  }
+//  } else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+//    storyboard = [UIStoryboard storyboardWithName:@"iPad" bundle:nil];
+//  }
   
   self.topViewController = [storyboard instantiateViewControllerWithIdentifier:@"GeoScroll"];
 }
@@ -27,5 +27,7 @@
 {
   return YES;
 }
+
+
 
 @end

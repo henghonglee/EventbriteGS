@@ -26,6 +26,7 @@
 @synthesize cellHeight;
 @synthesize likes;
 @synthesize dealCount;
+@synthesize locationString;
 @synthesize distanceInMeters;
 @synthesize imageArray;
 - (id)init

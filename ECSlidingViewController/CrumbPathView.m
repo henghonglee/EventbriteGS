@@ -21,13 +21,16 @@
     [crumbs lockForReading];
     MKMapPoint point;
     NSUInteger i;
-    for (i = 1; i < crumbs.pointCount; i++)
+    for (i = 0; i < crumbs.pointCount; i++)
     {
         point = crumbs.points[i];
         CGPoint lastCGPoint = [self pointForMapPoint:point];
         
         if (MKMapRectContainsPoint(mapRect, point)) {
-            CGContextAddEllipseInRect(context,(CGRectMake (lastCGPoint.x-lineWidth/4, lastCGPoint.y-lineWidth/4, lineWidth/2, lineWidth/2 )));
+            
+                CGContextAddEllipseInRect(context,(CGRectMake (lastCGPoint.x-lineWidth/4, lastCGPoint.y-lineWidth/4, lineWidth/2, lineWidth/2 )));
+                
+            
             CGContextSetStrokeColorWithColor(context, ((CrumbObj*)[crumbs.pointsArray objectAtIndex:i]).pointColor.CGColor);
 //            CGContextSetRGBStrokeColor(context, 1.0f, 0.0f, 0.0f, 1.0f);
             CGContextSetLineWidth(context, lineWidth/4);

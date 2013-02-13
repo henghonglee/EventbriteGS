@@ -22,6 +22,8 @@
   }
   
   self.topViewController = [MapNavViewController sharedInstance];
+
+
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveEvent:) name:@"SHOWMENU" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveHideMenuEvent:) name:@"HIDEMENU" object:nil];
     
@@ -38,5 +40,21 @@
 {
   return YES;
 }
+
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    if (toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft ||
+        toInterfaceOrientation == UIInterfaceOrientationLandscapeRight)
+    {
+        
+        [[NSNotificationCenter defaultCenter]removeObserver:self];
+    }
+    else
+    {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveEvent:) name:@"SHOWMENU" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveHideMenuEvent:) name:@"HIDEMENU" object:nil];
+    }
+}
+
 
 @end
