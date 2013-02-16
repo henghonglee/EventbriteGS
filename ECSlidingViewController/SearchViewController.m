@@ -29,7 +29,8 @@
 {
     [super viewDidLoad];
 
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textFieldTextDidChange) name:UITextFieldTextDidChangeNotification object:self.searchTF];
+    self.rsTableView.scrollsToTop = NO;
+    
     self.resultList = [[NSMutableArray alloc]init];
     self.shopResultList = [[NSMutableArray alloc]init];
     self.suggestedFood = [NSMutableDictionary dictionary];
@@ -45,11 +46,12 @@
 }
 -(void)viewWillAppear:(BOOL)animated
 {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textFieldTextDidChange) name:UITextFieldTextDidChangeNotification object:self.searchTF];
     [self.navigationController setNavigationBarHidden:NO animated:YES];
     
     UIBarButtonItem* searchButton = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doSearch)];
     self.navigationItem.rightBarButtonItem = searchButton;
-    [self.searchTF becomeFirstResponder];
+    //[self.searchTF becomeFirstResponder];
     self.searchState = kStateSelectingFood;
     self.finalSearchString = @"";
     [self.underMapView setRegion:self.searchRegion animated:YES];
@@ -284,8 +286,8 @@
 }
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
-    UILabel* headerLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 295, 40)];
-    UIView* headerView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 295, 40)];
+    UILabel* headerLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, 40)];
+    UIView* headerView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, 40)];
     UIView* lineView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 11,40)];
     [lineView setBackgroundColor:[UIColor yellowColor]];
     [headerView setBackgroundColor:[UIColor clearColor]];

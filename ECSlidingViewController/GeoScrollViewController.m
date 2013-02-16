@@ -18,11 +18,14 @@
 #import "CircleLayout.h"
 #import "ShopDetailViewController.h"
 
-#define kMainFont [UIFont systemFontOfSize:25.0f]
-#define kCellHeightConstraint 260
-#define kCellSubtitleHeightConstraint 220
-#define kCellPaddingLeft 3
-#define kCellPaddingTop 3
+#define kMainFont [UIFont systemFontOfSize:25.0]
+#define kSubtitleFont [UIFont systemFontOfSize:12.0f]
+#define kSourceFont [UIFont systemFontOfSize:12.0f]
+#define kDistanceFont [UIFont systemFontOfSize:12.0f]
+#define kCellHeightConstraint 240
+#define kCellSubtitleHeightConstraint 200
+#define kCellPaddingLeft 10
+#define kCellPaddingTop 5
 #define kCellColorBarWidth 11
 #define kStarLeftPadding 37
 #define kStarTopPadding 10+2
@@ -253,17 +256,20 @@
             gsObject.locationString = [dataObject objectForKey:@"location"];
             gsObject.link = [dataObject objectForKey:@"link"];
             gsObject.itemId = [NSNumber numberWithInt:[[dataObject objectForKey:@"id"] intValue]];
-            CGSize s = [gsObject.title sizeWithFont:[UIFont systemFontOfSize:25.0f] constrainedToSize:CGSizeMake(kCellHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
-            
+            CGSize s = [gsObject.title sizeWithFont:kMainFont constrainedToSize:CGSizeMake(kCellHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
+            CGSize x = [gsObject.subTitle sizeWithFont:kSubtitleFont constrainedToSize:CGSizeMake(kCellSubtitleHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
+//            CGSize sourceSize = [gsObject.source sizeWithFont:kSourceFont constrainedToSize:CGSizeMake(kCellSubtitleHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
+            gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + 10)];//padding btw title and subtitle;
             gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + MAX(30,s.height))];
+            gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + 5)];//padding btw title and subtitle;
+            gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + x.height)];
+//            gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + 5)];//padding btw title and subtitle;
+//            gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + sourceSize.height)];
+            gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + 5)];//padding btw title and subtitle;
+            gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + 10)];//padding btw title and subtitle;
             
-            gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + 2)];//padding btw title and subtitle;
-            CGSize x = [gsObject.subTitle sizeWithFont:[UIFont systemFontOfSize:12.0f] constrainedToSize:CGSizeMake(kCellSubtitleHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
+            gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + 10)];//padding btw title and subtitle;
             
-            gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + MAX(30,x.height))];
-            gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + 10)];
-            gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + 14.75)];
-            gsObject.cellHeight = [NSNumber numberWithInt:(gsObject.cellHeight.intValue + 2)];//padding btw title and subtitle;
             gsObject.descriptionhtml = [dataObject objectForKey:@"descriptionHTML"];
             gsObject.source = [dataObject objectForKey:@"source"];
             if ([[dataObject objectForKey:@"source"] isEqualToString:@"LADY IRON CHEF"]) {
@@ -390,15 +396,15 @@
         if (userLocation ) {
             for (GSObject* gsObj in loadedArray)
             {
-//                NSLog(@"gsObj.distanceInMeters.doubleValue = %f",gsObj.distanceInMeters.doubleValue);
+
                 if (!(gsObj.distanceInMeters.doubleValue > 0)) {
                 CLLocation *gsLoc = [[CLLocation alloc] initWithLatitude:gsObj.latitude.doubleValue longitude:gsObj.longitude.doubleValue];
-//                    if (![gsLoc isEqual:[NSNull null]] && ![userLocation.location isEqual:[NSNull null]]) {
-//                        CLLocationDistance meters = [gsLoc distanceFromLocation:userLocation.location];
-//                        [gsObj setDistanceInMeters:[NSNumber numberWithDouble:meters]];
-//                    }else{
+                    if (![gsLoc isEqual:[NSNull null]] && ![userLocation.location isEqual:[NSNull null]]) {
+                        CLLocationDistance meters = [gsLoc distanceFromLocation:userLocation.location];
+                        [gsObj setDistanceInMeters:[NSNumber numberWithDouble:meters]];
+                    }else{
                         [gsObj setDistanceInMeters:[NSNumber numberWithDouble:99999]];
-//                    }
+                    }
                 }
             }
         }
@@ -943,7 +949,7 @@
                             if (self.scopedGSObjectArray.count == 1) {
                                 MKMapView* underMapView = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
                                 for (GSObject* gsObj in scopedGSObjectArray) {
-                                    [underMapView setRegion:MKCoordinateRegionMake(CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue), MKCoordinateSpanMake(0.05, 0.05)) animated:YES];
+                                    [underMapView setRegion:MKCoordinateRegionMake(CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue), MKCoordinateSpanMake(0.005, 0.005)) animated:YES];
                                 }
                                 [self.GSObjectArray removeAllObjects];
                                 [self.GSObjectArray addObjectsFromArray:self.scopedGSObjectArray];
@@ -1061,11 +1067,12 @@
 //        MapButton.frame = CGRectMake(cell.bounds.size.width-44,0, 44, 44);
 //        [MapButton addTarget:self action:@selector(showMap)  forControlEvents:UIControlEventTouchUpInside];
 //
-        if (self.GSObjectArray.count >2) {
+        if (self.GSObjectArray.count > 2) {
             [cell.randomButton addTarget:self action:@selector(calculateRandom) forControlEvents:UIControlEventTouchUpInside];
-            cell.randomButton.hidden = NO;
+            cell.randomContainer.hidden = NO;
         }else{
-            cell.randomButton.hidden = YES;
+            cell.randomContainer.hidden = YES;
+
         }
         
 //        [cell.navView addSubview:MenuButton];
@@ -1112,67 +1119,75 @@
     if (cell == nil)
     {
         CGSize s = [gsObj.title sizeWithFont:kMainFont constrainedToSize:CGSizeMake(kCellHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
-        CGSize subTitleSize = [gsObj.subTitle sizeWithFont:[UIFont systemFontOfSize:12.0f] constrainedToSize:CGSizeMake(kCellSubtitleHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
+        CGSize subTitleSize = [gsObj.subTitle sizeWithFont:kSubtitleFont constrainedToSize:CGSizeMake(kCellSubtitleHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
+        CGSize sourceSize = [gsObj.source sizeWithFont:kSourceFont constrainedToSize:CGSizeMake(kCellSubtitleHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
         cell = [[RotatingTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:FromCellIdentifier];
-
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
 
         cell.mainCellView = [[UIView alloc]initWithFrame:CGRectMake(kCellPaddingLeft, kCellPaddingTop, cell.bounds.size.width-2*kCellPaddingLeft, gsObj.cellHeight.intValue-kCellPaddingTop*2)];
-        [cell.contentView addSubview:cell.mainCellView];
+        
         cell.colorBarView = [[UIView alloc]initWithFrame:CGRectMake(kCellPaddingLeft, kCellPaddingTop, kCellColorBarWidth, gsObj.cellHeight.intValue-kCellPaddingTop*2)];
+//        [cell.colorBarView setBackgroundColor:[UIColor magentaColor]];
         [cell.colorBarView setBackgroundColor:gsObj.cursorColor];
-        [cell.contentView addSubview:cell.colorBarView];
-       // cell.starview = [[HHStarView alloc]initWithFrame:CGRectMake(kStarLeftPadding,kStarTopPadding+s.height+5, 80+kStarHeight+15, kStarHeight) andRating:0.0f animated:NO];
-        [cell.contentView addSubview:cell.starview];
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        
         cell.titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(kStarLeftPadding,10,kCellHeightConstraint,s.height)];
-        [cell.contentView addSubview:cell.titleLabel];
+        cell.titleLabel.backgroundColor = [UIColor clearColor];
+        cell.titleLabel.textColor = [UIColor whiteColor];
+        [cell.titleLabel setFont:kMainFont];
+        [cell.titleLabel setNumberOfLines:0];
+        cell.titleLabel.shadowColor = [UIColor blackColor];
+        cell.titleLabel.shadowOffset = CGSizeMake(1, 1);
+        
+        
+        
+        cell.subTitleLabel = [[UILabel alloc]initWithFrame:CGRectMake(kStarLeftPadding,10 + s.height + 5 ,kCellSubtitleHeightConstraint,subTitleSize.height)];
+        cell.subTitleLabel.backgroundColor = [UIColor clearColor];
+        cell.subTitleLabel.textColor = [UIColor whiteColor];
+        [cell.subTitleLabel setFont:kSubtitleFont];
+        [cell.subTitleLabel setNumberOfLines:0];
+        cell.subTitleLabel.shadowColor = [UIColor blackColor];
+        cell.subTitleLabel.shadowOffset = CGSizeMake(1, 1);
+        
+//        cell.sourceLabel = [[UILabel alloc]initWithFrame:CGRectMake(kStarLeftPadding,10 + s.height + 5 + subTitleSize.height + 5 ,kCellSubtitleHeightConstraint,sourceSize.height)];
+//        cell.sourceLabel.backgroundColor = [UIColor clearColor];
+//        cell.sourceLabel.textColor = [UIColor whiteColor];
+//        [cell.sourceLabel setFont:kSourceFont];
+//        [cell.sourceLabel setNumberOfLines:0];
+//        cell.sourceLabel.shadowColor = [UIColor blackColor];
+//        cell.sourceLabel.shadowOffset = CGSizeMake(1, 1);
 
-        
-        cell.subTitleLabel = [[UILabel alloc]initWithFrame:CGRectMake(kStarLeftPadding,kStarTopPadding + s.height+5 ,kCellSubtitleHeightConstraint,subTitleSize.height)];
-        [cell.contentView addSubview:cell.subTitleLabel];
-        
-        
-        cell.distanceLabel = [[UILabel alloc]initWithFrame:CGRectMake(cell.titleLabel.frame.origin.x +cell.titleLabel.frame.size.width-40,kStarTopPadding + s.height ,40,30)];
+        cell.distanceLabel = [[UILabel alloc]initWithFrame:CGRectMake(cell.bounds.size.width-10-5-40,gsObj.cellHeight.intValue-5-30 ,40,30)];
         cell.distanceLabel.backgroundColor = [UIColor clearColor];
         cell.distanceLabel.textColor = [UIColor whiteColor];
-        [cell.distanceLabel setFont:[UIFont systemFontOfSize:12.0f]];
+        [cell.distanceLabel setFont:kDistanceFont];
         [cell.distanceLabel setTextAlignment:NSTextAlignmentRight];
         [cell.distanceLabel setNumberOfLines:0];
         cell.distanceLabel.shadowColor = [UIColor blackColor];
         cell.distanceLabel.shadowOffset = CGSizeMake(1, 1);
+        
+        
+        
+        cell.distanceIcon = [[UIImageView alloc]initWithFrame:CGRectMake(cell.distanceLabel.frame.origin.x - 10 ,cell.distanceLabel.frame.origin.y  ,10,cell.distanceLabel.frame.size.height)];
+        [cell.distanceIcon setImage:[UIImage imageNamed:@"distanceWhite.png"]];
+        [cell.distanceIcon setContentMode:UIViewContentModeScaleAspectFit];
+        
+
+        [cell.contentView addSubview:cell.mainCellView];
+        [cell.contentView addSubview:cell.colorBarView];
+        [cell.contentView addSubview:cell.starview];
+        [cell.contentView addSubview:cell.titleLabel];
+        [cell.contentView addSubview:cell.subTitleLabel];
+        [cell.contentView addSubview:cell.sourceLabel];
+        [cell.contentView addSubview:cell.distanceIcon];
         [cell.contentView addSubview:cell.distanceLabel];
         
     }
    
     cell.mainCellView.alpha = 0.3;
     cell.mainCellView.backgroundColor = [UIColor blackColor];
-    
-    
-
-
-
     cell.titleLabel.text = gsObj.title;
-    cell.titleLabel.backgroundColor = [UIColor clearColor];
-    cell.titleLabel.textColor = [UIColor whiteColor];
-    [cell.titleLabel setFont:kMainFont];
-    [cell.titleLabel setNumberOfLines:0];
-
-    cell.titleLabel.shadowColor = [UIColor blackColor];
-    cell.titleLabel.shadowOffset = CGSizeMake(1, 1);
-
-
-
-    cell.subTitleLabel.text = gsObj.subTitle;
-    cell.subTitleLabel.backgroundColor = [UIColor clearColor];
-    cell.subTitleLabel.textColor = [UIColor whiteColor];
-    [cell.subTitleLabel setFont:[UIFont systemFontOfSize:12.0f]];
-    [cell.subTitleLabel setNumberOfLines:0];
-    cell.subTitleLabel.shadowColor = [UIColor blackColor];
-    cell.subTitleLabel.shadowOffset = CGSizeMake(1, 1);
-
-    
-
-    
+    cell.subTitleLabel.text = [[gsObj.subTitle stringByReplacingOccurrencesOfString:@": " withString:@""]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    cell.sourceLabel.text = [NSString stringWithFormat:@"source: %@",gsObj.source];
     CLLocation *gsLoc = [[CLLocation alloc] initWithLatitude:gsObj.latitude.doubleValue longitude:gsObj.longitude.doubleValue];
     CLLocationDistance meters = [gsLoc distanceFromLocation:userLocation.location];
     [gsObj setDistanceInMeters:[NSNumber numberWithDouble:meters]];
@@ -1185,14 +1200,14 @@
     }
     
     
-    
-	//[cell.starview rating:gsObj.shopScore.floatValue/10.0f withAnimation:NO];
     cell.mainCellView.layer.cornerRadius = 0;
-    UIBezierPath* maskPath = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(1, 2, 12, (gsObj.cellHeight.intValue - 10)) byRoundingCorners:UIRectCornerTopLeft|UIRectCornerBottomLeft cornerRadii:CGSizeMake(kCellCornerRad, kCellCornerRad)];
-    CAShapeLayer *maskLayer = [CAShapeLayer layer];
-    maskLayer.frame = cell.colorBarView.layer.bounds;
-    maskLayer.path = maskPath.CGPath;
-    cell.colorBarView.layer.mask = maskLayer;
+    
+//    UIBezierPath* maskPath = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(1, 2, 12, (gsObj.cellHeight.intValue - 10)) byRoundingCorners:UIRectCornerTopLeft|UIRectCornerBottomLeft cornerRadii:CGSizeMake(kCellCornerRad, kCellCornerRad)];
+//    CAShapeLayer *maskLayer = [CAShapeLayer layer];
+//    maskLayer.frame = cell.colorBarView.layer.bounds;
+//    maskLayer.path = maskPath.CGPath;
+//    cell.colorBarView.layer.mask = maskLayer;
+    
     return cell;
 }
 

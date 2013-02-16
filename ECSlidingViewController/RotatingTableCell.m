@@ -10,7 +10,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import "GeoScrollViewController.h"
 @implementation RotatingTableCell
-@synthesize mainCellView,colorBarView,rankLabel,starview,distanceLabel;
+@synthesize mainCellView,colorBarView,rankLabel,starview,distanceLabel,distanceIcon ,sourceLabel;
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
@@ -40,21 +40,25 @@
         if ((convertedPoint.x+(self.bounds.size.height/2)) >=(230) && (convertedPoint.x+(self.bounds.size.height/2)) <=(280)) {
             if (self.colorBarView.alpha != 0.7) {
                 self.colorBarView.alpha = 0.7;
+                self.mainCellView.alpha = 0.3;
                 [master didScrollToEntryAtIndex:((NSIndexPath*)[((UITableView*)self.superview) indexPathForCell:self]).row-1];
             }
             
         }else{
             self.colorBarView.alpha = 0.0;
+            self.mainCellView.alpha = 0.3;
         }
     }else{    
         if ((convertedPoint.y+(self.bounds.size.height/2)) >=230 && (convertedPoint.y+(self.bounds.size.height/2)) <=310) {
             if (self.colorBarView.alpha != 0.7) {
                 self.colorBarView.alpha = 0.7;
+                self.mainCellView.alpha = 0.3;
                 [master didScrollToEntryAtIndex:((NSIndexPath*)[((UITableView*)self.superview) indexPathForCell:self]).row-1];
             }
             
         }else{
             self.colorBarView.alpha = 0.0;
+            self.mainCellView.alpha = 0.3;
         }
     }
 }

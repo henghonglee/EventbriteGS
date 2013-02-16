@@ -32,7 +32,6 @@ typedef enum {
 @property (nonatomic) int randomIndex;
 @property (nonatomic, strong) CLLocation *shouldZoomToLocation;
 @property (nonatomic, strong) CLGeocoder *geocoder;
-
 @property (nonatomic) BOOL selectionChanged;
 @property (nonatomic,strong) MKUserLocation* userLocation;
 @property (nonatomic, strong)NSMutableDictionary* boolhash;

@@ -29,7 +29,7 @@
 -(void)viewDidLoad
 {
     NSLog(@"collectionviewdidload");
-    self.collectionView.scrollsToTop = YES;
+    self.collectionView.scrollsToTop = NO;
     self.loadingIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     self.loadingIndicator.frame = CGRectMake(0,0, kBottomStackHeight, kBottomStackHeight);
     self.loadingIndicator.center = CGPointMake(self.collectionView.bounds.size.width/2, self.collectionView.bounds.size.height- kBottomStackHeight/2);

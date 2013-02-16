@@ -143,12 +143,13 @@
 - (void)viewDidLoad {
 	[super viewDidLoad];
     
-    UIButton* barbutton = [UIButton buttonWithType:UIButtonTypeCustom];
-    self.navigationItem.hidesBackButton = YES;
-    [barbutton setBackgroundImage:[UIImage imageNamed:@"directions.png"] forState:UIControlStateNormal];
-    [barbutton setFrame:CGRectMake(10, 0, 60, 44)];
-    [barbutton addTarget:self action:@selector(goOffline) forControlEvents:UIControlEventTouchUpInside];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:barbutton];
+    
+    UIBarButtonItem* barbutton = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(goOffline)
+                                  ];
+//    [barbutton setBackgroundImage:[UIImage imageNamed:@"directions.png"] forState:UIControlStateNormal];
+//    [barbutton setFrame:CGRectMake(10, 0, 60, 44)];
+//    [barbutton addTarget:self action:@selector(goOffline) forControlEvents:UIControlEventTouchUpInside];
+    self.navigationItem.rightBarButtonItem = barbutton;
     
     
 //    int64_t delayInSeconds = 20.0;
@@ -228,13 +229,13 @@
     }
     [[self navigationController] setNavigationBarHidden:NO animated:YES];
     NSAssert(self.navigationController, @"SVWebViewController needs to be contained in a UINavigationController. If you are presenting SVWebViewController modally, use SVModalWebViewController instead.");
-    UIButton* barbutton = [UIButton buttonWithType:UIButtonTypeCustom];
-    self.navigationItem.hidesBackButton = YES;
-    [barbutton setBackgroundImage:[UIImage imageNamed:@"back_button.png"] forState:UIControlStateNormal];
-    [barbutton setFrame:CGRectMake(-10, 0, 60, 44)];
-    barbutton.clipsToBounds = NO;
-    [barbutton addTarget:self action:@selector(backButtonAction) forControlEvents:UIControlEventTouchUpInside];
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:barbutton];
+//    UIButton* barbutton = [UIButton buttonWithType:UIButtonTypeCustom];
+
+//    [barbutton setBackgroundImage:[UIImage imageNamed:@"back_button.png"] forState:UIControlStateNormal];
+//    [barbutton setFrame:CGRectMake(-10, 0, 60, 44)];
+//    barbutton.clipsToBounds = NO;
+//    [barbutton addTarget:self action:@selector(backButtonAction) forControlEvents:UIControlEventTouchUpInside];
+//    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:barbutton];
 	[super viewWillAppear:animated];
 	
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {

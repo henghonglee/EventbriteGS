@@ -14,7 +14,9 @@
 @property (strong, nonatomic) UILabel *rankLabel;
 @property (strong, nonatomic) UILabel *titleLabel;
 @property (strong, nonatomic) UILabel *subTitleLabel;
+@property (strong, nonatomic) UILabel *sourceLabel;
 @property (strong, nonatomic) UILabel *distanceLabel;
+@property (strong, nonatomic) UIImageView *distanceIcon;
 //@property (strong, nonatomic) HHStarView* starView;
 @property (strong, nonatomic) NSNumber* itemIndex;
 @property (strong, nonatomic) UIView *colorBarView;

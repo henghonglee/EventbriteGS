@@ -37,6 +37,9 @@
 		EF0C5E6D16B2CC3900288EB3 /* stop.png in Resources */ = {isa = PBXBuildFile; fileRef = EF0C5E6816B2CC3900288EB3 /* stop.png */; };
 		EF25DDBB16C26587005F905E /* IEATISHOOTIPOST.dat in Resources */ = {isa = PBXBuildFile; fileRef = EF25DDBA16C26586005F905E /* IEATISHOOTIPOST.dat */; };
 		EF2BCCBD16BD822100C1192E /* foodtypes.txt in Resources */ = {isa = PBXBuildFile; fileRef = EF2BCCBC16BD822100C1192E /* foodtypes.txt */; };
+		EF3A33FB16CBF5AF000E10C5 /* distanceWhite@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EF3A33FA16CBF5AE000E10C5 /* distanceWhite@2x.png */; };
+		EF3A33FD16CBFBF2000E10C5 /* icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EF3A33FC16CBFBF2000E10C5 /* icon@2x.png */; };
+		EF3A33FF16CBFC5B000E10C5 /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = EF3A33FE16CBFC5A000E10C5 /* icon.png */; };
 		EF44BD46168B3ADB00F7BCB5 /* ShopDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF44BD42168B3AD800F7BCB5 /* ShopDetailViewController.m */; };
 		EF6326EF169DD9E7009A78C3 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EF6326EE169DD9E7009A78C3 /* Default-568h@2x.png */; };
 		EF9016F116AC171E0089C57D /* MenuCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EF9016F016AC171D0089C57D /* MenuCell.m */; };
@@ -66,8 +69,6 @@
 		EFD326AE16BFCD1C009594F2 /* LADY IRON CHEF.dat in Resources */ = {isa = PBXBuildFile; fileRef = EFD326AD16BFCD1B009594F2 /* LADY IRON CHEF.dat */; };
 		EFDBC97316C898FB0015A96A /* pin.png in Resources */ = {isa = PBXBuildFile; fileRef = EFDBC97116C898FB0015A96A /* pin.png */; };
 		EFDBC97416C898FB0015A96A /* pin@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EFDBC97216C898FB0015A96A /* pin@2x.png */; };
-		EFDBC97616C89C750015A96A /* icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EFDBC97516C89C750015A96A /* icon@2x.png */; };
-		EFDBC97816C89CD60015A96A /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = EFDBC97716C89CD60015A96A /* icon.png */; };
 		EFDBC97A16C89EEE0015A96A /* splash1.png in Resources */ = {isa = PBXBuildFile; fileRef = EFDBC97916C89EEE0015A96A /* splash1.png */; };
 		EFE28F401677060B00095554 /* UIImage+Resize.m in Sources */ = {isa = PBXBuildFile; fileRef = EFE28F3B1677060B00095554 /* UIImage+Resize.m */; };
 		EFE28F411677060B00095554 /* UIImage+Alpha.m in Sources */ = {isa = PBXBuildFile; fileRef = EFE28F3D1677060B00095554 /* UIImage+Alpha.m */; };
@@ -199,6 +200,9 @@
 		EF0C5E6816B2CC3900288EB3 /* stop.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = stop.png; path = SVWebViewController.bundle/iPad/stop.png; sourceTree = "<group>"; };
 		EF25DDBA16C26586005F905E /* IEATISHOOTIPOST.dat */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = IEATISHOOTIPOST.dat; sourceTree = "<group>"; };
 		EF2BCCBC16BD822100C1192E /* foodtypes.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = foodtypes.txt; sourceTree = "<group>"; };
+		EF3A33FA16CBF5AE000E10C5 /* distanceWhite@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "distanceWhite@2x.png"; sourceTree = "<group>"; };
+		EF3A33FC16CBFBF2000E10C5 /* icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon@2x.png"; sourceTree = "<group>"; };
+		EF3A33FE16CBFC5A000E10C5 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
 		EF3D430916AAB79F0064618E /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		EF44BD41168B3AD800F7BCB5 /* ShopDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShopDetailViewController.h; sourceTree = "<group>"; };
 		EF44BD42168B3AD800F7BCB5 /* ShopDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShopDetailViewController.m; sourceTree = "<group>"; };
@@ -250,8 +254,6 @@
 		EFD326AD16BFCD1B009594F2 /* LADY IRON CHEF.dat */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = "LADY IRON CHEF.dat"; sourceTree = "<group>"; };
 		EFDBC97116C898FB0015A96A /* pin.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pin.png; sourceTree = "<group>"; };
 		EFDBC97216C898FB0015A96A /* pin@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pin@2x.png"; sourceTree = "<group>"; };
-		EFDBC97516C89C750015A96A /* icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon@2x.png"; sourceTree = "<group>"; };
-		EFDBC97716C89CD60015A96A /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
 		EFDBC97916C89EEE0015A96A /* splash1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = splash1.png; sourceTree = "<group>"; };
 		EFE28F3A1677060B00095554 /* UIImage+Resize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Resize.h"; sourceTree = "<group>"; };
 		EFE28F3B1677060B00095554 /* UIImage+Resize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Resize.m"; sourceTree = "<group>"; };
@@ -408,8 +410,8 @@
 		2750E76114CDB0DF007727A0 = {
 			isa = PBXGroup;
 			children = (
-				EFDBC97516C89C750015A96A /* icon@2x.png */,
-				EFDBC97716C89CD60015A96A /* icon.png */,
+				EF3A33FC16CBFBF2000E10C5 /* icon@2x.png */,
+				EF3A33FE16CBFC5A000E10C5 /* icon.png */,
 				EFA44FD716B2737F004D40E7 /* AdSupport.framework */,
 				2750E77614CDB0DF007727A0 /* ECSlidingViewController */,
 				2750E76F14CDB0DF007727A0 /* Frameworks */,
@@ -502,6 +504,7 @@
 				EF0C5E5216B28C5500288EB3 /* MTStatusBarOverlay.m */,
 				EF6326EE169DD9E7009A78C3 /* Default-568h@2x.png */,
 				EFFD8D1616B693A4001DF353 /* directions@2x.png */,
+				EF3A33FA16CBF5AE000E10C5 /* distanceWhite@2x.png */,
 				2750E79214CDB93A007727A0 /* MenuViewController.h */,
 				2750E79314CDB93A007727A0 /* MenuViewController.m */,
 				EF0C5E2A16B27C7100288EB3 /* navigation.png */,
@@ -905,9 +908,10 @@
 				EFE83D4A16C77104005C45A5 /* miss-claude.ttf in Resources */,
 				EFDBC97316C898FB0015A96A /* pin.png in Resources */,
 				EFDBC97416C898FB0015A96A /* pin@2x.png in Resources */,
-				EFDBC97616C89C750015A96A /* icon@2x.png in Resources */,
-				EFDBC97816C89CD60015A96A /* icon.png in Resources */,
 				EFDBC97A16C89EEE0015A96A /* splash1.png in Resources */,
+				EF3A33FB16CBF5AF000E10C5 /* distanceWhite@2x.png in Resources */,
+				EF3A33FD16CBFBF2000E10C5 /* icon@2x.png in Resources */,
+				EF3A33FF16CBFC5B000E10C5 /* icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
