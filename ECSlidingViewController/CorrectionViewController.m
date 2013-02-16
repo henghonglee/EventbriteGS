@@ -23,7 +23,7 @@
         self.view.backgroundColor = [UIColor whiteColor];
     }
     return self;
-}
+} 
 
 - (void)viewDidLoad
 {

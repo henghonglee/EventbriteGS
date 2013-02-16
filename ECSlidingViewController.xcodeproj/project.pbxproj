@@ -201,8 +201,8 @@
 		EF25DDBA16C26586005F905E /* IEATISHOOTIPOST.dat */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = IEATISHOOTIPOST.dat; sourceTree = "<group>"; };
 		EF2BCCBC16BD822100C1192E /* foodtypes.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = foodtypes.txt; sourceTree = "<group>"; };
 		EF3A33FA16CBF5AE000E10C5 /* distanceWhite@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "distanceWhite@2x.png"; sourceTree = "<group>"; };
-		EF3A33FC16CBFBF2000E10C5 /* icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon@2x.png"; sourceTree = "<group>"; };
-		EF3A33FE16CBFC5A000E10C5 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
+		EF3A33FC16CBFBF2000E10C5 /* icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "icon@2x.png"; path = "../icon@2x.png"; sourceTree = "<group>"; };
+		EF3A33FE16CBFC5A000E10C5 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = ../icon.png; sourceTree = "<group>"; };
 		EF3D430916AAB79F0064618E /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		EF44BD41168B3AD800F7BCB5 /* ShopDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShopDetailViewController.h; sourceTree = "<group>"; };
 		EF44BD42168B3AD800F7BCB5 /* ShopDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShopDetailViewController.m; sourceTree = "<group>"; };
@@ -410,8 +410,6 @@
 		2750E76114CDB0DF007727A0 = {
 			isa = PBXGroup;
 			children = (
-				EF3A33FC16CBFBF2000E10C5 /* icon@2x.png */,
-				EF3A33FE16CBFC5A000E10C5 /* icon.png */,
 				EFA44FD716B2737F004D40E7 /* AdSupport.framework */,
 				2750E77614CDB0DF007727A0 /* ECSlidingViewController */,
 				2750E76F14CDB0DF007727A0 /* Frameworks */,
@@ -499,21 +497,11 @@
 				27FC94DF14D0C14E0000B18C /* InitialSlidingViewController.m */,
 				EF2BCCBC16BD822100C1192E /* foodtypes.txt */,
 				EFE7A67816BCB11A0008E4FF /* suggestedLocations.txt */,
-				EFFD8D1316B68C4C001DF353 /* back_button@2x.png */,
 				EF0C5E5116B28C5500288EB3 /* MTStatusBarOverlay.h */,
 				EF0C5E5216B28C5500288EB3 /* MTStatusBarOverlay.m */,
 				EF6326EE169DD9E7009A78C3 /* Default-568h@2x.png */,
-				EFFD8D1616B693A4001DF353 /* directions@2x.png */,
-				EF3A33FA16CBF5AE000E10C5 /* distanceWhite@2x.png */,
 				2750E79214CDB93A007727A0 /* MenuViewController.h */,
 				2750E79314CDB93A007727A0 /* MenuViewController.m */,
-				EF0C5E2A16B27C7100288EB3 /* navigation.png */,
-				EFDBC97116C898FB0015A96A /* pin.png */,
-				EFDBC97216C898FB0015A96A /* pin@2x.png */,
-				EFFD8D1A16B69876001DF353 /* v.png */,
-				EFFD8D1C16B69BDF001DF353 /* plus.png */,
-				EFFD8D1816B69577001DF353 /* nav@2x.png */,
-				EF0C5E5A16B2C9C700288EB3 /* toolnav.png */,
 				EF9016EF16AC171D0089C57D /* MenuCell.h */,
 				EF9016F016AC171D0089C57D /* MenuCell.m */,
 				EF9016F316AC172B0089C57D /* MenuCell.xib */,
@@ -525,7 +513,6 @@
 				EF44BD42168B3AD800F7BCB5 /* ShopDetailViewController.m */,
 				EFD326A216BE9250009594F2 /* CorrectionViewController.h */,
 				EFD326A316BE9250009594F2 /* CorrectionViewController.m */,
-				EFE83D4916C77104005C45A5 /* miss-claude.ttf */,
 				EFFE149016C3561F00232A38 /* DANIEL FOOD DIARY.dat */,
 				EF25DDBA16C26586005F905E /* IEATISHOOTIPOST.dat */,
 				EFD326AD16BFCD1B009594F2 /* LADY IRON CHEF.dat */,
@@ -729,6 +716,19 @@
 		EFE28FA0167707E700095554 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				EFE83D4916C77104005C45A5 /* miss-claude.ttf */,
+				EFFD8D1616B693A4001DF353 /* directions@2x.png */,
+				EF3A33FA16CBF5AE000E10C5 /* distanceWhite@2x.png */,
+				EF3A33FC16CBFBF2000E10C5 /* icon@2x.png */,
+				EF3A33FE16CBFC5A000E10C5 /* icon.png */,
+				EFFD8D1316B68C4C001DF353 /* back_button@2x.png */,
+				EF0C5E2A16B27C7100288EB3 /* navigation.png */,
+				EFDBC97116C898FB0015A96A /* pin.png */,
+				EFDBC97216C898FB0015A96A /* pin@2x.png */,
+				EFFD8D1A16B69876001DF353 /* v.png */,
+				EFFD8D1C16B69BDF001DF353 /* plus.png */,
+				EFFD8D1816B69577001DF353 /* nav@2x.png */,
+				EF0C5E5A16B2C9C700288EB3 /* toolnav.png */,
 				EFDBC97916C89EEE0015A96A /* splash1.png */,
 				EFE83D4016C73B70005C45A5 /* icons */,
 				EFE83D3E16C73248005C45A5 /* sandwiches_pepper_food_1600x1200_wallpaper_High Quality Wallpaper_640x960_www.wallpaperhi.com.jpg */,
@@ -1049,8 +1049,8 @@
 		2750E78514CDB0DF007727A0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer: Lee Heng Hong (T53AB93G9J)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Lee Heng Hong (T53AB93G9J)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -1067,8 +1067,8 @@
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "B353EF43-4982-4DD4-ADE0-E0AD7481B081";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "B353EF43-4982-4DD4-ADE0-E0AD7481B081";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1077,8 +1077,8 @@
 		2750E78614CDB0DF007727A0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer: Lee Heng Hong (T53AB93G9J)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Lee Heng Hong (T53AB93G9J)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -1095,8 +1095,8 @@
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "B353EF43-4982-4DD4-ADE0-E0AD7481B081";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "B353EF43-4982-4DD4-ADE0-E0AD7481B081";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
