@@ -62,6 +62,14 @@
 		EFA83A7C16B1142100BD8057 /* SearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA83A7A16B1142100BD8057 /* SearchViewController.m */; };
 		EFA83A8416B1197800BD8057 /* TrieNode.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA83A8116B1197800BD8057 /* TrieNode.m */; };
 		EFA83A8516B1197800BD8057 /* Trie.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA83A8316B1197800BD8057 /* Trie.m */; };
+		EFC3BD8C16CFB651005D133F /* pinLoad-1 (dragged).tiff in Resources */ = {isa = PBXBuildFile; fileRef = EFC3BD8416CFB651005D133F /* pinLoad-1 (dragged).tiff */; };
+		EFC3BD8D16CFB651005D133F /* pinLoad-5 (dragged).tiff in Resources */ = {isa = PBXBuildFile; fileRef = EFC3BD8516CFB651005D133F /* pinLoad-5 (dragged).tiff */; };
+		EFC3BD8E16CFB651005D133F /* pinLoad-2 (dragged).tiff in Resources */ = {isa = PBXBuildFile; fileRef = EFC3BD8616CFB651005D133F /* pinLoad-2 (dragged).tiff */; };
+		EFC3BD8F16CFB651005D133F /* pinLoad-8 (dragged).tiff in Resources */ = {isa = PBXBuildFile; fileRef = EFC3BD8716CFB651005D133F /* pinLoad-8 (dragged).tiff */; };
+		EFC3BD9016CFB651005D133F /* pinLoad-7 (dragged).tiff in Resources */ = {isa = PBXBuildFile; fileRef = EFC3BD8816CFB651005D133F /* pinLoad-7 (dragged).tiff */; };
+		EFC3BD9116CFB651005D133F /* pinLoad-6 (dragged).tiff in Resources */ = {isa = PBXBuildFile; fileRef = EFC3BD8916CFB651005D133F /* pinLoad-6 (dragged).tiff */; };
+		EFC3BD9216CFB651005D133F /* pinLoad-3 (dragged).tiff in Resources */ = {isa = PBXBuildFile; fileRef = EFC3BD8A16CFB651005D133F /* pinLoad-3 (dragged).tiff */; };
+		EFC3BD9316CFB651005D133F /* pinLoad-4 (dragged).tiff in Resources */ = {isa = PBXBuildFile; fileRef = EFC3BD8B16CFB651005D133F /* pinLoad-4 (dragged).tiff */; };
 		EFC526DE169A9D5B00D9DFBF /* CrumbObj.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC526DD169A9D5B00D9DFBF /* CrumbObj.m */; };
 		EFD326A416BE9251009594F2 /* CorrectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EFD326A316BE9250009594F2 /* CorrectionViewController.m */; };
 		EFD326A816BF650C009594F2 /* SGFOODONFOOT.dat in Resources */ = {isa = PBXBuildFile; fileRef = EFD326A716BF650B009594F2 /* SGFOODONFOOT.dat */; };
@@ -245,6 +253,14 @@
 		EFB7CF55169EBE4600E1AED6 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		EFB7CF56169EBE4600E1AED6 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		EFB7CF57169EBE4600E1AED6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		EFC3BD8416CFB651005D133F /* pinLoad-1 (dragged).tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "pinLoad-1 (dragged).tiff"; sourceTree = "<group>"; };
+		EFC3BD8516CFB651005D133F /* pinLoad-5 (dragged).tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "pinLoad-5 (dragged).tiff"; sourceTree = "<group>"; };
+		EFC3BD8616CFB651005D133F /* pinLoad-2 (dragged).tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "pinLoad-2 (dragged).tiff"; sourceTree = "<group>"; };
+		EFC3BD8716CFB651005D133F /* pinLoad-8 (dragged).tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "pinLoad-8 (dragged).tiff"; sourceTree = "<group>"; };
+		EFC3BD8816CFB651005D133F /* pinLoad-7 (dragged).tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "pinLoad-7 (dragged).tiff"; sourceTree = "<group>"; };
+		EFC3BD8916CFB651005D133F /* pinLoad-6 (dragged).tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "pinLoad-6 (dragged).tiff"; sourceTree = "<group>"; };
+		EFC3BD8A16CFB651005D133F /* pinLoad-3 (dragged).tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "pinLoad-3 (dragged).tiff"; sourceTree = "<group>"; };
+		EFC3BD8B16CFB651005D133F /* pinLoad-4 (dragged).tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "pinLoad-4 (dragged).tiff"; sourceTree = "<group>"; };
 		EFC526DC169A9D5B00D9DFBF /* CrumbObj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CrumbObj.h; sourceTree = "<group>"; };
 		EFC526DD169A9D5B00D9DFBF /* CrumbObj.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CrumbObj.m; sourceTree = "<group>"; };
 		EFD326A216BE9250009594F2 /* CorrectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CorrectionViewController.h; sourceTree = "<group>"; };
@@ -760,6 +776,14 @@
 		EFE28FE5167708B400095554 /* HUDS */ = {
 			isa = PBXGroup;
 			children = (
+				EFC3BD8416CFB651005D133F /* pinLoad-1 (dragged).tiff */,
+				EFC3BD8516CFB651005D133F /* pinLoad-5 (dragged).tiff */,
+				EFC3BD8616CFB651005D133F /* pinLoad-2 (dragged).tiff */,
+				EFC3BD8716CFB651005D133F /* pinLoad-8 (dragged).tiff */,
+				EFC3BD8816CFB651005D133F /* pinLoad-7 (dragged).tiff */,
+				EFC3BD8916CFB651005D133F /* pinLoad-6 (dragged).tiff */,
+				EFC3BD8A16CFB651005D133F /* pinLoad-3 (dragged).tiff */,
+				EFC3BD8B16CFB651005D133F /* pinLoad-4 (dragged).tiff */,
 				EFF236B316B7655200DA9D0B /* loading-5 (dragged).tiff */,
 				EFF236B416B7655200DA9D0B /* loading-6 (dragged).tiff */,
 				EFF236B516B7655200DA9D0B /* loading-7 (dragged).tiff */,
@@ -912,6 +936,14 @@
 				EF3A33FB16CBF5AF000E10C5 /* distanceWhite@2x.png in Resources */,
 				EF3A33FD16CBFBF2000E10C5 /* icon@2x.png in Resources */,
 				EF3A33FF16CBFC5B000E10C5 /* icon.png in Resources */,
+				EFC3BD8C16CFB651005D133F /* pinLoad-1 (dragged).tiff in Resources */,
+				EFC3BD8D16CFB651005D133F /* pinLoad-5 (dragged).tiff in Resources */,
+				EFC3BD8E16CFB651005D133F /* pinLoad-2 (dragged).tiff in Resources */,
+				EFC3BD8F16CFB651005D133F /* pinLoad-8 (dragged).tiff in Resources */,
+				EFC3BD9016CFB651005D133F /* pinLoad-7 (dragged).tiff in Resources */,
+				EFC3BD9116CFB651005D133F /* pinLoad-6 (dragged).tiff in Resources */,
+				EFC3BD9216CFB651005D133F /* pinLoad-3 (dragged).tiff in Resources */,
+				EFC3BD9316CFB651005D133F /* pinLoad-4 (dragged).tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

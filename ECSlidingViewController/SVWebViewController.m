@@ -143,7 +143,7 @@
 - (void)viewDidLoad {
 	[super viewDidLoad];
     
-    
+    self.isLoading = YES;
     UIBarButtonItem* barbutton = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(goOffline)
                                   ];
 //    [barbutton setBackgroundImage:[UIImage imageNamed:@"directions.png"] forState:UIControlStateNormal];
