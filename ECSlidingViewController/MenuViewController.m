@@ -18,7 +18,7 @@
     self.menuItems = [NSMutableArray arrayWithObjects:@"BLOGS",@"SUGGEST A BLOG",nil];
 }
 
-
+  
 - (void)viewDidLoad
 {
   [super viewDidLoad];
