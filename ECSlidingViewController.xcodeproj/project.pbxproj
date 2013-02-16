@@ -502,9 +502,6 @@
 				EF6326EE169DD9E7009A78C3 /* Default-568h@2x.png */,
 				2750E79214CDB93A007727A0 /* MenuViewController.h */,
 				2750E79314CDB93A007727A0 /* MenuViewController.m */,
-				EF9016EF16AC171D0089C57D /* MenuCell.h */,
-				EF9016F016AC171D0089C57D /* MenuCell.m */,
-				EF9016F316AC172B0089C57D /* MenuCell.xib */,
 				27498DD314E96EEF005C043E /* SampleTableViewController.h */,
 				27498DD414E96EEF005C043E /* SampleTableViewController.m */,
 				2750E79814CDB99A007727A0 /* SecondTopViewController.h */,
@@ -641,6 +638,9 @@
 		EFE28F4A1677064500095554 /* CustomViews */ = {
 			isa = PBXGroup;
 			children = (
+				EF9016EF16AC171D0089C57D /* MenuCell.h */,
+				EF9016F016AC171D0089C57D /* MenuCell.m */,
+				EF9016F316AC172B0089C57D /* MenuCell.xib */,
 				EFE28F4B1677065200095554 /* RotatingTableCell.h */,
 				EFE28F4C1677065200095554 /* RotatingTableCell.m */,
 				EFE28F4D1677065200095554 /* SorterCell.h */,

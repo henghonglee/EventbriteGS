@@ -48,74 +48,81 @@
 
 -(void)viewDidLoad
 {
-    NSLog(@"viewdidload for geoscroll");
     self.boolhash = [[NSMutableDictionary alloc] init];
     self.GSObjectArray = [[NSMutableArray alloc] init];
     self.loadedGSObjectArray = [[NSMutableArray alloc] init];
     self.scopedGSObjectArray = [[NSMutableArray alloc] init];
+    
     self.tableView = [[UITableView alloc]initWithFrame:self.view.bounds];
     self.tableView.autoresizesSubviews = YES;
-    [self.tableView setAutoresizingMask:UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleLeftMargin];
+    self.tableView.autoresizingMask = UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleLeftMargin ;
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     self.tableView.scrollsToTop = YES;
-    
-    [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
-    [self.tableView setBackgroundColor:[UIColor clearColor]];
-//    [self.tableView setBackgroundColor:[UIColor greenColor]];
+    self.tableView.separatorStyle=UITableViewCellSeparatorStyleNone;
+    self.tableView.backgroundColor=[UIColor clearColor];
     [self.view addSubview:self.tableView];
-    
-    
+    dispatch_async(dispatch_get_main_queue(), ^
+   {
+       [SVProgressHUD showWithStatus:@"Loading"];
+   });
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [self LoadData];
+    });
+
 }
 
 -(void)viewDidAppear:(BOOL)animated
 {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        
-        [self LoadData];
-        
-    });
 }
 
 -(void)didRefreshTable:(id)sender
 {
+    NSArray* menuItems = [NSArray arrayWithObjects:@"IEATISHOOTIPOST",@"LADY IRON CHEF",@"LOVE SG FOOD",@"SGFOODONFOOT",@"DANIEL FOOD DIARY", nil];
     
-//,@"DANIEL'S FOOD DIARY",@"KEROPOKMAN"
-        NSArray* menuItems = [NSArray arrayWithObjects:@"IEATISHOOTIPOST",@"LADY IRON CHEF",@"LOVE SG FOOD",@"SGFOODONFOOT",@"DANIEL FOOD DIARY", nil];
-
-        NSMutableArray* delarray = [[NSMutableArray alloc]init];
-        for (NSString* blog in menuItems) {
-
-            
-            if([[[NSUserDefaults standardUserDefaults] objectForKey:blog] isEqualToString:@"Enabled"])
+    
+    
+    NSMutableArray* delarray = [[NSMutableArray alloc]init];
+    for (NSString* blog in menuItems)
+    {
+        if([[[NSUserDefaults standardUserDefaults] objectForKey:blog] isEqualToString:@"Enabled"])
+        {
+            if (![[self.boolhash objectForKey:blog] isEqualToString:@"Enabled"])
             {
-                if (![[self.boolhash objectForKey:blog] isEqualToString:@"Enabled"])
+                        [self retrieveAndProcessDataFromCacheOrServerForBlog:blog];
+                        [self.boolhash setObject:@"Enabled" forKey:blog];
+                                                 
+            }   
+        }
+        else
+        {
+            if ([[self.boolhash objectForKey:blog] isEqualToString:@"Enabled"])
+            {
+                
+                for (GSObject* gsobj in self.loadedGSObjectArray)
                 {
-                            [self retrieveAndProcessDataFromCacheOrServerForBlog:blog];
-                            [self.boolhash setObject:@"Enabled" forKey:blog];
-                            [self prepareDataForDisplay];                            
+                    if ([gsobj.source isEqualToString:blog])
+                    {
+                        [delarray addObject:gsobj];
+                    }
                 }
                 
-            }else{
+                [self.boolhash setObject:@"Disabled" forKey:blog];
                 
-                if ([[self.boolhash objectForKey:blog] isEqualToString:@"Enabled"])
+                for (GSObject* delgs in delarray)
                 {
-                    
-                    for (GSObject* gsobj in self.loadedGSObjectArray) {
-                        if ([gsobj.source isEqualToString:blog]) {
-                            [delarray addObject:gsobj];
-                        }
-                    }
-                    [self.boolhash setObject:@"Disabled" forKey:blog];
-                    for (GSObject* delgs in delarray) {
-                        [self.loadedGSObjectArray removeObject:delgs];
-                    }
-                    [self prepareDataForDisplay];
+                    [self.loadedGSObjectArray removeObject:delgs];
                 }
+               
             }
         }
-
-
+    }
+    [self prepareDataForDisplay];
+    dispatch_async(dispatch_get_main_queue(), ^
+   {
+       NSLog(@"dismissing progress hud");
+       [SVProgressHUD dismiss];
+   });
     
 }
 
@@ -123,76 +130,82 @@
 {
 
  
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-        NSString *documentsDirectory = [paths objectAtIndex:0];
-        NSString *yourArrayFileName = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.dat",blog]];
-        NSError* error = nil;
-        NSData* data = [NSData dataWithContentsOfFile:yourArrayFileName options:NSDataReadingMappedIfSafe error:&error];
-        if (error)
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *yourArrayFileName = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.dat",blog]];
+    NSError* error = nil;
+    NSData* data = [NSData dataWithContentsOfFile:yourArrayFileName options:NSDataReadingMappedIfSafe error:&error];
+    if (error)
+    {
+        NSLog(@"error = %@",error);
+        //if error get from main bundle .. means first launch
+        NSString* dbFile = [[NSBundle mainBundle] pathForResource:[NSString stringWithFormat:@"%@",blog] ofType:@"dat"];
+        NSData* filedata = [NSData dataWithContentsOfFile:dbFile options:NSDataReadingMappedIfSafe error:&error];
+        NSArray *archivedArray = [NSKeyedUnarchiver unarchiveObjectWithData:filedata];
+        [self processData:archivedArray];
+    }
+    else
+    {
+        NSArray *archivedArray = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+        NSLog(@"got data from file %@",yourArrayFileName);
+        [self processData:archivedArray];
+        
+    }
+
+
+
+
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://tastebudsapp.herokuapp.com/items?source=%@",[blog stringByReplacingOccurrencesOfString:@" " withString:@"%20"]]];
+    
+    NSLog(@"url = %@",url);
+    
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON)
+    {
+        NSLog(@"recieved response json");
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^
         {
-            NSLog(@"error = %@",error);
-            //if error get from main bundle .. means first launch
-            NSString* dbFile = [[NSBundle mainBundle] pathForResource:[NSString stringWithFormat:@"%@",blog] ofType:@"dat"];
-            NSData* filedata = [NSData dataWithContentsOfFile:dbFile options:NSDataReadingMappedIfSafe error:&error];
-            NSArray *archivedArray = [NSKeyedUnarchiver unarchiveObjectWithData:filedata];
-            [self processData:archivedArray];
-        }
-        else
-        {
-            NSArray *archivedArray = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-            NSLog(@"got data from file %@",yourArrayFileName);
-            [self processData:archivedArray];
-            
-        }
-        
-        
-        
-        
-            NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://tastebudsapp.herokuapp.com/items?source=%@",[blog stringByReplacingOccurrencesOfString:@" " withString:@"%20"]]];
-                          NSLog(@"url = %@",url);
-            NSURLRequest *request = [NSURLRequest requestWithURL:url];
-            AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
-                NSLog(@"recieved response json");
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-                    NSString *dataArrayName;
-                    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-                    NSString *documentsDirectory = [paths objectAtIndex:0];
-                    dataArrayName = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.dat",blog]];
-                                        
-                    NSData *retrieveddata = [NSKeyedArchiver archivedDataWithRootObject:JSON];
-                    if (![retrieveddata isEqualToData:data]){
-                        [retrieveddata writeToFile:yourArrayFileName atomically:YES];
-                        [[self class]addSkipBackupAttributeToItemAtURL:[NSURL fileURLWithPath:dataArrayName]];
-                        NSLog(@"wrotedata to file %@",dataArrayName);
-                        
-                    }else{
-                        NSLog(@"data is duplicate, not saved");
-                    }
-                });
-                
-            } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
-                NSLog(@"failed with error = %@",error);
-                
-            }];
-            [operation start];
-         
+            NSString *dataArrayName;
+            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+            NSString *documentsDirectory = [paths objectAtIndex:0];
+            dataArrayName = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.dat",blog]];
+                                
+            NSData *retrieveddata = [NSKeyedArchiver archivedDataWithRootObject:JSON];
+            if (![retrieveddata isEqualToData:data])
+            {
+                [retrieveddata writeToFile:yourArrayFileName atomically:YES];
+                [[self class]addSkipBackupAttributeToItemAtURL:[NSURL fileURLWithPath:dataArrayName]];
+                NSLog(@"wrotedata to file %@",dataArrayName);
+            }
+            else
+            {
+                NSLog(@"data is duplicate, not saved");
+            }
+        });
+    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON)
+    {
+        NSLog(@"failed with error = %@",error);
+    }];
+    [operation start];
 }
 
 
 -(void)LoadData
 {
-        
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(topDidAnchorRight ) name:ECSlidingViewTopDidAnchorRight object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underLeftWillDisappear) name:ECSlidingViewUnderLeftWillDisappear object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(topDidAnchorRight )
+                                                 name:ECSlidingViewTopDidAnchorRight object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(underLeftWillDisappear)
+                                                 name:ECSlidingViewUnderLeftWillDisappear object:nil];
     
-        [self didRefreshTable:nil];
-    
+    [self didRefreshTable:nil];
 }
 
 -(void)prepareDataForDisplay
 {
     @synchronized(self.loadedGSObjectArray) {
-        NSLog(@"runnign");
+        NSLog(@"running prepareDataForDisplay");
         if(userLocation)
         {
             self.loadedGSObjectArray = [self sortLoadedArray:self.loadedGSObjectArray ByVariable:@"distanceInMeters" ascending:YES];
@@ -205,7 +218,8 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         self.tableView.frame = self.view.bounds;
         [self.tableView reloadData];
-        if ([[UIDevice currentDevice] systemVersion].floatValue < 6.0) {
+        if ([[UIDevice currentDevice] systemVersion].floatValue < 6.0)
+        {
             int64_t delayInSeconds = 2.0;
             dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
             dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
@@ -272,19 +286,33 @@
             
             gsObject.descriptionhtml = [dataObject objectForKey:@"descriptionHTML"];
             gsObject.source = [dataObject objectForKey:@"source"];
-            if ([[dataObject objectForKey:@"source"] isEqualToString:@"LADY IRON CHEF"]) {
+            if ([[dataObject objectForKey:@"source"] isEqualToString:@"LADY IRON CHEF"])
+            {
                 gsObject.cursorColor = [UIColor blueColor]; //lady iron chef
-            }else if ([[dataObject objectForKey:@"source"] isEqualToString:@"IEATISHOOTIPOST"]) {
+            }
+            else if ([[dataObject objectForKey:@"source"] isEqualToString:@"IEATISHOOTIPOST"])
+            {
                 gsObject.cursorColor = [UIColor redColor];//ieat
-            }else if ([[dataObject objectForKey:@"source"] isEqualToString:@"DANIEL FOOD DIARY"]){
+            }
+            else if ([[dataObject objectForKey:@"source"] isEqualToString:@"DANIEL FOOD DIARY"])
+            {
                 gsObject.cursorColor = [UIColor magentaColor];
-            }else if ([[dataObject objectForKey:@"source"] isEqualToString:@"KEROPOKMAN"]){
+            }
+            else if ([[dataObject objectForKey:@"source"] isEqualToString:@"KEROPOKMAN"])
+            {
                 gsObject.cursorColor = [UIColor greenColor];
-            }else if ([[dataObject objectForKey:@"source"] isEqualToString:@"LOVE SG FOOD"]){
-                    gsObject.cursorColor = [UIColor cyanColor];
-            }else{
-                gsObject.cursorColor = [UIColor darkTextColor]; //lovesgfood
-                
+            }
+            else if ([[dataObject objectForKey:@"source"] isEqualToString:@"LOVE SG FOOD"])
+            {
+                    gsObject.cursorColor = [UIColor blackColor];
+            }
+            else if ([[dataObject objectForKey:@"source"] isEqualToString:@"SGFOODONFOOT"])
+            {
+                gsObject.cursorColor = [UIColor cyanColor];
+            }
+            else
+            {
+                gsObject.cursorColor = [UIColor darkTextColor];
             }            
         }
 
@@ -294,9 +322,12 @@
         }
         else
         {
-            if (![[dataObject objectForKey:@"images"] isKindOfClass:[NSString class]]) {
+            if (![[dataObject objectForKey:@"images"] isKindOfClass:[NSString class]])
+            {
                 gsObject.imageArray = [NSArray arrayWithArray:[dataObject objectForKey:@"images"]];
-            }else{
+            }
+            else
+            {
                  gsObject.imageArray = [NSArray array];
             }
             
@@ -545,11 +576,7 @@
             
             }
         }
-    dispatch_async(dispatch_get_main_queue(), ^
-    {
-        NSLog(@"dismissing progress hud");
-        [SVProgressHUD dismiss];
-    });
+   
 }
 
 -(void)updateCrumbsWithGsObject:(GSObject*)gsObj IntoResultArray:(NSMutableArray*)resultArray withMap:(MKMapView*)map andRegion:(MKCoordinateRegion)region
@@ -682,10 +709,17 @@
 }
 -(void)underLeftWillDisappear
 {
+
     NSLog(@"underLeftWillDisAppear");
     if (self.selectionChanged) {
         self.selectionChanged=NO;
-        [self didRefreshTable:nil];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD showWithStatus:@"Loading"];    
+        });
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            [self didRefreshTable:nil];
+        });
+        
     }
     
 
