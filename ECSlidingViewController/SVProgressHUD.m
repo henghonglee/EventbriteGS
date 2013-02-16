@@ -642,12 +642,12 @@ CGFloat SVProgressHUDRingThickness = 6;
 - (UIImageView *)spinnerView {
     if (spinnerView == nil) {
 #warning changed spinner here
-        int numberOfFrames = 10;
+        int numberOfFrames = 8;
         NSMutableArray *imagesArray = [NSMutableArray arrayWithCapacity:numberOfFrames];
         for (int i=1; numberOfFrames >= i; ++i)
         {
             [imagesArray addObject:[UIImage imageNamed:
-                                    [NSString stringWithFormat:@"loading-%d (dragged).tiff", i]]];
+                                    [NSString stringWithFormat:@"pinLoad-%d (dragged).tiff", i]]];
         }
         
         
