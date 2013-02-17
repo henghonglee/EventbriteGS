@@ -39,11 +39,6 @@
         serialQueue = dispatch_queue_create("com.example.MyQueue", NULL);
 
 }
--(void)viewWillDisappear:(BOOL)animated
-{
-    [self.navigationController setNavigationBarHidden:NO animated:YES];
-    free(serialQueue);
-}
 -(void)viewWillAppear:(BOOL)animated
 {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textFieldTextDidChange) name:UITextFieldTextDidChangeNotification object:self.searchTF];
@@ -55,14 +50,7 @@
     self.searchState = kStateSelectingFood;
     self.finalSearchString = @"";
     [self.underMapView setRegion:self.searchRegion animated:YES];
-//    NSString * dbFile;
-//    NSString * contents;
-//    
-//    
-//    dbFile = [[NSBundle mainBundle] pathForResource:@"suggestedLocations" ofType:@"txt"];
-//    contents = [NSString stringWithContentsOfFile:dbFile encoding:NSASCIIStringEncoding error:nil];
-//    self.suggestedLocations = [contents componentsSeparatedByString:@"\n"];
-//    NSLog(@"file data = %@",contents);
+    
     
     dispatch_async(serialQueue, ^{
         for (GSObject* gsobj in self.dataArray) {
@@ -86,15 +74,27 @@
         for (GSObject* gsobj in self.dataArray) {
             [self.suggestedFood setObject:[NSString stringWithFormat:@"%.01f km",(gsobj.distanceInMeters.doubleValue)/1000.0f] forKey:gsobj.title];
         }
+        [self.resultList sortUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.rsTableView reloadData];
         });
         
     });
-    
-    
-
 }
+
+-(void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [self becomeFirstResponder];
+}
+
+-(void)viewWillDisappear:(BOOL)animated
+{
+    [self.navigationController setNavigationBarHidden:NO animated:YES];
+    free(serialQueue);
+    [self resignFirstResponder];
+    [super viewWillDisappear:animated];
+}
+
 -(void)doSearch
 {
     [self.navigationController popViewControllerAnimated:YES];
@@ -135,7 +135,7 @@
                     }
                 }
             }
-           
+                [self.resultList sortUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
                 [self.rsTableView reloadData];
                 [self.rsTableView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:NO];
             });
@@ -175,6 +175,8 @@
             [self.resultList addObjectsFromArray:[set1 allObjects]];
         }
     }
+
+    
     [self.rsTableView reloadData];
 
 }
@@ -392,6 +394,22 @@
     [super viewDidUnload];
 }
 
+- (BOOL)canBecomeFirstResponder
+{
+    return YES;
+}
+- (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event
+{
+    if ( event.subtype == UIEventSubtypeMotionShake )
+    {
+        NSLog(@"did shake phone in search view controller.. show instructions for search here");
+    }
+    
+    if ( [super respondsToSelector:@selector(motionEnded:withEvent:)] )
+        [super motionEnded:motion withEvent:event];
+}
+
+
 //checks if a point is in the region
 -(BOOL)coordinate:(CLLocationCoordinate2D)coord ContainedinRegion:(MKCoordinateRegion)region
 {
@@ -416,5 +434,7 @@
         return NO;
     }
 }
+
+
 
 @end
