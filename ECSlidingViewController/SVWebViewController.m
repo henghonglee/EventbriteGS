@@ -144,66 +144,84 @@
 	[super viewDidLoad];
     
     self.isLoading = YES;
-    UIBarButtonItem* barbutton = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(goOffline)
+    UIBarButtonItem* barbutton = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(showActionSheet)
                                   ];
-//    [barbutton setBackgroundImage:[UIImage imageNamed:@"directions.png"] forState:UIControlStateNormal];
-//    [barbutton setFrame:CGRectMake(10, 0, 60, 44)];
-//    [barbutton addTarget:self action:@selector(goOffline) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.rightBarButtonItem = barbutton;
-    
-    
-//    int64_t delayInSeconds = 20.0;
-//    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
-//    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-//        if (self.isLoading) {
-//            UIBarButtonItem* barItem = [[UIBarButtonItem alloc]initWithTitle:@"Offline" style:UIBarButtonItemStyleBordered target:self action:@selector(goOffline)];
-//            self.navigationItem.rightBarButtonItem = barItem;
-//        }
-//    });
-
 }
 
+-(void) showActionSheet
+{
+    UIActionSheet* actionSheet = [[UIActionSheet alloc]initWithTitle:@"Actions" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Suggest Changes",@"Directions", nil];
+    [actionSheet setActionSheetStyle:UIActionSheetStyleAutomatic];
+    [actionSheet showInView:self.view];
+
+    
+}
+
+
+-(void)getDirections
+{
+    NSString* saddr = @"Current+Locaton";
+    
+    
+    if([[UIApplication sharedApplication] canOpenURL:
+        [NSURL URLWithString:@"comgooglemaps://"]]){
+        saddr = [NSString stringWithFormat:@"%f,%f", self.currentLocation.coordinate.latitude,self.currentLocation.coordinate.longitude];
+        NSLog(@"");
+        [[UIApplication sharedApplication]openURL:[NSURL URLWithString:[NSString stringWithFormat:@"comgooglemaps://?saddr=%@&daddr=%@&zoom=14&directionsmode=driving",saddr,[gsobj.locationString stringByReplacingOccurrencesOfString:@" " withString:@"+"]]]];
+    }else{
+        
+        NSString* urlStr;
+        
+        if ([[[UIDevice currentDevice] systemVersion] floatValue] >=6) {
+            //iOS 6+, Should use map.apple.com. Current Location doesn't work in iOS 6 . Must provide the coordinate.
+            if ((self.currentLocation.coordinate.latitude != kCLLocationCoordinate2DInvalid.latitude) && (self.currentLocation.coordinate.longitude != kCLLocationCoordinate2DInvalid.longitude)) {
+                //Valid location.
+                saddr = [NSString stringWithFormat:@"%f,%f", self.currentLocation.coordinate.latitude,self.currentLocation.coordinate.longitude];
+                urlStr = [NSString stringWithFormat:@"http://maps.apple.com/maps?saddr=%@&daddr=%@", saddr, [gsobj.locationString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+            } else {
+                //Invalid location. Location Service disabled.
+                urlStr = [NSString stringWithFormat:@"http://maps.apple.com/maps?daddr=%@", [gsobj.locationString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+            }
+        } else {
+            // < iOS 6. Use maps.google.com
+            urlStr = [NSString stringWithFormat:@"http://maps.google.com/maps?saddr=%@&daddr=%@", saddr, [gsobj.locationString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+        }
+        
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlStr]];
+        
+    }
+    
+    
+}
 -(void)goOffline
 {
 //    UIViewController*viewController = [[UIViewController alloc] init];
-    CorrectionViewController* viewController= [[CorrectionViewController alloc]init];
-    viewController.gsobj = self.gsobj;
-    [self.navigationController pushViewController:viewController animated:YES];
-//    if([[UIApplication sharedApplication] canOpenURL:
-//        [NSURL URLWithString:@"comgooglemaps://"]]){
-//
-//        [[UIApplication sharedApplication]openURL:[NSURL URLWithString:[NSString stringWithFormat:@"comgooglemaps://?daddr=%@&zoom=14&directionsmode=driving",[gsobj.locationString stringByReplacingOccurrencesOfString:@" " withString:@"+"]]]];
-//    }else{
-//        CLLocation* currentLocation;
-//        for (UIViewController* vc in self.navigationController.viewControllers) {
-//            if ([vc isKindOfClass:[GeoScrollViewController class]]) {
-//                currentLocation = ((GeoScrollViewController*)vc).userLocation.location;
-//            }
-//        }
-//        NSString* urlStr;
-//        NSString* saddr = @"Current+Locaton";
-//        
-//        if ([[[UIDevice currentDevice] systemVersion] floatValue] >=6) {
-//            //iOS 6+, Should use map.apple.com. Current Location doesn't work in iOS 6 . Must provide the coordinate.
-//            if ((currentLocation.coordinate.latitude != kCLLocationCoordinate2DInvalid.latitude) && (currentLocation.coordinate.longitude != kCLLocationCoordinate2DInvalid.longitude)) {
-//                //Valid location.
-//                saddr = [NSString stringWithFormat:@"%f,%f", currentLocation.coordinate.latitude,currentLocation.coordinate.longitude];
-//                urlStr = [NSString stringWithFormat:@"http://maps.apple.com/maps?saddr=%@&daddr=%@", saddr, [gsobj.locationString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-//            } else {
-//                //Invalid location. Location Service disabled.
-//                urlStr = [NSString stringWithFormat:@"http://maps.apple.com/maps?daddr=%@", [gsobj.locationString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-//            }
-//        } else {
-//            // < iOS 6. Use maps.google.com
-//            urlStr = [NSString stringWithFormat:@"http://maps.google.com/maps?saddr=%@&daddr=%@", saddr, [gsobj.locationString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-//        }
-//        
-//        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlStr]];
-//
-//    }
-//
+    
 }
+-(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:@"Directions"]) {
+        [self getDirections];
+    }
+    if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:@"Suggest Changes"]) {
+        CorrectionViewController* viewController= [[CorrectionViewController alloc]init];
+        viewController.gsobj = self.gsobj;
+        [self.navigationController pushViewController:viewController animated:YES];
+    }   
+}
+-(void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
 
+}
+-(void)actionSheet:(UIActionSheet *)actionSheet willDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    
+}
+-(void)actionSheetCancel:(UIActionSheet *)actionSheet
+{
+    
+}
 - (void)viewDidUnload {
     [super viewDidUnload];
     mainWebView = nil;
@@ -350,35 +368,35 @@
 #pragma mark -
 #pragma mark UIActionSheetDelegate
 
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-	NSString *title = [actionSheet buttonTitleAtIndex:buttonIndex];
-    
-	if([title isEqualToString:NSLocalizedString(@"Open in Safari", @"")])
-        [[UIApplication sharedApplication] openURL:self.mainWebView.request.URL];
-    
-    if([title isEqualToString:NSLocalizedString(@"Copy Link", @"")]) {
-        UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-        pasteboard.string = self.mainWebView.request.URL.absoluteString;
-    }
-    
-    else if([title isEqualToString:NSLocalizedString(@"Mail Link to this Page", @"")]) {
-        
-		MFMailComposeViewController *mailViewController = [[MFMailComposeViewController alloc] init];
-        
-		mailViewController.mailComposeDelegate = self;
-        [mailViewController setSubject:[self.mainWebView stringByEvaluatingJavaScriptFromString:@"document.title"]];
-  		[mailViewController setMessageBody:self.mainWebView.request.URL.absoluteString isHTML:NO];
-		mailViewController.modalPresentationStyle = UIModalPresentationFormSheet;
-        
-#if __IPHONE_OS_VERSION_MIN_REQUIRED < 60000
-		[self presentModalViewController:mailViewController animated:YES];
-#else
-        [self presentViewController:mailViewController animated:YES completion:NULL];
-#endif
-	}
-    
-    pageActionSheet = nil;
-}
+//- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+//	NSString *title = [actionSheet buttonTitleAtIndex:buttonIndex];
+//    
+//	if([title isEqualToString:NSLocalizedString(@"Open in Safari", @"")])
+//        [[UIApplication sharedApplication] openURL:self.mainWebView.request.URL];
+//    
+//    if([title isEqualToString:NSLocalizedString(@"Copy Link", @"")]) {
+//        UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+//        pasteboard.string = self.mainWebView.request.URL.absoluteString;
+//    }
+//    
+//    else if([title isEqualToString:NSLocalizedString(@"Mail Link to this Page", @"")]) {
+//        
+//		MFMailComposeViewController *mailViewController = [[MFMailComposeViewController alloc] init];
+//        
+//		mailViewController.mailComposeDelegate = self;
+//        [mailViewController setSubject:[self.mainWebView stringByEvaluatingJavaScriptFromString:@"document.title"]];
+//  		[mailViewController setMessageBody:self.mainWebView.request.URL.absoluteString isHTML:NO];
+//		mailViewController.modalPresentationStyle = UIModalPresentationFormSheet;
+//        
+//#if __IPHONE_OS_VERSION_MIN_REQUIRED < 60000
+//		[self presentModalViewController:mailViewController animated:YES];
+//#else
+//        [self presentViewController:mailViewController animated:YES completion:NULL];
+//#endif
+//	}
+//    
+//    pageActionSheet = nil;
+//}
 
 #pragma mark -
 #pragma mark MFMailComposeViewControllerDelegate

@@ -48,6 +48,7 @@
 
 -(void)viewDidLoad
 {
+    
     self.boolhash = [[NSMutableDictionary alloc] init];
     self.GSObjectArray = [[NSMutableArray alloc] init];
     self.loadedGSObjectArray = [[NSMutableArray alloc] init];
@@ -62,8 +63,12 @@
     self.tableView.separatorStyle=UITableViewCellSeparatorStyleNone;
     self.tableView.backgroundColor=[UIColor clearColor];
     [self.view addSubview:self.tableView];
+    
+    
+    
     dispatch_async(dispatch_get_main_queue(), ^
    {
+      
        [SVProgressHUD showWithStatus:@"Loading"];
    });
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -72,9 +77,12 @@
 
 }
 
--(void)viewDidAppear:(BOOL)animated
-{
+-(void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [self becomeFirstResponder];
 }
+
+
 
 -(void)didRefreshTable:(id)sender
 {
@@ -87,12 +95,15 @@
     {
         if([[[NSUserDefaults standardUserDefaults] objectForKey:blog] isEqualToString:@"Enabled"])
         {
+             NSLog(@" enabled");
             if (![[self.boolhash objectForKey:blog] isEqualToString:@"Enabled"])
             {
                         [self retrieveAndProcessDataFromCacheOrServerForBlog:blog];
                         [self.boolhash setObject:@"Enabled" forKey:blog];
                                                  
-            }   
+            }else{
+                NSLog(@"already enabled");
+            }
         }
         else
         {
@@ -359,7 +370,6 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
-    NSLog(@"firsttop appearing");
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(topDidAnchorLeft ) name:ECSlidingViewTopDidAnchorLeft object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underRightWillDisappear) name:ECSlidingViewUnderRightWillDisappear object:nil];
@@ -379,8 +389,9 @@
 }
 -(void)viewWillDisappear:(BOOL)animated
 {
-    NSLog(@"firststop disappearing");
+    [self resignFirstResponder];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [super viewWillDisappear:animated];
 }
 
 #pragma mark custom methods
@@ -669,7 +680,31 @@
 -(void)didReceiveUserLocation:(MKUserLocation*)location
 {
     userLocation = location;
+    
 }
+- (BOOL)canBecomeFirstResponder
+{
+    return YES;
+}
+- (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event
+{
+    if ( event.subtype == UIEventSubtypeMotionShake )
+    {
+        if ([self.slidingViewController.slidingViewController underLeftShowing]) {
+            NSLog(@"did shake phone in Menu view controller.. show instructions for Menu here");
+        }else{
+            if ([self.slidingViewController underRightShowing]) {
+                NSLog(@"did shake phone in undermap view controller.. show instructions for undermap here");
+            }else{
+                NSLog(@"did shake phone in geoscroll view controller.. show instructions for geoscroll here");
+            }
+        }
+    }
+    
+    if ( [super respondsToSelector:@selector(motionEnded:withEvent:)] )
+        [super motionEnded:motion withEvent:event];
+}
+
 -(void)topDidAnchorRight{
     NSLog(@"topDidAnchorRight");
 }
@@ -1135,7 +1170,16 @@
             }
         }
         endcell.endTableBackgroundView.layer.cornerRadius = 0;
-        
+        if([SVProgressHUD isVisible])
+        {
+            endcell.endTableBackgroundView.hidden = YES;
+        }else{
+            if (self.GSObjectArray.count==0) {
+                endcell.endTableBackgroundView.hidden = NO;
+            }else{
+                endcell.endTableBackgroundView.hidden = YES;
+            }
+        }
         return endcell;
     }
     GSObject* gsObj;
@@ -1261,6 +1305,7 @@
     NSURL *URL = [NSURL URLWithString:[NSString stringWithFormat:@"%@",selectedGSObj.link]];
 	SVWebViewController *webViewController = [[SVWebViewController alloc] initWithURL:URL];
     webViewController.gsobj = selectedGSObj;
+    webViewController.currentLocation = self.userLocation;
 	[self.navigationController pushViewController:webViewController animated:YES];
     
 }

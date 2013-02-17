@@ -10,12 +10,13 @@
 
 #import "SVModalWebViewController.h"
 #import "GSObject.h"
-@interface SVWebViewController : UIViewController
+@interface SVWebViewController : UIViewController <UIActionSheetDelegate>
 
 - (id)initWithAddress:(NSString*)urlString;
 - (id)initWithURL:(NSURL*)URL;
 @property (nonatomic, strong) GSObject* gsobj;
 @property (nonatomic) BOOL isLoading;
+@property (nonatomic, strong) CLLocation* currentLocation;
 @property (nonatomic, readwrite) SVWebViewControllerAvailableActions availableActions;
 
 @end
