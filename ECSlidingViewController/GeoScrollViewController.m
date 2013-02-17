@@ -48,6 +48,7 @@
 
 -(void)viewDidLoad
 {
+    
     self.boolhash = [[NSMutableDictionary alloc] init];
     self.GSObjectArray = [[NSMutableArray alloc] init];
     self.loadedGSObjectArray = [[NSMutableArray alloc] init];
@@ -62,8 +63,12 @@
     self.tableView.separatorStyle=UITableViewCellSeparatorStyleNone;
     self.tableView.backgroundColor=[UIColor clearColor];
     [self.view addSubview:self.tableView];
+    
+    
+    
     dispatch_async(dispatch_get_main_queue(), ^
    {
+      
        [SVProgressHUD showWithStatus:@"Loading"];
    });
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -87,12 +92,15 @@
     {
         if([[[NSUserDefaults standardUserDefaults] objectForKey:blog] isEqualToString:@"Enabled"])
         {
+             NSLog(@" enabled");
             if (![[self.boolhash objectForKey:blog] isEqualToString:@"Enabled"])
             {
                         [self retrieveAndProcessDataFromCacheOrServerForBlog:blog];
                         [self.boolhash setObject:@"Enabled" forKey:blog];
                                                  
-            }   
+            }else{
+                NSLog(@"already enabled");
+            }
         }
         else
         {
@@ -669,6 +677,7 @@
 -(void)didReceiveUserLocation:(MKUserLocation*)location
 {
     userLocation = location;
+    
 }
 -(void)topDidAnchorRight{
     NSLog(@"topDidAnchorRight");

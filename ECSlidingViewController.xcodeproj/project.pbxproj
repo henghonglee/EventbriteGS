@@ -515,7 +515,6 @@
 				EFE7A67816BCB11A0008E4FF /* suggestedLocations.txt */,
 				EF0C5E5116B28C5500288EB3 /* MTStatusBarOverlay.h */,
 				EF0C5E5216B28C5500288EB3 /* MTStatusBarOverlay.m */,
-				EF6326EE169DD9E7009A78C3 /* Default-568h@2x.png */,
 				2750E79214CDB93A007727A0 /* MenuViewController.h */,
 				2750E79314CDB93A007727A0 /* MenuViewController.m */,
 				27498DD314E96EEF005C043E /* SampleTableViewController.h */,
@@ -732,6 +731,7 @@
 		EFE28FA0167707E700095554 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				EF6326EE169DD9E7009A78C3 /* Default-568h@2x.png */,
 				EFE83D4916C77104005C45A5 /* miss-claude.ttf */,
 				EFFD8D1616B693A4001DF353 /* directions@2x.png */,
 				EF3A33FA16CBF5AE000E10C5 /* distanceWhite@2x.png */,

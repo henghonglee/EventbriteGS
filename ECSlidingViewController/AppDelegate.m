@@ -8,12 +8,24 @@
 
 #import "AppDelegate.h"
 #import "Mobclix.h"
+#define VERSION 1.0
 @implementation AppDelegate
 
 @synthesize window = _window;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    if ([[[NSUserDefaults standardUserDefaults]objectForKey:[NSString stringWithFormat:@"%0.2f",VERSION]] isEqualToString:@"Enabled"]) {
+        
+    }else{
+        NSLog(@"not enabled");
+        [[NSUserDefaults standardUserDefaults] setObject:@"Enabled" forKey:[NSString stringWithFormat:@"%0.2f",VERSION]];
+        NSArray* menuItems = [NSArray arrayWithObjects:@"IEATISHOOTIPOST",@"LADY IRON CHEF",@"LOVE SG FOOD",@"SGFOODONFOOT",@"DANIEL FOOD DIARY", nil];
+        for (NSString* blog in menuItems)
+        {
+            [[NSUserDefaults standardUserDefaults] setObject:@"Enabled" forKey:blog];
+        }
+    }
   [self.window makeKeyAndVisible];
     [Mobclix startWithApplicationId:@"DD9EE023-DB44-43A2-BE49-8E8EA51459F5"];
     
@@ -31,6 +43,10 @@
       [UIFont fontWithName:@"Helvetica-Light" size:21.0f],
       UITextAttributeFont,
       nil]];
+    
+    
+    
+    
   return YES;
 }
 

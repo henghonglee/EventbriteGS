@@ -71,7 +71,11 @@ static dispatch_once_t onceToken;
 
 -(void)mapView:(MKMapView *)retMapView didUpdateUserLocation:(MKUserLocation *)userLocation
 {
-  
+    NSLog(@"did update user location");
+    CLLocation* seaLoc = [[CLLocation alloc]initWithLatitude:0.0 longitude:0.0];
+    if ([userLocation.location distanceFromLocation:seaLoc] < 100) {
+        return;
+    }
     dispatch_once(&onceToken, ^{
         MKCoordinateRegion region;
         region.center.latitude = [self.mapView userLocation].coordinate.latitude;
