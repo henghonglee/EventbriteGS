@@ -692,11 +692,54 @@
     {
         if ([self.slidingViewController.slidingViewController underLeftShowing]) {
             NSLog(@"did shake phone in Menu view controller.. show instructions for Menu here");
+            BOOL removedInstructions = NO;
+            for (UIView* view in self.slidingViewController.slidingViewController.underLeftViewController.view.subviews) {
+                if ([view isKindOfClass:[UIImageView class]]) {
+                    if(((UIImageView*)view).image == [UIImage imageNamed:@"MenuInstructions.png"]){
+                        [view removeFromSuperview];
+                        removedInstructions = YES;
+                    }
+                }
+            }
+            if (!removedInstructions) {
+                UIImageView* MenuInstructions = [[UIImageView alloc]initWithFrame:self.slidingViewController.slidingViewController.underLeftViewController.view.bounds];
+                [MenuInstructions setImage:[UIImage imageNamed:@"MenuInstructions.png"]];
+                [self.slidingViewController.slidingViewController.underLeftViewController.view addSubview:MenuInstructions];
+            }
+            
         }else{
             if ([self.slidingViewController underRightShowing]) {
                 NSLog(@"did shake phone in undermap view controller.. show instructions for undermap here");
+                BOOL removedInstructions = NO;
+                for (UIView* view in self.slidingViewController.underRightViewController.view.subviews) {
+                    if ([view isKindOfClass:[UIImageView class]]) {
+                        if(((UIImageView*)view).image == [UIImage imageNamed:@"MapInstructions.png"]){
+                            [view removeFromSuperview];
+                            removedInstructions = YES;
+                        }
+                    }
+                }
+                if (!removedInstructions) {
+                    UIImageView* MenuInstructions = [[UIImageView alloc]initWithFrame:self.slidingViewController.underRightViewController.view.bounds];
+                    [MenuInstructions setImage:[UIImage imageNamed:@"MapInstructions.png"]];
+                    [self.slidingViewController.underRightViewController.view addSubview:MenuInstructions];
+                }
             }else{
                 NSLog(@"did shake phone in geoscroll view controller.. show instructions for geoscroll here");
+                BOOL removedInstructions = NO;
+                for (UIView* view in self.slidingViewController.topViewController.view.subviews) {
+                    if ([view isKindOfClass:[UIImageView class]]) {
+                        if(((UIImageView*)view).image == [UIImage imageNamed:@"GeoscrollInstructions.png"]){
+                            [view removeFromSuperview];
+                            removedInstructions = YES;
+                        }
+                    }
+                }
+                if (!removedInstructions) {
+                    UIImageView* MenuInstructions = [[UIImageView alloc]initWithFrame:self.slidingViewController.topViewController.view.bounds];
+                    [MenuInstructions setImage:[UIImage imageNamed:@"GeoscrollInstructions.png"]];
+                    [self.slidingViewController.topViewController.view addSubview:MenuInstructions];
+                }
             }
         }
     }

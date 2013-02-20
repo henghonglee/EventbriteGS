@@ -23,6 +23,7 @@
 {
   [super viewDidLoad];
     //@"DANIEL'S FOOD DIARY",@"KEROPOKMAN",
+    self.isBlogsRevealed = YES;
     self.arrayToAdd = [NSArray arrayWithObjects:@"IEATISHOOTIPOST",@"LADY IRON CHEF",@"LOVE SG FOOD",@"SGFOODONFOOT",@"DANIEL FOOD DIARY", nil];
     self.menuTableView.scrollsToTop = NO;
     self.menuTableView.backgroundColor = [UIColor clearColor];
