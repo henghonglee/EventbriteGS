@@ -109,6 +109,12 @@
     [self dismissModalViewControllerAnimated:NO];
     [self.delegate searchViewControllerDidFinishWithSearchString:self.finalSearchString];
 }
+-(IBAction)cancelSearch:(id)sender
+{
+    self.finalSearchString = @"";
+    [self dismissModalViewControllerAnimated:NO];
+     [self.delegate searchViewControllerDidFinishWithSearchString:self.finalSearchString];
+}
 -(void)textFieldTextDidChange{
     if ([self.searchTF.text isEqualToString:@""]) {
         NSLog(@"empty string");
@@ -207,10 +213,12 @@
 -(BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     [self dismissModalViewControllerAnimated:NO];
-    if ([self.finalSearchString isEqualToString:@""] && self.searchTF.text.length > 0) {
-       [self.delegate searchViewControllerDidFinishWithSearchString:[NSString stringWithFormat:@"addr=%@",self.searchTF.text]];
+    if (self.resultList.count>0) {
+        [self.delegate searchViewControllerDidFinishWithSearchString:[self.resultList objectAtIndex:0]];
+    }else if(self.shopResultList.count>0){
+        [self.delegate searchViewControllerDidFinishWithSearchString:[self.shopResultList objectAtIndex:0]];
     }else{
-        [self.delegate searchViewControllerDidFinishWithSearchString:self.finalSearchString];
+        [self.delegate searchViewControllerDidFinishWithSearchString:[NSString stringWithFormat:@"addr=%@",self.searchTF.text]];
     }
     return YES;
 }
@@ -226,6 +234,15 @@
     UITableViewCell* tableCell = (UITableViewCell*)[tableView dequeueReusableCellWithIdentifier:@"ListingCell"];
     switch (indexPath.section) {
         case 0:
+            if (self.resultList.count==0) {
+                tableCell.textLabel.text = [NSString stringWithFormat:@"Search addresses for \"%@ Singapore\" ",self.searchTF.text];
+                tableCell.detailTextLabel.text = @"";
+                tableCell.textLabel.font = [UIFont fontWithName:@"Helvetica-Light" size:13.0f];
+                tableCell.contentView.backgroundColor = [UIColor whiteColor];
+                tableCell.contentView.alpha = 0.8;
+                return tableCell;
+            }
+            
             if([self.finalSearchString rangeOfString:[NSString stringWithFormat:@"%@",[self.resultList objectAtIndex:indexPath.row]]].location != NSNotFound)
             {
                 cell.indicatorImage.hidden = NO;
@@ -262,7 +279,11 @@
 {
     switch (section) {
         case 0:
-            return [self.resultList count];
+            if (self.resultList.count == 0) {
+                return 1;
+            }else{
+                return [self.resultList count];
+            }
             break;
         case 1:
            return [self.shopResultList count];
@@ -281,8 +302,11 @@
 {
     switch (section) {
         case 0:
-            if ([self.resultList count]>0)
+            if ([self.resultList count]>0){
                 return 40;
+            }else{
+                return 0;
+            }
             break;
         case 1:
             if ([self.shopResultList count]>0)
@@ -343,9 +367,16 @@
         }
         else if ((int)self.searchState == kStateSelectingFood)
         {
+            if (self.resultList.count==0) {
+                [self.delegate searchViewControllerDidFinishWithSearchString:[NSString stringWithFormat:@"addr=%@",self.searchTF.text]];
+                self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+                [self dismissModalViewControllerAnimated:YES];
+                return;
+            }
+            
             self.finalSearchString = [self.resultList objectAtIndex:indexPath.row];
             [self.delegate searchViewControllerDidFinishWithSearchString:self.finalSearchString];
-            self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+            self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
             [self dismissModalViewControllerAnimated:YES];
             }
         
@@ -367,7 +398,7 @@
         {
             self.finalSearchString = [self.shopResultList objectAtIndex:indexPath.row];
             [self.delegate searchViewControllerDidFinishWithSearchString:self.finalSearchString];
-            self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+            self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
             [self dismissModalViewControllerAnimated:YES];
 
         }

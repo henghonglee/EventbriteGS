@@ -301,7 +301,7 @@
 
 - (void)webViewDidStartLoad:(UIWebView *)webView {
 	[[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-    NSLog(@"is loading");
+  //  NSLog(@"is loading");
     self.isLoading = YES;
 //    [self updateToolbarItems];
 }
@@ -313,7 +313,7 @@
     self.navigationItem.title = [webView stringByEvaluatingJavaScriptFromString:@"document.title"];
     
     if (webView == mainWebView) {
-        NSLog(@"done loading");
+    //    NSLog(@"done loading");
         self.isLoading = NO;
         dispatch_async(dispatch_get_main_queue(), ^{
             [SVProgressHUD dismiss];

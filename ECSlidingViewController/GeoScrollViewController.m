@@ -203,9 +203,9 @@
 
 -(void)LoadData
 {
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(topDidAnchorRight )
-                                                 name:ECSlidingViewTopDidAnchorRight object:nil];
+//    [[NSNotificationCenter defaultCenter] addObserver:self
+//                                             selector:@selector(topDidAnchorRight )
+//                                                 name:ECSlidingViewTopDidAnchorRight object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(underLeftWillDisappear)
                                                  name:ECSlidingViewUnderLeftWillDisappear object:nil];
@@ -1001,7 +1001,7 @@
         self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
         
         self.tableView.hidden = YES;
-        [self presentModalViewController:searchViewController animated:NO];
+        [self presentModalViewController:searchViewController animated:YES];
         return NO;
 
 }
@@ -1009,6 +1009,14 @@
 {
     NSLog(@"searchString = %@",searchString);
     self.tableView.hidden = NO;
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(topDidAnchorLeft ) name:ECSlidingViewTopDidAnchorLeft object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underRightWillDisappear) name:ECSlidingViewUnderRightWillDisappear object:nil];
+    
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underLeftWillAppear) name:ECSlidingViewUnderLeftWillAppear object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underLeftWillDisappear) name:ECSlidingViewUnderLeftWillDisappear object:nil];
     ((SorterCell*)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]]).searchTextField.text = searchString;
     [self textFieldShouldReturn:((SorterCell*)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]]).searchTextField];
 }
@@ -1088,9 +1096,10 @@
                                 [self.GSObjectArray addObjectsFromArray:self.scopedGSObjectArray];
                             }
                             [self.tableView reloadData];
+                            if (self.scopedGSObjectArray.count > 1) {
                             MKMapView* underMapView = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
                             [underMapView setVisibleMapRect:MKMapRectInset([underMapView visibleMapRect], [underMapView visibleMapRect].size.width*0.005, [underMapView visibleMapRect].size.height*0.005) animated:YES];
-                            
+                            }
                             
                             if ([self.GSObjectArray count]>0) {[self didScrollToEntryAtIndex:0];}
                             MTStatusBarOverlay *overlay = [MTStatusBarOverlay sharedInstance];

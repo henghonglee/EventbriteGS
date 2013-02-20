@@ -466,7 +466,7 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
 
 - (void)addTopViewSnapshot
 {
-    NSLog(@"adding top view snapshot");
+   // NSLog(@"adding top view snapshot");
     if (!self.topViewSnapshot.superview && !self.shouldAllowUserInteractionsWhenAnchored) {
         topViewSnapshot.layer.contents = (id)[UIImage imageWithUIView:self.topView].CGImage;
         
