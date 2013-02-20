@@ -686,6 +686,12 @@
 {
     return YES;
 }
+
+-(void)selectedInstructions:(UIButton*)sender
+{
+    [sender removeFromSuperview];
+}
+
 - (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event
 {
     if ( event.subtype == UIEventSubtypeMotionShake )
@@ -694,16 +700,20 @@
             NSLog(@"did shake phone in Menu view controller.. show instructions for Menu here");
             BOOL removedInstructions = NO;
             for (UIView* view in self.slidingViewController.slidingViewController.underLeftViewController.view.subviews) {
-                if ([view isKindOfClass:[UIImageView class]]) {
-                    if(((UIImageView*)view).image == [UIImage imageNamed:@"MenuInstructions.png"]){
+                if ([view isKindOfClass:[UIButton class]])
+                {
+                    if (view.tag == 1) {
                         [view removeFromSuperview];
                         removedInstructions = YES;
                     }
                 }
             }
             if (!removedInstructions) {
-                UIImageView* MenuInstructions = [[UIImageView alloc]initWithFrame:self.slidingViewController.slidingViewController.underLeftViewController.view.bounds];
-                [MenuInstructions setImage:[UIImage imageNamed:@"MenuInstructions.png"]];
+                UIButton* MenuInstructions = [UIButton buttonWithType:UIButtonTypeCustom];
+                [MenuInstructions setTag:1];
+                [MenuInstructions setFrame:self.slidingViewController.slidingViewController.underLeftViewController.view.bounds];
+                [MenuInstructions setImage:[UIImage imageNamed:@"MenuInstructions.png"] forState:UIControlStateNormal];
+                [MenuInstructions addTarget:self action:@selector(selectedInstructions:) forControlEvents:UIControlEventTouchDown];
                 [self.slidingViewController.slidingViewController.underLeftViewController.view addSubview:MenuInstructions];
             }
             
@@ -712,32 +722,41 @@
                 NSLog(@"did shake phone in undermap view controller.. show instructions for undermap here");
                 BOOL removedInstructions = NO;
                 for (UIView* view in self.slidingViewController.underRightViewController.view.subviews) {
-                    if ([view isKindOfClass:[UIImageView class]]) {
-                        if(((UIImageView*)view).image == [UIImage imageNamed:@"MapInstructions.png"]){
+                    if ([view isKindOfClass:[UIButton class]])
+                    {
+                        if (view.tag == 1) {
                             [view removeFromSuperview];
                             removedInstructions = YES;
                         }
                     }
                 }
                 if (!removedInstructions) {
-                    UIImageView* MenuInstructions = [[UIImageView alloc]initWithFrame:self.slidingViewController.underRightViewController.view.bounds];
-                    [MenuInstructions setImage:[UIImage imageNamed:@"MapInstructions.png"]];
+                    UIButton* MenuInstructions = [UIButton buttonWithType:UIButtonTypeCustom];
+                    [MenuInstructions setTag:1];
+                    [MenuInstructions setFrame:self.slidingViewController.underRightViewController.view.bounds];
+                    [MenuInstructions setImage:[UIImage imageNamed:@"MapInstructions.png"] forState:UIControlStateNormal];
+                    [MenuInstructions addTarget:self action:@selector(selectedInstructions:) forControlEvents:UIControlEventTouchDown];
                     [self.slidingViewController.underRightViewController.view addSubview:MenuInstructions];
                 }
+            
             }else{
                 NSLog(@"did shake phone in geoscroll view controller.. show instructions for geoscroll here");
                 BOOL removedInstructions = NO;
                 for (UIView* view in self.slidingViewController.topViewController.view.subviews) {
-                    if ([view isKindOfClass:[UIImageView class]]) {
-                        if(((UIImageView*)view).image == [UIImage imageNamed:@"GeoscrollInstructions.png"]){
+                    if ([view isKindOfClass:[UIButton class]])
+                    {
+                        if (view.tag == 1) {
                             [view removeFromSuperview];
                             removedInstructions = YES;
                         }
                     }
                 }
                 if (!removedInstructions) {
-                    UIImageView* MenuInstructions = [[UIImageView alloc]initWithFrame:self.slidingViewController.topViewController.view.bounds];
-                    [MenuInstructions setImage:[UIImage imageNamed:@"GeoscrollInstructions.png"]];
+                    UIButton* MenuInstructions = [UIButton buttonWithType:UIButtonTypeCustom];
+                    [MenuInstructions setTag:1];
+                    [MenuInstructions setFrame:self.slidingViewController.topViewController.view.bounds];
+                    [MenuInstructions setImage:[UIImage imageNamed:@"GeoscrollInstructions.png"] forState:UIControlStateNormal];
+                    [MenuInstructions addTarget:self action:@selector(selectedInstructions:) forControlEvents:UIControlEventTouchDown];
                     [self.slidingViewController.topViewController.view addSubview:MenuInstructions];
                 }
             }
@@ -799,17 +818,15 @@
         });
         
     }
-    
+    for (UIView* view in self.slidingViewController.underRightViewController.view.subviews) {
+        if ([view isKindOfClass:[UIButton class]])
+        {
+            if (view.tag == 1) {
+                [view removeFromSuperview];
+            }
+        }
+    }
 
-
-    
-    
-    
-//    for (UIGestureRecognizer* gr in self.view.gestureRecognizers) {
-//        [self.view removeGestureRecognizer:gr];
-//    }
-//    [self.view addGestureRecognizer:self.slidingViewController.panGesture];
-//    
 }
 
 -(void)underRightWillDisappear
@@ -981,13 +998,17 @@
         MKCoordinateRegion region = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView.region;
         searchViewController.searchRegion = region;
         [searchViewController.underMapView setRegion:region animated:NO];
-        [self.navigationController pushViewController:searchViewController animated:YES];
+        self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+        
+        self.tableView.hidden = YES;
+        [self presentModalViewController:searchViewController animated:NO];
         return NO;
 
 }
 -(void)searchViewControllerDidFinishWithSearchString:(NSString *)searchString
 {
     NSLog(@"searchString = %@",searchString);
+    self.tableView.hidden = NO;
     ((SorterCell*)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]]).searchTextField.text = searchString;
     [self textFieldShouldReturn:((SorterCell*)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]]).searchTextField];
 }
@@ -1067,6 +1088,8 @@
                                 [self.GSObjectArray addObjectsFromArray:self.scopedGSObjectArray];
                             }
                             [self.tableView reloadData];
+                            MKMapView* underMapView = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
+                            [underMapView setVisibleMapRect:MKMapRectInset([underMapView visibleMapRect], [underMapView visibleMapRect].size.width*0.005, [underMapView visibleMapRect].size.height*0.005) animated:YES];
                             
                             
                             if ([self.GSObjectArray count]>0) {[self didScrollToEntryAtIndex:0];}

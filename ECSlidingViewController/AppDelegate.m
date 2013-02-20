@@ -15,6 +15,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    self.window.rootViewController.modalPresentationStyle = UIModalPresentationCurrentContext;
     application.applicationSupportsShakeToEdit = YES;
     if ([[[NSUserDefaults standardUserDefaults]objectForKey:[NSString stringWithFormat:@"%0.2f",VERSION]] isEqualToString:@"Enabled"]) {
         

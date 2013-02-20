@@ -24,7 +24,11 @@
     }
     return self;
 }
+- (void)awakeFromNib {
+    
+    
 
+}
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -42,10 +46,10 @@
 -(void)viewWillAppear:(BOOL)animated
 {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textFieldTextDidChange) name:UITextFieldTextDidChangeNotification object:self.searchTF];
-    [self.navigationController setNavigationBarHidden:NO animated:YES];
-    
-    UIBarButtonItem* searchButton = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doSearch)];
-    self.navigationItem.rightBarButtonItem = searchButton;
+    self.view.opaque = YES;
+   self.view.backgroundColor = [UIColor clearColor];
+//    UIBarButtonItem* searchButton = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doSearch)];
+//    self.navigationItem.rightBarButtonItem = searchButton;
     //[self.searchTF becomeFirstResponder];
     self.searchState = kStateSelectingFood;
     self.finalSearchString = @"";
@@ -76,7 +80,13 @@
         }
         [self.resultList sortUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
         dispatch_async(dispatch_get_main_queue(), ^{
+//            NSMutableArray* indexPaths = [NSMutableArray array];
+//            for (int i=0; i<self.resultList.count; i++) {
+//                [indexPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
+//            }
+            //[self.rsTableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
             [self.rsTableView reloadData];
+
         });
         
     });
@@ -84,20 +94,19 @@
 
 -(void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [self becomeFirstResponder];
+    [self.searchTF becomeFirstResponder];
 }
 
 -(void)viewWillDisappear:(BOOL)animated
 {
-    [self.navigationController setNavigationBarHidden:NO animated:YES];
     free(serialQueue);
-    [self resignFirstResponder];
+    [self.searchTF resignFirstResponder];
     [super viewWillDisappear:animated];
 }
 
 -(void)doSearch
 {
-    [self.navigationController popViewControllerAnimated:YES];
+    [self dismissModalViewControllerAnimated:NO];
     [self.delegate searchViewControllerDidFinishWithSearchString:self.finalSearchString];
 }
 -(void)textFieldTextDidChange{
@@ -197,7 +206,7 @@
 }
 -(BOOL)textFieldShouldReturn:(UITextField *)textField
 {
-    [self.navigationController popViewControllerAnimated:YES];
+    [self dismissModalViewControllerAnimated:NO];
     if ([self.finalSearchString isEqualToString:@""] && self.searchTF.text.length > 0) {
        [self.delegate searchViewControllerDidFinishWithSearchString:[NSString stringWithFormat:@"addr=%@",self.searchTF.text]];
     }else{
@@ -334,30 +343,12 @@
         }
         else if ((int)self.searchState == kStateSelectingFood)
         {
-            SearchCell* checkCell = [tableView cellForRowAtIndexPath:indexPath];
-            if([self.finalSearchString rangeOfString:[NSString stringWithFormat:@"%@",[self.resultList objectAtIndex:indexPath.row]]].location != NSNotFound){
-                checkCell.indicatorImage.hidden = YES;
-                if ([self.finalSearchString isEqualToString:[NSString stringWithFormat:@"%@",[self.resultList objectAtIndex:indexPath.row]]]) {
-                    self.finalSearchString =@"";
-                }
-                self.finalSearchString = [self.finalSearchString stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"+%@",[self.resultList objectAtIndex:indexPath.row]] withString:@""];
-                self.finalSearchString = [self.finalSearchString stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@+",[self.resultList objectAtIndex:indexPath.row]] withString:@""];
-                
-            }else{
-                if (self.finalSearchString.length ==0 ) {
-                    self.finalSearchString =[self.resultList objectAtIndex:indexPath.row];
-                }else{
-                    self.finalSearchString = [self.finalSearchString stringByAppendingFormat:@"+%@",[self.resultList objectAtIndex:indexPath.row]];
-                }
-                checkCell.indicatorImage.hidden = NO;
-
+            self.finalSearchString = [self.resultList objectAtIndex:indexPath.row];
+            [self.delegate searchViewControllerDidFinishWithSearchString:self.finalSearchString];
+            self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+            [self dismissModalViewControllerAnimated:YES];
             }
-            
-            
-            NSLog(@"selected food");
-            
-            self.searchTF.text = self.finalSearchString;
-        }
+        
     }else{
         [tableView deselectRowAtIndexPath:indexPath animated:YES];
         if ((int)self.searchState == kStateSelectingLocation)
@@ -375,8 +366,10 @@
         else if ((int)self.searchState == kStateSelectingFood)
         {
             self.finalSearchString = [self.shopResultList objectAtIndex:indexPath.row];
-            [self.navigationController popViewControllerAnimated:YES];
             [self.delegate searchViewControllerDidFinishWithSearchString:self.finalSearchString];
+            self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+            [self dismissModalViewControllerAnimated:YES];
+
         }
     }
     
