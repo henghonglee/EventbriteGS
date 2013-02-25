@@ -36,9 +36,20 @@
     NSLog(@"hiding menu");
 }
 
+-(BOOL)shouldAutorotate{
+    if (self.underLeftShowing) {
+        return NO;
+    }else{
+        return YES;
+    }
+}
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
 {
-  return YES;
+    if (self.underLeftShowing) {
+        return NO;
+    }else{
+        return YES;
+    }
 }
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration

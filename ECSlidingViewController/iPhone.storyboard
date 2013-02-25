@@ -10,15 +10,15 @@
                 <viewController storyboardIdentifier="Menu" id="Wid-ZD-WEx" customClass="MenuViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="W0P-Wb-YYH">
                         <rect key="frame" x="0.0" y="20" width="320" height="460"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="splash1.png" id="Frd-Np-GQy">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" image="splash1.png" id="Frd-Np-GQy">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="460"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
                             </imageView>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="35U-4J-jxL">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="460"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 <color key="separatorColor" red="0.93207644628099173" green="0.93207644628099173" blue="0.93207644628099173" alpha="1" colorSpace="calibratedRGB"/>
                                 <sections/>
@@ -286,31 +286,70 @@
                                     <outlet property="delegate" destination="Xzu-tL-m7w" id="bDS-3w-Zpu"/>
                                 </connections>
                             </mapView>
-                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="OUL-NT-o4j">
-                                <rect key="frame" x="275" y="415" width="45" height="45"/>
+                            <view hidden="YES" alpha="0.99999999999999989" contentMode="scaleToFill" id="cPQ-Fi-mfQ">
+                                <rect key="frame" x="0.0" y="415" width="320" height="45"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" size="button"/>
-                                <state key="normal" backgroundImage="alumBtn.png">
-                                    <color key="titleColor" red="0.1960784314" green="0.30980392159999998" blue="0.52156862749999999" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="zoomToLoc:" destination="Xzu-tL-m7w" eventType="touchUpInside" id="h7x-gE-gnb"/>
-                                </connections>
-                            </button>
+                                <subviews>
+                                    <label hidden="YES" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="LabelLabelLabelLabel LabelLabelLabelLabelLabel" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="VaO-G4-mrx">
+                                        <rect key="frame" x="15" y="5" width="241" height="35"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                        <color key="shadowColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                        <size key="shadowOffset" width="1" height="1"/>
+                                    </label>
+                                    <button hidden="YES" opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="OUL-NT-o4j">
+                                        <rect key="frame" x="273" y="1" width="44" height="44"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="boldSystem" size="button"/>
+                                        <state key="normal" image="locationBlue.png">
+                                            <color key="titleColor" red="0.1960784314" green="0.30980392159999998" blue="0.52156862749999999" alpha="1" colorSpace="calibratedRGB"/>
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <state key="highlighted">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="zoomToLoc:" destination="Xzu-tL-m7w" eventType="touchUpInside" id="h7x-gE-gnb"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="xfS-P2-hzf">
+                                        <rect key="frame" x="0.0" y="1" width="265" height="44"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                        <state key="normal">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <state key="highlighted">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="showGeoscroll:" destination="Xzu-tL-m7w" eventType="touchUpInside" id="271-Jd-0JW"/>
+                                        </connections>
+                                    </button>
+                                    <view contentMode="scaleToFill" id="W7s-SU-VU2">
+                                        <rect key="frame" x="270" y="0.0" width="2" height="44"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    </view>
+                                </subviews>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <connections>
+                        <outlet property="InfoPanelView" destination="cPQ-Fi-mfQ" id="dV7-cl-zWU"/>
+                        <outlet property="ShopButton" destination="xfS-P2-hzf" id="d0e-kU-wzi"/>
                         <outlet property="locationButton" destination="OUL-NT-o4j" id="NMB-kV-JG6"/>
                         <outlet property="mapView" destination="dw3-qk-cfj" id="GQl-c5-rjz"/>
                         <outlet property="shop1" destination="LBa-dv-dDC" id="X9O-e3-nKH"/>
                         <outlet property="shop1LoadingIndicator" destination="eCn-5D-dee" id="Gbc-ky-2Dr"/>
                         <outlet property="shop2" destination="3lV-QB-tHu" id="SIe-3I-s8C"/>
                         <outlet property="shop2LoadingIndicator" destination="8pO-zH-EDA" id="BkO-hv-x80"/>
+                        <outlet property="shopLabel" destination="VaO-G4-mrx" id="wep-9N-L2O"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Rpl-dc-Arn" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -331,12 +370,117 @@
             </objects>
             <point key="canvasLocation" x="1096" y="-2935"/>
         </scene>
+        <!--Map Search View Controller-->
+        <scene sceneID="UDG-aW-3iH">
+            <objects>
+                <viewController storyboardIdentifier="MapSearch" id="jjY-4b-bo4" customClass="MapSearchViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="M4D-Gm-OET">
+                        <rect key="frame" x="0.0" y="20" width="320" height="460"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <searchBar contentMode="redraw" id="ALI-8z-j8r">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                <textInputTraits key="textInputTraits"/>
+                                <connections>
+                                    <outlet property="delegate" destination="jjY-4b-bo4" id="g85-ui-43R"/>
+                                </connections>
+                            </searchBar>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <connections>
+                        <outlet property="searchDisplayController" destination="Ewr-37-dh5" id="rCZ-cE-CMY"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="xP6-Iw-EOu" sceneMemberID="firstResponder"/>
+                <searchDisplayController id="Ewr-37-dh5">
+                    <connections>
+                        <outlet property="delegate" destination="jjY-4b-bo4" id="X92-o7-uJb"/>
+                        <outlet property="searchBar" destination="ALI-8z-j8r" id="lAK-b8-B4U"/>
+                        <outlet property="searchContentsController" destination="jjY-4b-bo4" id="dwe-sV-eiL"/>
+                        <outlet property="searchResultsDataSource" destination="jjY-4b-bo4" id="K3b-F3-Xcg"/>
+                        <outlet property="searchResultsDelegate" destination="jjY-4b-bo4" id="dWc-Kl-FWx"/>
+                    </connections>
+                </searchDisplayController>
+            </objects>
+        </scene>
     </scenes>
     <resources>
-        <image name="alumBtn.png" width="150" height="151"/>
+        <image name="locationBlue.png" width="16" height="16"/>
         <image name="search.png" width="101" height="101"/>
         <image name="splash1.png" width="640" height="960"/>
     </resources>
+    <classes>
+        <class className="CorrectionViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/CorrectionViewController.h"/>
+        </class>
+        <class className="ECSlidingViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ECSlidingViewController.h"/>
+        </class>
+        <class className="GeoScrollViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/GeoScrollViewController.h"/>
+        </class>
+        <class className="InitialSlidingViewController" superclassName="ECSlidingViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/InitialSlidingViewController.h"/>
+        </class>
+        <class className="MapNavViewController" superclassName="UINavigationController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/MapNavViewController.h"/>
+        </class>
+        <class className="MapSearchViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/MapSearchViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="ibSearchBar" candidateClass="UISearchBar"/>
+            </relationships>
+        </class>
+        <class className="MapSlidingViewController" superclassName="ECSlidingViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/MapSlidingViewController.h"/>
+        </class>
+        <class className="MenuViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/MenuViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="menuTableView" candidateClass="UITableView"/>
+            </relationships>
+        </class>
+        <class className="SearchCell" superclassName="UITableViewCell">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/SearchCell.h"/>
+            <relationships>
+                <relationship kind="outlet" name="indicatorImage" candidateClass="UIImageView"/>
+                <relationship kind="outlet" name="subTitleLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="titleLabel" candidateClass="UILabel"/>
+            </relationships>
+        </class>
+        <class className="SearchViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/SearchViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="rsTableView" candidateClass="UITableView"/>
+                <relationship kind="outlet" name="searchTF" candidateClass="UITextField"/>
+                <relationship kind="outlet" name="underMapView" candidateClass="MKMapView"/>
+            </relationships>
+        </class>
+        <class className="ShopDetailViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ShopDetailViewController.h"/>
+        </class>
+        <class className="UnderMapViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/UnderMapViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="selectCategory:"/>
+                <relationship kind="outlet" name="InfoPanelView" candidateClass="UIView"/>
+                <relationship kind="outlet" name="ShopButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="allButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="categorySelectionButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="detailButton" candidateClass="UIView"/>
+                <relationship kind="outlet" name="locationButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="mapView" candidateClass="MKMapView"/>
+                <relationship kind="outlet" name="shop1" candidateClass="UIImageView"/>
+                <relationship kind="outlet" name="shop1LoadingIndicator" candidateClass="UIActivityIndicatorView"/>
+                <relationship kind="outlet" name="shop2" candidateClass="UIImageView"/>
+                <relationship kind="outlet" name="shop2LoadingIndicator" candidateClass="UIActivityIndicatorView"/>
+                <relationship kind="outlet" name="shopLabel" candidateClass="UILabel"/>
+                <relationship kind="outletCollection" name="categoryButtons" candidateClass="UIButton"/>
+            </relationships>
+        </class>
+    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

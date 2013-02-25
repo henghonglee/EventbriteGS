@@ -19,13 +19,15 @@
 //  } else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
 //    storyboard = [UIStoryboard storyboardWithName:@"iPad" bundle:nil];
 //  }
-  
+        [self setAnchorLeftPeekAmount:1.0f];    
   self.topViewController = [storyboard instantiateViewControllerWithIdentifier:@"GeoScroll"];
 }
-
+-(BOOL)shouldAutorotate{
+    return NO;
+}
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
 {
-  return YES;
+  return NO;
 }
 
 

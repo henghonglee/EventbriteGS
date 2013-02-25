@@ -24,7 +24,7 @@
 #import "MapNavViewController.h"
 #import "MapSlidingViewController.h"
 #import "GeoScrollViewController.h"
-
+#import "UnderMapViewController.h"
 ////////////////////////////////////////////////////////////////////////
 #pragma mark -
 #pragma mark Functions
@@ -1098,34 +1098,8 @@ kDetailViewWidth, kHistoryTableRowHeight*kMaxHistoryTableRowCount + kStatusBarHe
         if(![((MapSlidingViewController*)((MapNavViewController*)[MapNavViewController sharedInstance]).topViewController).topViewController isKindOfClass:[GeoScrollViewController class]])
              return;
         
-        
         [((GeoScrollViewController*)((MapSlidingViewController*)((MapNavViewController*)[MapNavViewController sharedInstance]).topViewController).topViewController).tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
-        // if we are currently in a special state, restore to normal
-        // and ignore current set animation in that case
-//        if (self.shrinked) {
-//            [self setShrinked:NO animated:YES];
-//        } else if (!self.detailViewHidden) {
-//            [self setDetailViewHidden:YES animated:YES];
-//        } else {
-//            // normal case/status, do what's specified in animation-state
-//            switch (self.animation) {
-//                case MTStatusBarOverlayAnimationShrink:
-//                    [self setShrinked:!self.shrinked animated:YES];
-//                    break;
-//                    
-//                case MTStatusBarOverlayAnimationFallDown:
-//                    // detailView currently visible -> hide it
-//                    [self setDetailViewHidden:!self.detailViewHidden animated:YES];
-//                    break;
-//                case MTStatusBarOverlayAnimationNone:
-//                    // ignore
-//                    break;
-//            }
-//        }
-//        
-//		if ([self.delegate respondsToSelector:@selector(statusBarOverlayDidRecognizeGesture:)]) {
-//			[self.delegate statusBarOverlayDidRecognizeGesture:gestureRecognizer];
-//		}
+
 	}
 }
 

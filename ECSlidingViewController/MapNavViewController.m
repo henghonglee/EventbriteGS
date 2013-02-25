@@ -53,7 +53,13 @@
     if (![self.slidingViewController.underLeftViewController isKindOfClass:[UINavigationController class]]) {
         self.slidingViewController.underLeftViewController  = [self.storyboard instantiateViewControllerWithIdentifier:@"Menu"];
     }
+}
+-(BOOL)shouldAutorotate{
+    return NO;
+}
+-(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation{
 
+    return NO;
 }
 - (void)didReceiveMemoryWarning
 {

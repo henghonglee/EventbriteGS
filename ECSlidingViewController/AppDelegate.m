@@ -8,13 +8,31 @@
 
 #import "AppDelegate.h"
 #import "Mobclix.h"
+#import "Flurry.h"
+#import <BugSense-iOS/BugSenseController.h>
+
 #define VERSION 1.0
 @implementation AppDelegate
 
 @synthesize window = _window;
 
+
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    [Flurry startSession:@"GS58TP8CPRJC55Z7PGV2"];
+    [BugSenseController sharedControllerWithBugSenseAPIKey:@"e10888bc"];
+
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"userUID"]) {
+        //on first launch get a UUID from our servers
+        //things we want to know from our users
+        // - types of food they click on
+        // - how long they read it for
+        // - where they are
+        // - how long they stay in our app (Flurry)
+    }
+    
+    
     self.window.rootViewController.modalPresentationStyle = UIModalPresentationCurrentContext;
     application.applicationSupportsShakeToEdit = YES;
     if ([[[NSUserDefaults standardUserDefaults]objectForKey:[NSString stringWithFormat:@"%0.2f",VERSION]] isEqualToString:@"Enabled"]) {

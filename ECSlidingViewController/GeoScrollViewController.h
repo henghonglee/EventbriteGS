@@ -44,4 +44,5 @@ typedef enum {
 -(void)didScrollToEntryAtIndex:(int)idx;
 -(void)didReceiveUserLocation:(MKUserLocation*)location;
 -(void)LoadData;
+
 @end

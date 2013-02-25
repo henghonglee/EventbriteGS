@@ -13,7 +13,7 @@
 #import "CrumbPath.h"
 #import "CrumbPathView.h"
 #import <SDWebImage/UIImageView+WebCache.h>
-@interface UnderMapViewController : UIViewController <MKMapViewDelegate>
+@interface UnderMapViewController : UIViewController <MKMapViewDelegate,UIGestureRecognizerDelegate>
 {
     MKMapView *mapView;
     
@@ -26,8 +26,11 @@
 @property (nonatomic, strong) CrumbPathView *crumbView;
 @property (nonatomic, unsafe_unretained) CGFloat peekLeftAmount;
 @property (nonatomic) BOOL categoriesShown;
+@property (weak, nonatomic) IBOutlet UIView *InfoPanelView;
 @property (nonatomic) BOOL isCalloutHidden;
 @property (strong, nonatomic) IBOutletCollection(UIButton) NSArray *categoryButtons;
+@property (weak, nonatomic) IBOutlet UILabel *shopLabel;
+@property (weak, nonatomic) IBOutlet UIButton *ShopButton;
 @property (strong, nonatomic) CustomCalloutView* callout;
 @property (weak, nonatomic) IBOutlet UIButton *allButton;
 @property (strong, nonatomic) IBOutlet MKMapView *mapView;
@@ -38,8 +41,9 @@
 @property (weak, nonatomic) IBOutlet UIButton *locationButton;
 @property (weak, nonatomic) IBOutlet UIImageView *shop1;
 @property (weak, nonatomic) IBOutlet UIImageView *shop2;
-
+@property (nonatomic,strong) GSObject* gsObjSelected;
 - (IBAction)selectCategory:(id)sender;
 -(void)dismissCallout;
 -(void)hideCategoryButtons;
+- (IBAction)showGeoscroll:(id)sender;
 @end

@@ -41,6 +41,9 @@
 		EF3A33FD16CBFBF2000E10C5 /* icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EF3A33FC16CBFBF2000E10C5 /* icon@2x.png */; };
 		EF3A33FF16CBFC5B000E10C5 /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = EF3A33FE16CBFC5A000E10C5 /* icon.png */; };
 		EF44BD46168B3ADB00F7BCB5 /* ShopDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF44BD42168B3AD800F7BCB5 /* ShopDetailViewController.m */; };
+		EF5FDC0716D8CEF30019E3BA /* MapSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF5FDC0616D8CEF30019E3BA /* MapSearchViewController.m */; };
+		EF5FDC0916D92C360019E3BA /* locationBlue@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EF5FDC0816D92C360019E3BA /* locationBlue@2x.png */; };
+		EF5FDC0B16DA13F70019E3BA /* libFlurry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EF5FDC0A16DA13F60019E3BA /* libFlurry.a */; };
 		EF6326EF169DD9E7009A78C3 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EF6326EE169DD9E7009A78C3 /* Default-568h@2x.png */; };
 		EF9016F116AC171E0089C57D /* MenuCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EF9016F016AC171D0089C57D /* MenuCell.m */; };
 		EF9016F416AC172B0089C57D /* MenuCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EF9016F316AC172B0089C57D /* MenuCell.xib */; };
@@ -217,6 +220,11 @@
 		EF3D430916AAB79F0064618E /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		EF44BD41168B3AD800F7BCB5 /* ShopDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShopDetailViewController.h; sourceTree = "<group>"; };
 		EF44BD42168B3AD800F7BCB5 /* ShopDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShopDetailViewController.m; sourceTree = "<group>"; };
+		EF5FDC0516D8CEF30019E3BA /* MapSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapSearchViewController.h; sourceTree = "<group>"; };
+		EF5FDC0616D8CEF30019E3BA /* MapSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapSearchViewController.m; sourceTree = "<group>"; };
+		EF5FDC0816D92C360019E3BA /* locationBlue@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "locationBlue@2x.png"; sourceTree = "<group>"; };
+		EF5FDC0A16DA13F60019E3BA /* libFlurry.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFlurry.a; path = "../../../Downloads/Flurry iPhone SDK v4.1.0/Flurry/libFlurry.a"; sourceTree = "<group>"; };
+		EF5FDC0C16DA14130019E3BA /* Flurry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Flurry.h; sourceTree = "<group>"; };
 		EF6326EE169DD9E7009A78C3 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		EF9016EF16AC171D0089C57D /* MenuCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuCell.h; sourceTree = "<group>"; };
 		EF9016F016AC171D0089C57D /* MenuCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MenuCell.m; sourceTree = "<group>"; };
@@ -401,6 +409,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EF5FDC0B16DA13F70019E3BA /* libFlurry.a in Frameworks */,
+				EFA44FB816B26FA5004D40E7 /* MessageUI.framework in Frameworks */,
 				EFA44FD816B2737F004D40E7 /* AdSupport.framework in Frameworks */,
 				EFA44FC216B271E0004D40E7 /* CoreMotion.framework in Frameworks */,
 				EFE28FEF167708EE00095554 /* SystemConfiguration.framework in Frameworks */,
@@ -410,7 +420,6 @@
 				EFA44FBE16B271D0004D40E7 /* AudioToolbox.framework in Frameworks */,
 				EFA44FBB16B271BF004D40E7 /* AddressBook.framework in Frameworks */,
 				EFA44FBC16B271BF004D40E7 /* AddressBookUI.framework in Frameworks */,
-				EFA44FB816B26FA5004D40E7 /* MessageUI.framework in Frameworks */,
 				EFE28FF71677098F00095554 /* libz.dylib in Frameworks */,
 				EFE28FF1167708F400095554 /* MobileCoreServices.framework in Frameworks */,
 				EFE28FE41677086900095554 /* MapKit.framework in Frameworks */,
@@ -432,7 +441,6 @@
 		2750E76114CDB0DF007727A0 = {
 			isa = PBXGroup;
 			children = (
-				EFA44FD716B2737F004D40E7 /* AdSupport.framework */,
 				2750E77614CDB0DF007727A0 /* ECSlidingViewController */,
 				2750E76F14CDB0DF007727A0 /* Frameworks */,
 				2750E76D14CDB0DF007727A0 /* Products */,
@@ -450,6 +458,9 @@
 		2750E76F14CDB0DF007727A0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EF5FDC0A16DA13F60019E3BA /* libFlurry.a */,
+				EF5FDC0C16DA14130019E3BA /* Flurry.h */,
+				EFA44FD716B2737F004D40E7 /* AdSupport.framework */,
 				EF3D430916AAB79F0064618E /* libsqlite3.dylib */,
 				EFA44FC516B271EE004D40E7 /* MediaPlayer.framework */,
 				EFA44FC316B271E7004D40E7 /* EventKit.framework */,
@@ -513,27 +524,12 @@
 			isa = PBXGroup;
 			children = (
 				EFA44FCD16B2727E004D40E7 /* Mobclix SDK */,
-				2750E79514CDB959007727A0 /* FirstTopViewController.h */,
-				2750E79614CDB959007727A0 /* FirstTopViewController.m */,
+				EFDE1CA016DA8EF4007A0C5A /* Deprecated */,
 				27FC94DE14D0C14E0000B18C /* InitialSlidingViewController.h */,
 				27FC94DF14D0C14E0000B18C /* InitialSlidingViewController.m */,
 				EF2BCCBC16BD822100C1192E /* foodtypes.txt */,
-				EFE7A67816BCB11A0008E4FF /* suggestedLocations.txt */,
-				EF0C5E5116B28C5500288EB3 /* MTStatusBarOverlay.h */,
-				EF0C5E5216B28C5500288EB3 /* MTStatusBarOverlay.m */,
 				2750E79214CDB93A007727A0 /* MenuViewController.h */,
 				2750E79314CDB93A007727A0 /* MenuViewController.m */,
-				27498DD314E96EEF005C043E /* SampleTableViewController.h */,
-				27498DD414E96EEF005C043E /* SampleTableViewController.m */,
-				2750E79814CDB99A007727A0 /* SecondTopViewController.h */,
-				2750E79914CDB99A007727A0 /* SecondTopViewController.m */,
-				EF44BD41168B3AD800F7BCB5 /* ShopDetailViewController.h */,
-				EF44BD42168B3AD800F7BCB5 /* ShopDetailViewController.m */,
-				EFD326A216BE9250009594F2 /* CorrectionViewController.h */,
-				EFD326A316BE9250009594F2 /* CorrectionViewController.m */,
-				EFCC16D116D3E6AE00A369B7 /* GeoscrollInstructions.png */,
-				EFCC16CF16D3E60000A369B7 /* MapInstructions.png */,
-				EFCC16CD16D3E2D000A369B7 /* MenuInstructions.png */,
 				EFFE149016C3561F00232A38 /* DANIEL FOOD DIARY.dat */,
 				EF25DDBA16C26586005F905E /* IEATISHOOTIPOST.dat */,
 				EFD326AD16BFCD1B009594F2 /* LADY IRON CHEF.dat */,
@@ -567,6 +563,8 @@
 		EF9D8917167A4496002B352D /* Overlay */ = {
 			isa = PBXGroup;
 			children = (
+				EF0C5E5116B28C5500288EB3 /* MTStatusBarOverlay.h */,
+				EF0C5E5216B28C5500288EB3 /* MTStatusBarOverlay.m */,
 				EFC526DC169A9D5B00D9DFBF /* CrumbObj.h */,
 				EFC526DD169A9D5B00D9DFBF /* CrumbObj.m */,
 				EF9D8919167A44A8002B352D /* CrumbPath.h */,
@@ -633,6 +631,24 @@
 				EFB7CF57169EBE4600E1AED6 /* Foundation.framework */,
 			);
 			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		EFDE1CA016DA8EF4007A0C5A /* Deprecated */ = {
+			isa = PBXGroup;
+			children = (
+				EFE7A67816BCB11A0008E4FF /* suggestedLocations.txt */,
+				2750E79514CDB959007727A0 /* FirstTopViewController.h */,
+				2750E79614CDB959007727A0 /* FirstTopViewController.m */,
+				27498DD314E96EEF005C043E /* SampleTableViewController.h */,
+				27498DD414E96EEF005C043E /* SampleTableViewController.m */,
+				2750E79814CDB99A007727A0 /* SecondTopViewController.h */,
+				2750E79914CDB99A007727A0 /* SecondTopViewController.m */,
+				EF44BD41168B3AD800F7BCB5 /* ShopDetailViewController.h */,
+				EF44BD42168B3AD800F7BCB5 /* ShopDetailViewController.m */,
+				EFD326A216BE9250009594F2 /* CorrectionViewController.h */,
+				EFD326A316BE9250009594F2 /* CorrectionViewController.m */,
+			);
+			name = Deprecated;
 			sourceTree = "<group>";
 		};
 		EFE28F39167705F700095554 /* UIImage Categories */ = {
@@ -733,6 +749,8 @@
 				EFE28F8F1677078F00095554 /* CircleLayout.m */,
 				EFE28F901677078F00095554 /* ViewController.h */,
 				EFE28F911677078F00095554 /* ViewController.m */,
+				EF5FDC0516D8CEF30019E3BA /* MapSearchViewController.h */,
+				EF5FDC0616D8CEF30019E3BA /* MapSearchViewController.m */,
 			);
 			name = Geoscroll;
 			sourceTree = "<group>";
@@ -740,6 +758,10 @@
 		EFE28FA0167707E700095554 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				EFCC16D116D3E6AE00A369B7 /* GeoscrollInstructions.png */,
+				EFCC16CF16D3E60000A369B7 /* MapInstructions.png */,
+				EFCC16CD16D3E2D000A369B7 /* MenuInstructions.png */,
+				EF5FDC0816D92C360019E3BA /* locationBlue@2x.png */,
 				EF6326EE169DD9E7009A78C3 /* Default-568h@2x.png */,
 				EFE83D4916C77104005C45A5 /* miss-claude.ttf */,
 				EFFD8D1616B693A4001DF353 /* directions@2x.png */,
@@ -956,6 +978,7 @@
 				EFCC16CE16D3E2D000A369B7 /* MenuInstructions.png in Resources */,
 				EFCC16D016D3E60000A369B7 /* MapInstructions.png in Resources */,
 				EFCC16D216D3E6AE00A369B7 /* GeoscrollInstructions.png in Resources */,
+				EF5FDC0916D92C360019E3BA /* locationBlue@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1018,6 +1041,7 @@
 				EF0C5E5316B28C5500288EB3 /* MTStatusBarOverlay.m in Sources */,
 				EFD326A416BE9251009594F2 /* CorrectionViewController.m in Sources */,
 				EFE83D4D16C77C47005C45A5 /* SearchCell.m in Sources */,
+				EF5FDC0716D8CEF30019E3BA /* MapSearchViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1095,6 +1119,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -1108,11 +1133,16 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/ECSlidingViewController\"",
 					"\"$(SRCROOT)/ECSlidingViewController/Mobclix SDK\"",
+					"\"$(SRCROOT)/../../../Downloads/Flurry iPhone SDK v4.1.0/Flurry\"",
 				);
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-all_load",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				STRIP_INSTALLED_PRODUCT = NO;
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1123,6 +1153,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -1136,11 +1167,16 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/ECSlidingViewController\"",
 					"\"$(SRCROOT)/ECSlidingViewController/Mobclix SDK\"",
+					"\"$(SRCROOT)/../../../Downloads/Flurry iPhone SDK v4.1.0/Flurry\"",
 				);
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-all_load",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				STRIP_INSTALLED_PRODUCT = NO;
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};

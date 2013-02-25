@@ -17,7 +17,7 @@
 #import "ViewController.h"
 #import "CircleLayout.h"
 #import "ShopDetailViewController.h"
-
+#import "Flurry.h"
 #define kMainFont [UIFont systemFontOfSize:25.0]
 #define kSubtitleFont [UIFont systemFontOfSize:12.0f]
 #define kSourceFont [UIFont systemFontOfSize:12.0f]
@@ -68,7 +68,6 @@
     
     dispatch_async(dispatch_get_main_queue(), ^
    {
-      
        [SVProgressHUD showWithStatus:@"Loading"];
    });
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -78,6 +77,7 @@
 }
 
 -(void)viewDidAppear:(BOOL)animated {
+    [self.slidingViewController setAnchorLeftPeekAmount:1.0f];
     [super viewDidAppear:animated];
     [self becomeFirstResponder];
 }
@@ -100,7 +100,7 @@
             {
                         [self retrieveAndProcessDataFromCacheOrServerForBlog:blog];
                         [self.boolhash setObject:@"Enabled" forKey:blog];
-                                                 
+                
             }else{
                 NSLog(@"already enabled");
             }
@@ -344,6 +344,11 @@
             
 
         }
+        if ([[dataObject objectForKey:@"is_post"] isEqualToNumber:[NSNumber numberWithBool:NO]])
+        {
+            NSLog(@"not a post");
+            continue;
+        }
         
         if ([[dataObject objectForKey:@"foodtype"] isKindOfClass:[NSString class]])
         {
@@ -381,6 +386,7 @@
     [super viewWillAppear:animated];
     self.navigationController.navigationBarHidden = YES;
     [self.view setBackgroundColor:[UIColor clearColor]];
+
     if (![self.slidingViewController.underRightViewController isKindOfClass:[UnderMapViewController class]]) {
         self.slidingViewController.underRightViewController  = [self.storyboard instantiateViewControllerWithIdentifier:@"UnderMap"];
     }
@@ -680,7 +686,9 @@
 -(void)didReceiveUserLocation:(MKUserLocation*)location
 {
     userLocation = location;
-    
+
+    [Flurry setLatitude:location.coordinate.latitude
+              longitude:location.coordinate.longitude horizontalAccuracy:0.001f verticalAccuracy:0.001f];
 }
 - (BOOL)canBecomeFirstResponder
 {
@@ -784,8 +792,23 @@
     }
 
     UnderMapViewController* menuViewController = ((UnderMapViewController*)self.slidingViewController.underRightViewController);
+    menuViewController.InfoPanelView.frame = CGRectMake(self.view.bounds.size.width-320, self.view.bounds.size.height, 320, 45);
+    menuViewController.InfoPanelView.hidden = NO;
+    menuViewController.shopLabel.hidden = NO;
     menuViewController.locationButton.hidden = NO;
     menuViewController.allButton.hidden = NO;
+
+    CGRect slideViewFinalFrame = CGRectMake(self.view.bounds.size.width-320, self.view.bounds.size.height-45, 320, 45);
+    [UIView animateWithDuration:0.2
+                          delay:0.1
+                        options: UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         menuViewController.InfoPanelView.frame = slideViewFinalFrame;
+                     } 
+                     completion:^(BOOL finished){
+                         NSLog(@"Done!");
+                     }];
+    
     for (UIButton* btn in menuViewController.categoryButtons) {
         btn.hidden = NO;
     }
@@ -835,6 +858,8 @@
         UnderMapViewController* menuViewController = ((UnderMapViewController*)self.slidingViewController.underRightViewController);
         NSLog(@"underright will disappear");
         [menuViewController dismissCallout];
+        menuViewController.InfoPanelView.hidden = YES;
+        menuViewController.shopLabel.hidden = YES;
         menuViewController.locationButton.hidden = YES;
         menuViewController.allButton.hidden = YES;
         [menuViewController hideCategoryButtons];
@@ -914,7 +939,13 @@
             [underMapView removeAnnotation:annnote];  // remove any annotations that exist
         }
     }
-    [underMapView addAnnotation:[self.GSObjectArray objectAtIndex:idx]];
+    GSObject* gsObj = [self.GSObjectArray objectAtIndex:idx];
+    [underMapView addAnnotation:gsObj];
+    
+    UnderMapViewController* menuViewController = ((UnderMapViewController*)self.slidingViewController.underRightViewController);
+//    menuViewController.shopLabel.text = gsObj.title;
+    menuViewController.shopLabel.text =@"Back to Listings";
+    menuViewController.gsObjSelected = gsObj;
     [((UnderMapViewController*)self.slidingViewController.underRightViewController) willAnimateRotationToInterfaceOrientation:self.interfaceOrientation duration:0];
 }
 
@@ -991,6 +1022,7 @@
 
 -(BOOL)textFieldShouldBeginEditing:(UITextField *)textField
 {
+        [Flurry logEvent:@"Search_Started" timed:YES];
         self.random = NO;
         SearchViewController * searchViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"Search"];
         searchViewController.delegate = self;
@@ -1005,9 +1037,13 @@
         return NO;
 
 }
+
 -(void)searchViewControllerDidFinishWithSearchString:(NSString *)searchString
 {
-    NSLog(@"searchString = %@",searchString);
+    if (searchString.length>0) {
+        [Flurry endTimedEvent:@"Search_Started" withParameters:nil];
+    }
+    
     self.tableView.hidden = NO;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(topDidAnchorLeft ) name:ECSlidingViewTopDidAnchorLeft object:nil];
@@ -1035,6 +1071,7 @@
                 for (NSString* term in searchterms) {
                     NSLog(@"term - %@",term);
                     if ([term rangeOfString:@"addr="].location!=NSNotFound) {
+                        [Flurry logEvent:@"SearchForAddress" timed:NO];
                         //reverse geocode
                         if (!self.geocoder) {
                             self.geocoder = [[CLGeocoder alloc] init];
@@ -1084,22 +1121,27 @@
                             }
                         }];
                     }else{
+                        [Flurry logEvent:@"SearchForFood" timed:NO];
                         MKCoordinateRegion region = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView.region;
                         [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:currentSearch IntoArray:self.GSObjectArray WithRefresh:YES];
                         dispatch_async(dispatch_get_main_queue(), ^{
-                            if (self.scopedGSObjectArray.count == 1) {
+                            NSLog(@"%d gsobjectarray , %d scoped",self.GSObjectArray.count,self.scopedGSObjectArray.count);
+                            // if searching for individual stall , assuming not found in current search area
+                            if (self.GSObjectArray.count == 0) {
                                 MKMapView* underMapView = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
-                                for (GSObject* gsObj in scopedGSObjectArray) {
-                                    [underMapView setRegion:MKCoordinateRegionMake(CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue), MKCoordinateSpanMake(0.005, 0.005)) animated:YES];
-                                }
+                                GSObject* gsObj = [scopedGSObjectArray objectAtIndex:scopedGSObjectArray.count-1];
+                                [underMapView setRegion:MKCoordinateRegionMake(CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue), MKCoordinateSpanMake(0.005, 0.005)) animated:YES];
+                                
                                 [self.GSObjectArray removeAllObjects];
                                 [self.GSObjectArray addObjectsFromArray:self.scopedGSObjectArray];
                             }
                             [self.tableView reloadData];
+                            
                             if (self.scopedGSObjectArray.count > 1) {
                             MKMapView* underMapView = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
                             [underMapView setVisibleMapRect:MKMapRectInset([underMapView visibleMapRect], [underMapView visibleMapRect].size.width*0.005, [underMapView visibleMapRect].size.height*0.005) animated:YES];
                             }
+                            
                             
                             if ([self.GSObjectArray count]>0) {[self didScrollToEntryAtIndex:0];}
                             MTStatusBarOverlay *overlay = [MTStatusBarOverlay sharedInstance];
@@ -1153,11 +1195,30 @@
 }
 -(void)calculateRandom
 {
-    self.random = !self.random;
-    self.randomIndex = rand() % self.GSObjectArray.count;
-    [self.tableView reloadData];
     if (self.random) {
-        [self scrollViewDidEndDecelerating:self.tableView];
+        self.random = !self.random;
+        self.randomIndex = rand() % self.GSObjectArray.count;
+        [self.tableView reloadData];
+
+    }else{
+        dispatch_async(dispatch_get_main_queue(), ^
+       {
+           [SVProgressHUD showWithStatus:@"Loading"];
+       });
+        double delayInSeconds = 2.0;
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            self.random = !self.random;
+            self.randomIndex = rand() % self.GSObjectArray.count;
+            [self.tableView reloadData];
+            if (self.random) {
+                [self scrollViewDidEndDecelerating:self.tableView];
+            }
+            dispatch_async(dispatch_get_main_queue(), ^
+           {
+               [SVProgressHUD dismiss];
+           });
+        });
     }
 }
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -1182,10 +1243,7 @@
     [self.slidingViewController anchorTopViewTo:ECLeft];
 }
 
--(void)showMenu
-{
-    [self.slidingViewController.slidingViewController anchorTopViewTo:ECRight];
-}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     
@@ -1273,7 +1331,7 @@
     {
         CGSize s = [gsObj.title sizeWithFont:kMainFont constrainedToSize:CGSizeMake(kCellHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
         CGSize subTitleSize = [gsObj.subTitle sizeWithFont:kSubtitleFont constrainedToSize:CGSizeMake(kCellSubtitleHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
-        CGSize sourceSize = [gsObj.source sizeWithFont:kSourceFont constrainedToSize:CGSizeMake(kCellSubtitleHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
+//        CGSize sourceSize = [gsObj.source sizeWithFont:kSourceFont constrainedToSize:CGSizeMake(kCellSubtitleHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
         cell = [[RotatingTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:FromCellIdentifier];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
 
@@ -1366,17 +1424,19 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+
     if (indexPath.row == 0 || indexPath.row == [self.GSObjectArray count]+1)
     {
         return;
     }
     GSObject* selectedGSObj;
+    
     if (self.random) {
         selectedGSObj   = [self.GSObjectArray objectAtIndex:self.randomIndex];
     }else{
       selectedGSObj   = [self.GSObjectArray objectAtIndex:indexPath.row-1];
     }
-
+    
     NSURL *URL = [NSURL URLWithString:[NSString stringWithFormat:@"%@",selectedGSObj.link]];
 	SVWebViewController *webViewController = [[SVWebViewController alloc] initWithURL:URL];
     webViewController.gsobj = selectedGSObj;
@@ -1439,18 +1499,26 @@
         });
     }
 }
-
+-(BOOL)shouldAutorotate{
+    return NO;
+}
+-(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
+{
+    return NO;
+}
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
     if (toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft ||
         toInterfaceOrientation == UIInterfaceOrientationLandscapeRight)
     {
 
-        [self.slidingViewController setAnchorLeftPeekAmount:160.0f];
+        [self.slidingViewController setAnchorLeftPeekAmount:1.0f];
+        [self.slidingViewController resetTopView];
     }
     else
     {
-        [self.slidingViewController setAnchorLeftPeekAmount:50.0f];
+        [self.slidingViewController setAnchorLeftPeekAmount:1.0f];
+        [self.slidingViewController resetTopView];        
     }
 }
 

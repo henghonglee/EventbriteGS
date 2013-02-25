@@ -14,12 +14,12 @@
 #define kPaddingBetweenElements 10.0f
 #define kPaddingTop 5.0f
 #define kPaddingRight 5.0f
-#define kPaddingLeft 20.0f
+#define kPaddingLeft 16.0f
 #define kPaddingBottom 30.0f
 #define kColorBarWidth 15.0f
 #define kCloseButtonWidthHeight 25.0f
-#define kImageViewSizeWidth 50.0f
-#define kImageViewSizeHeight 50.0f
+#define kImageViewSizeWidth 42.0f
+#define kImageViewSizeHeight 42.0f
 #define kPinPoint 140.0f
 #define kCalloutArrowHeight 12.0f
 #define kCalloutArrowWidth 10.0f

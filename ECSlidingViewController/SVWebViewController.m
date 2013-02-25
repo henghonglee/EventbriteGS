@@ -5,6 +5,8 @@
 //  Copyright 2010 Sam Vermette. All rights reserved.
 //
 //  https://github.com/samvermette/SVWebViewController
+#import "Flurry.h"
+#import "MapSearchViewController.h"
 #import "ShopDetailViewController.h"
 #import "CorrectionViewController.h"
 #import "SVWebViewController.h"
@@ -35,7 +37,14 @@
 
 
 @implementation SVWebViewController
-
+typedef enum {
+    ScrollDirectionNone,
+    ScrollDirectionRight,
+    ScrollDirectionLeft,
+    ScrollDirectionUp,
+    ScrollDirectionDown,
+    ScrollDirectionCrazy,
+} ScrollDirection;
 @synthesize availableActions;
 @synthesize gsobj;
 @synthesize URL, mainWebView;
@@ -131,13 +140,59 @@
 }
 
 #pragma mark - View lifecycle
-
+-(void)backAction
+{
+    [self.navigationController popViewControllerAnimated:YES];
+}
 - (void)loadView {
+//    self.topButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+//    self.topButton.frame = CGRectMake(0, 0, 320,44);
+//    self.topButton.hidden = NO;
+//    [self.topButton addTarget:self action:@selector(getDirections) forControlEvents:UIControlEventTouchUpInside];
+//    [self.topButton setTitle:@"Bring Me There" forState:UIControlStateNormal];
+    UIView* view = [[UIView alloc]initWithFrame:[UIScreen mainScreen].bounds];
+    UISwipeGestureRecognizer* swipeGesture = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(backAction)];
+    [swipeGesture setDirection:UISwipeGestureRecognizerDirectionRight];
+
     mainWebView = [[UIWebView alloc] initWithFrame:[UIScreen mainScreen].bounds];
     mainWebView.delegate = self;
     mainWebView.scalesPageToFit = YES;
+    [mainWebView.scrollView setDelegate:self];
     [mainWebView loadRequest:[NSURLRequest requestWithURL:self.URL]];
-    self.view = mainWebView;
+    [mainWebView setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
+    self.view = view;
+    [self.view addGestureRecognizer:swipeGesture];    
+    [self.view addSubview:mainWebView];
+//    [self.view addSubview:self.topButton];
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)sender
+{
+    ScrollDirection scrollDirection = ScrollDirectionDown;
+    if (self.lastContentOffset > mainWebView.scrollView.contentOffset.y)
+        scrollDirection = ScrollDirectionUp;
+    else if (self.lastContentOffset < mainWebView.scrollView.contentOffset.y)
+        scrollDirection = ScrollDirectionDown;
+    
+    self.lastContentOffset = mainWebView.scrollView.contentOffset.y;
+    if (self.lastContentOffset>44) {
+    
+    // do whatever you need to with scrollDirection here.
+    switch (scrollDirection) {
+        case ScrollDirectionUp:
+            [self.navigationController setNavigationBarHidden:NO animated:YES];
+            break;
+        case ScrollDirectionDown:
+            [self.navigationController setNavigationBarHidden:YES animated:YES];
+            break;
+            
+        default:
+            break;
+            
+    }
+    }else{
+          self.topButton.frame = CGRectMake(00, 0, 320, 44);
+    }
 }
 
 - (void)viewDidLoad {
@@ -151,7 +206,7 @@
 
 -(void) showActionSheet
 {
-    UIActionSheet* actionSheet = [[UIActionSheet alloc]initWithTitle:@"Actions" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Suggest Changes",@"Directions", nil];
+    UIActionSheet* actionSheet = [[UIActionSheet alloc]initWithTitle:@"Actions" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Stall Closed" otherButtonTitles:@"Suggest Changes",@"Directions",@"Email To Friend",@"SMS To Friend", nil];
     [actionSheet setActionSheetStyle:UIActionSheetStyleAutomatic];
     [actionSheet showInView:self.view];
 
@@ -205,11 +260,84 @@
         [self getDirections];
     }
     if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:@"Suggest Changes"]) {
-        CorrectionViewController* viewController= [[CorrectionViewController alloc]init];
+        [Flurry logEvent:@"Suggest_Changes" timed:NO];
+        MapSearchViewController* viewController = [[UIStoryboard storyboardWithName:@"iPhone" bundle:nil] instantiateViewControllerWithIdentifier:@"MapSearch"];
         viewController.gsobj = self.gsobj;
         [self.navigationController pushViewController:viewController animated:YES];
-    }   
+    }
+    if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:@"Stall Closed"]) {
+        NSURL *tokenurl = [NSURL URLWithString:@"http://tastebudsapp.herokuapp.com"];
+        AFHTTPClient* afclient = [[AFHTTPClient alloc]initWithBaseURL:tokenurl];
+        [afclient putPath:[NSString stringWithFormat:@"/items/%d",self.gsobj.itemId.intValue] parameters:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO],@"item[is_post]", nil] success:^(AFHTTPRequestOperation *operation, id responseObject) {
+            UIAlertView* alert = [[UIAlertView alloc]initWithTitle:@"Success" message:@"" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [alert show];
+        } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+            UIAlertView* alert = [[UIAlertView alloc]initWithTitle:@"Error!" message:[NSString stringWithFormat:@"%@",error] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [alert show];
+        }];
+        
+    }
+    if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:@"Email To Friend"]) {
+        [Flurry logEvent:@"EmailtoFriend" timed:NO];                                    
+        NSURL *tokenurl = [NSURL URLWithString:@"https://api-ssl.bitly.com"];
+        AFHTTPClient* afclient = [[AFHTTPClient alloc]initWithBaseURL:tokenurl];
+        [afclient getPath:[NSString stringWithFormat:@"/v3/shorten?access_token=53cab9bedd220deabf7b15a8882cb6164471075c&longUrl=%@",[gsobj.link stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding]] parameters:[NSDictionary dictionaryWithObjectsAndKeys:nil] success:^(AFHTTPRequestOperation *operation, id responseObject) {
+            
+            
+            NSError* error = nil;
+            NSDictionary *item = [NSJSONSerialization JSONObjectWithData:responseObject options:NSJSONReadingMutableContainers error:&error];
+            
+            MFMailComposeViewController*controller = [[MFMailComposeViewController alloc] init];
+            if([MFMailComposeViewController canSendMail])
+            {
+                [controller setSubject:@"TasteBuds"];
+                [controller setMessageBody:[NSString stringWithFormat:@"Hey, lets go try this place %@ \n\n Shared using Tastebuds for iOS: Get the app at %@",[[item objectForKey:@"data"] objectForKey:@"url"],@"<itunes link>"]isHTML:NO];
+
+                controller.mailComposeDelegate = self;
+                [self presentModalViewController:controller animated:YES];
+            }
+            
+            
+            
+        } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+            UIAlertView* alert = [[UIAlertView alloc]initWithTitle:@"Error!" message:[NSString stringWithFormat:@"%@",error] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [alert show];
+        }];
+    }
+    if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:@"SMS To Friend"]) {
+        [Flurry logEvent:@"SMStoFriend" timed:NO];
+
+        NSURL *tokenurl = [NSURL URLWithString:@"https://api-ssl.bitly.com"];
+        AFHTTPClient* afclient = [[AFHTTPClient alloc]initWithBaseURL:tokenurl];
+        [afclient getPath:[NSString stringWithFormat:@"/v3/shorten?access_token=53cab9bedd220deabf7b15a8882cb6164471075c&longUrl=%@",[gsobj.link stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding]] parameters:[NSDictionary dictionaryWithObjectsAndKeys:nil] success:^(AFHTTPRequestOperation *operation, id responseObject) {
+
+
+            NSError* error = nil;
+            NSDictionary *item = [NSJSONSerialization JSONObjectWithData:responseObject options:NSJSONReadingMutableContainers error:&error];
+
+                    MFMessageComposeViewController *controller = [[MFMessageComposeViewController alloc] init];
+                    if([MFMessageComposeViewController canSendText])
+                    {
+                        controller.body = [NSString stringWithFormat:@"Hey, lets go try this place %@ \n\n Shared using Tastebuds for iOS: Get the app at %@",[[item objectForKey:@"data"] objectForKey:@"url"],@"<itunes link>"];
+                        controller.recipients = @[];
+                        controller.messageComposeDelegate = self;
+                        [self presentModalViewController:controller animated:YES];
+                    }
+            
+         
+            
+        } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+            UIAlertView* alert = [[UIAlertView alloc]initWithTitle:@"Error!" message:[NSString stringWithFormat:@"%@",error] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [alert show];
+        }];
+
+        
+        
+    }
 }
+
+
+
 -(void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
 
@@ -222,6 +350,9 @@
 {
     
 }
+
+
+
 - (void)viewDidUnload {
     [super viewDidUnload];
     mainWebView = nil;
@@ -271,7 +402,10 @@
         [SVProgressHUD dismiss];
     });
 }
-
+-(void)viewDidAppear:(BOOL)animated
+{
+    [[self navigationController] setNavigationBarHidden:NO animated:YES];
+}
 - (void)viewDidDisappear:(BOOL)animated {
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
 }
@@ -409,6 +543,15 @@
                         error:(NSError *)error
 {
     
+#if __IPHONE_OS_VERSION_MIN_REQUIRED < 60000
+	[self dismissModalViewControllerAnimated:YES];
+#else
+    [self dismissViewControllerAnimated:YES completion:NULL];
+#endif
+}
+
+- (void)messageComposeViewController:(MFMessageComposeViewController *)controller didFinishWithResult:(MessageComposeResult)result
+{
 #if __IPHONE_OS_VERSION_MIN_REQUIRED < 60000
 	[self dismissModalViewControllerAnimated:YES];
 #else

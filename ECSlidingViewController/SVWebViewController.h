@@ -10,13 +10,14 @@
 
 #import "SVModalWebViewController.h"
 #import "GSObject.h"
-@interface SVWebViewController : UIViewController <UIActionSheetDelegate>
+@interface SVWebViewController : UIViewController <UIActionSheetDelegate,UIScrollViewDelegate,MFMessageComposeViewControllerDelegate>
 
 - (id)initWithAddress:(NSString*)urlString;
 - (id)initWithURL:(NSURL*)URL;
 @property (nonatomic, strong) GSObject* gsobj;
 @property (nonatomic) BOOL isLoading;
 @property (nonatomic, strong) CLLocation* currentLocation;
+@property (nonatomic)float lastContentOffset;
 @property (nonatomic, readwrite) SVWebViewControllerAvailableActions availableActions;
-
+@property (nonatomic,strong) UIButton* topButton;
 @end
