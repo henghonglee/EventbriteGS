@@ -109,9 +109,10 @@ static dispatch_once_t onceToken;
         region.span.latitudeDelta = 0.01;
         region.span.longitudeDelta = 0.01;
         [retMapView setRegion:region animated:NO];
+        [((GeoScrollViewController*)self.slidingViewController.topViewController) didReceiveUserLocation:self.mapView.userLocation];
         
     });
-    [((GeoScrollViewController*)self.slidingViewController.topViewController) didReceiveUserLocation:self.mapView.userLocation];
+    ((GeoScrollViewController*)self.slidingViewController.topViewController).userLocation = self.mapView.userLocation;
 }
 
 - (MKAnnotationView *)mapView:(MKMapView *)theMapView viewForAnnotation:(id <MKAnnotation>)annotation

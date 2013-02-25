@@ -31,6 +31,10 @@
 - (void)receiveEvent:(NSNotification *)notification {
     
     [super anchorTopViewTo:ECRight];
+    if([[NSUserDefaults standardUserDefaults]objectForKey:@"LeftReveal"]==nil)
+    {
+        [[NSUserDefaults standardUserDefaults] setObject:@"Enabled" forKey:@"LeftReveal"];
+    }
 }
 - (void)receiveHideMenuEvent:(NSNotification *)notification {
     NSLog(@"hiding menu");

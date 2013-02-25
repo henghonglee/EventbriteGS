@@ -78,8 +78,15 @@
 
 -(void)viewDidAppear:(BOOL)animated {
     [self.slidingViewController setAnchorLeftPeekAmount:1.0f];
+    
     [super viewDidAppear:animated];
     [self becomeFirstResponder];
+    if ([[NSUserDefaults standardUserDefaults]objectForKey:@"RightReveal"]==nil) {
+        [self hintRight];
+    }else if ([[NSUserDefaults standardUserDefaults]objectForKey:@"LeftReveal"]==nil) {
+        [self hintLeft];
+    }
+
 }
 
 
@@ -346,7 +353,6 @@
         }
         if ([[dataObject objectForKey:@"is_post"] isEqualToNumber:[NSNumber numberWithBool:NO]])
         {
-            NSLog(@"not a post");
             continue;
         }
         
@@ -686,7 +692,9 @@
 -(void)didReceiveUserLocation:(MKUserLocation*)location
 {
     userLocation = location;
-
+    [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:MKCoordinateRegionMake(CLLocationCoordinate2DMake(location.coordinate.latitude, location.coordinate.longitude), MKCoordinateSpanMake(0.01, 0.01)) AndSearch:@"" IntoArray:self.GSObjectArray WithRefresh:YES];
+    [self.tableView reloadData];
+    
     [Flurry setLatitude:location.coordinate.latitude
               longitude:location.coordinate.longitude horizontalAccuracy:0.001f verticalAccuracy:0.001f];
 }
@@ -780,7 +788,33 @@
 }
 -(void)topDidAnchorLeft
 {
+    if([[NSUserDefaults standardUserDefaults]objectForKey:@"RightReveal"]==nil)
+    {
+        [[NSUserDefaults standardUserDefaults] setObject:@"Enabled" forKey:@"RightReveal"];
+        //show instructions
+        if ([self.slidingViewController underRightShowing]) {
+            NSLog(@"did shake phone in undermap view controller.. show instructions for undermap here");
+            BOOL removedInstructions = NO;
+            for (UIView* view in self.slidingViewController.underRightViewController.view.subviews) {
+                if ([view isKindOfClass:[UIButton class]])
+                {
+                    if (view.tag == 1) {
+                        [view removeFromSuperview];
+                        removedInstructions = YES;
+                    }
+                }
+            }
+            if (!removedInstructions) {
+                UIButton* MenuInstructions = [UIButton buttonWithType:UIButtonTypeCustom];
+                [MenuInstructions setTag:1];
+                [MenuInstructions setFrame:self.slidingViewController.underRightViewController.view.bounds];
+                [MenuInstructions setImage:[UIImage imageNamed:@"MapInstructions.png"] forState:UIControlStateNormal];
+                [MenuInstructions addTarget:self action:@selector(selectedInstructions:) forControlEvents:UIControlEventTouchDown];
+                [self.slidingViewController.underRightViewController.view addSubview:MenuInstructions];
+            }
+        }
 
+    }
     MKMapView* underMapView = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
     for (id annnote in underMapView.annotations) {
         if ([annnote isKindOfClass:[MKUserLocation class]] || [annnote isKindOfClass:[GScursor class]]) {
@@ -831,6 +865,7 @@
 {
 
     NSLog(@"underLeftWillDisAppear");
+    
     if (self.selectionChanged) {
         self.selectionChanged=NO;
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -854,6 +889,7 @@
 
 -(void)underRightWillDisappear
 {
+    
     if (self.slidingViewController.underRightShowing) {
         UnderMapViewController* menuViewController = ((UnderMapViewController*)self.slidingViewController.underRightViewController);
         NSLog(@"underright will disappear");
@@ -877,7 +913,10 @@
             oldRegion = newRegion;
             //TODO: here we still need to crawl more data
         }
-        
+        if ([[NSUserDefaults standardUserDefaults]objectForKey:@"LeftReveal"]==nil) {
+            [self hintLeft];
+        }
+
 
         
         
@@ -1521,5 +1560,42 @@
         [self.slidingViewController resetTopView];        
     }
 }
+-(void)hintLeft
+{
+    double delayInSeconds = 1.5;
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+        CGRect slideViewFinalFrame = CGRectMake(15, 0, self.view.bounds.size.width,  self.view.bounds.size.height);
+        CGRect slideViewReturnFrame = CGRectMake(00, 0, self.view.bounds.size.width,  self.view.bounds.size.height);
+        [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            self.slidingViewController.topViewController.view.frame = slideViewFinalFrame;
+        } completion:^(BOOL finished) {
+            [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                self.slidingViewController.topViewController.view.frame = slideViewReturnFrame;
+            } completion:^(BOOL finished) {
+                
+            }];
+        }];
+    });
 
+}
+-(void)hintRight
+{
+    
+    double delayInSeconds = 1.5;
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+        CGRect slideViewFinalFrame = CGRectMake(-15, 0, self.view.bounds.size.width,  self.view.bounds.size.height);
+        CGRect slideViewReturnFrame = CGRectMake(00, 0, self.view.bounds.size.width,  self.view.bounds.size.height);
+        [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            self.slidingViewController.topViewController.view.frame = slideViewFinalFrame;
+        } completion:^(BOOL finished) {
+            [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                self.slidingViewController.topViewController.view.frame = slideViewReturnFrame;
+            } completion:^(BOOL finished) {
+                
+            }];
+        }];
+    });
+}
 @end

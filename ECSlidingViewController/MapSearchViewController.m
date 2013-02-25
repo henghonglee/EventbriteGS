@@ -27,7 +27,7 @@
     [super viewDidLoad];
     [self.searchDisplayController setDelegate:self];
     [self.ibSearchBar setDelegate:self];
-
+    [self.ibSearchBar setPlaceholder:@"Suggest New Location"];
     // Zoom the map to current location.
 //    [self.ibMapView setShowsUserLocation:YES];
 //    [self.ibMapView setUserInteractionEnabled:YES];
