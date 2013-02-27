@@ -346,7 +346,7 @@
         }
         if ([[dataObject objectForKey:@"is_post"] isEqualToNumber:[NSNumber numberWithBool:NO]])
         {
-            NSLog(@"not a post");
+            
             continue;
         }
         
@@ -478,30 +478,7 @@
     self.random = NO;
         [resultArray removeAllObjects];
         MKMapView* map = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
-        if (search.length > 0){//remove all annotations
-            
-            for (id annnote in map.annotations) {
-                if ([annnote isKindOfClass:[MKUserLocation class]])
-                {
-                    //NOOP
-                }else{
-                    [map removeAnnotation:annnote];  // remove any annotations that exist
-                }
-            }
-            
-            
-        }else{
-            if (refresh) {
-                for (id annnote in map.annotations) {
-                    if ([annnote isKindOfClass:[MKUserLocation class]])
-                    {
-                        //NOOP
-                    }else{
-                     //   [map removeAnnotation:annnote];  // remove any annotations that exist
-                    }
-                }
-            }
-        }
+    
 //    @synchronized(loadedArray){
         if (refresh) {
             if (((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs){
@@ -792,13 +769,13 @@
     }
 
     UnderMapViewController* menuViewController = ((UnderMapViewController*)self.slidingViewController.underRightViewController);
-    menuViewController.InfoPanelView.frame = CGRectMake(self.view.bounds.size.width-320, self.view.bounds.size.height, 320, 45);
+    menuViewController.InfoPanelView.frame = CGRectMake(self.view.bounds.size.width-320, self.view.bounds.size.height, 320, 60);
     menuViewController.InfoPanelView.hidden = NO;
     menuViewController.shopLabel.hidden = NO;
     menuViewController.locationButton.hidden = NO;
     menuViewController.allButton.hidden = NO;
 
-    CGRect slideViewFinalFrame = CGRectMake(self.view.bounds.size.width-320, self.view.bounds.size.height-45, 320, 45);
+    CGRect slideViewFinalFrame = CGRectMake(self.view.bounds.size.width-320, self.view.bounds.size.height-60, 320, 60);
     [UIView animateWithDuration:0.2
                           delay:0.1
                         options: UIViewAnimationOptionCurveEaseInOut
@@ -943,8 +920,14 @@
     [underMapView addAnnotation:gsObj];
     
     UnderMapViewController* menuViewController = ((UnderMapViewController*)self.slidingViewController.underRightViewController);
-//    menuViewController.shopLabel.text = gsObj.title;
-    menuViewController.shopLabel.text =@"Back to Listings";
+    if (gsObj.imageArray.count > 0) {
+        [menuViewController.shopImageView setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@",[gsObj.imageArray objectAtIndex:0]]]];
+    }else{
+        [menuViewController.shopImageView setImage:nil];
+    }
+
+    menuViewController.shopLabel.text = gsObj.title;
+
     menuViewController.gsObjSelected = gsObj;
     [((UnderMapViewController*)self.slidingViewController.underRightViewController) willAnimateRotationToInterfaceOrientation:self.interfaceOrientation duration:0];
 }
@@ -968,49 +951,7 @@
 -(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
     //TODO: animate pin here!
-    MKMapView* underMapView = ((MKMapView*)((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView);
-    for (id annote in underMapView.annotations) {
-        if ([annote isKindOfClass:[GSObject class]]) { //should only have one
-            MKAnnotationView*annView = [underMapView viewForAnnotation:annote];
-            [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-                CATransform3D zRotation;
-                zRotation = CATransform3DMakeRotation(M_PI/10, 0, 0, 1.0);
-                annView.layer.transform = zRotation;
-                
-            }completion:^(BOOL finished) {
-                [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-                    CATransform3D zRotation;
-                    zRotation = CATransform3DMakeRotation(-M_PI/10, 0, 0, 1.0);
-                    annView.layer.transform = zRotation;
-                    
-                }completion:^(BOOL finished) {
-                    [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-                        CATransform3D zRotation;
-                        zRotation = CATransform3DMakeRotation(M_PI/12, 0, 0, 1.0);
-                        annView.layer.transform = zRotation;
-                        
-                    }completion:^(BOOL finished) {
-                        [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-                            CATransform3D zRotation;
-                            zRotation = CATransform3DMakeRotation(-M_PI/12, 0, 0, 1.0);
-                            annView.layer.transform = zRotation;
-                            
-                        }completion:^(BOOL finished) {
-                            [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-                                CATransform3D zRotation;
-                                zRotation = CATransform3DMakeRotation(0, 0, 0, 1.0);
-                                annView.layer.transform = zRotation;
-                                
-                            }completion:^(BOOL finished) {
-                                
-                            }];
-                        }];
-                    }];
-                }];
-            }];
-            
-        }
-    }
+    [self animatePin];
     
 }
 
@@ -1499,6 +1440,38 @@
         });
     }
 }
+
+-(void)didTouchMapAtCoordinate:(CLLocationCoordinate2D)mapTouchCoordinate
+{
+    MKMapView* map = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
+    CLLocation* touchLocation = [[CLLocation alloc]initWithLatitude:mapTouchCoordinate.latitude longitude:mapTouchCoordinate.longitude];
+    MKZoomScale currentZoomScale = map.bounds.size.width / map.visibleMapRect.size.width;
+    
+    
+    for (GSObject* gsObj in self.loadedGSObjectArray)
+    {
+        CLLocation* location = [[CLLocation alloc]initWithLatitude:gsObj.coordinate.latitude longitude:gsObj.coordinate.longitude];
+        if ([touchLocation distanceFromLocation:location]< (0.2*MKRoadWidthAtZoomScale(currentZoomScale)))
+        {
+//            if ([self.GSObjectArray containsObject:gsObj])
+//            {
+//                [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:[self.GSObjectArray indexOfObject:gsObj]+1 inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
+//                [self animatePin];                
+//            }
+//            else
+//            {
+//                NSLog(@"found not in gsobject array");
+                MKCoordinateRegion region =map.region;
+                [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:self.currentSearch IntoArray:self.GSObjectArray WithRefresh:NO];
+                [self.tableView reloadData];
+                [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:[self.GSObjectArray indexOfObject:gsObj]+1 inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
+                [self animatePin];
+//            }
+            break;
+        }
+    }
+}
+
 -(BOOL)shouldAutorotate{
     return NO;
 }
@@ -1521,5 +1494,78 @@
         [self.slidingViewController resetTopView];        
     }
 }
-
+-(void)animatePin
+{
+    MKMapView* underMapView = ((MKMapView*)((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView);
+    for (id annote in underMapView.annotations) {
+        if ([annote isKindOfClass:[GSObject class]]) { //should only have one
+            MKAnnotationView*annView = [underMapView viewForAnnotation:annote];
+            [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                CATransform3D zRotation;
+                zRotation = CATransform3DMakeRotation(M_PI/6, 0, 0, 1.0);
+                annView.layer.transform = zRotation;
+                
+            }completion:^(BOOL finished) {
+                [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                    CATransform3D zRotation;
+                    zRotation = CATransform3DMakeRotation(-M_PI/6, 0, 0, 1.0);
+                    annView.layer.transform = zRotation;
+                    
+                }completion:^(BOOL finished) {
+                    [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                        CATransform3D zRotation;
+                        zRotation = CATransform3DMakeRotation(M_PI/6, 0, 0, 1.0);
+                        annView.layer.transform = zRotation;
+                        
+                    }completion:^(BOOL finished) {
+                        [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                            CATransform3D zRotation;
+                            zRotation = CATransform3DMakeRotation(-M_PI/6, 0, 0, 1.0);
+                            annView.layer.transform = zRotation;
+                            
+                        }completion:^(BOOL finished) {
+                            [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                                CATransform3D zRotation;
+                                zRotation = CATransform3DMakeRotation(M_PI/6, 0, 0, 1.0);
+                                annView.layer.transform = zRotation;
+                                
+                            }completion:^(BOOL finished) {
+                                [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                                    CATransform3D zRotation;
+                                    zRotation = CATransform3DMakeRotation(-M_PI/6, 0, 0, 1.0);
+                                    annView.layer.transform = zRotation;
+                                    
+                                }completion:^(BOOL finished) {
+                                    [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                                        CATransform3D zRotation;
+                                        zRotation = CATransform3DMakeRotation(M_PI/8, 0, 0, 1.0);
+                                        annView.layer.transform = zRotation;
+                                        
+                                    }completion:^(BOOL finished) {
+                                        [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                                            CATransform3D zRotation;
+                                            zRotation = CATransform3DMakeRotation(-M_PI/8, 0, 0, 1.0);
+                                            annView.layer.transform = zRotation;
+                                            
+                                        }completion:^(BOOL finished) {
+                                            [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                                                CATransform3D zRotation;
+                                                zRotation = CATransform3DMakeRotation(0, 0, 0, 1.0);
+                                                annView.layer.transform = zRotation;
+                                                
+                                            }completion:^(BOOL finished) {
+                                                
+                                            }];
+                                        }];
+                                    }];
+                                }];
+                            }];
+                        }];
+                    }];
+                }];
+            }];
+            
+        }
+    }
+}
 @end

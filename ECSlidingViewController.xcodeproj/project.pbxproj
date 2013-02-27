@@ -43,8 +43,8 @@
 		EF44BD46168B3ADB00F7BCB5 /* ShopDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF44BD42168B3AD800F7BCB5 /* ShopDetailViewController.m */; };
 		EF5FDC0716D8CEF30019E3BA /* MapSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF5FDC0616D8CEF30019E3BA /* MapSearchViewController.m */; };
 		EF5FDC0916D92C360019E3BA /* locationBlue@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EF5FDC0816D92C360019E3BA /* locationBlue@2x.png */; };
-		EF5FDC0B16DA13F70019E3BA /* libFlurry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EF5FDC0A16DA13F60019E3BA /* libFlurry.a */; };
 		EF6326EF169DD9E7009A78C3 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EF6326EE169DD9E7009A78C3 /* Default-568h@2x.png */; };
+		EF68E9F516DD13CA006A6D84 /* libFlurry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EF68E9F416DD13CA006A6D84 /* libFlurry.a */; };
 		EF9016F116AC171E0089C57D /* MenuCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EF9016F016AC171D0089C57D /* MenuCell.m */; };
 		EF9016F416AC172B0089C57D /* MenuCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EF9016F316AC172B0089C57D /* MenuCell.xib */; };
 		EF9D891D167A44A8002B352D /* CrumbPath.m in Sources */ = {isa = PBXBuildFile; fileRef = EF9D891A167A44A8002B352D /* CrumbPath.m */; };
@@ -223,9 +223,9 @@
 		EF5FDC0516D8CEF30019E3BA /* MapSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapSearchViewController.h; sourceTree = "<group>"; };
 		EF5FDC0616D8CEF30019E3BA /* MapSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapSearchViewController.m; sourceTree = "<group>"; };
 		EF5FDC0816D92C360019E3BA /* locationBlue@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "locationBlue@2x.png"; sourceTree = "<group>"; };
-		EF5FDC0A16DA13F60019E3BA /* libFlurry.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFlurry.a; path = "../../../Downloads/Flurry iPhone SDK v4.1.0/Flurry/libFlurry.a"; sourceTree = "<group>"; };
 		EF5FDC0C16DA14130019E3BA /* Flurry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Flurry.h; sourceTree = "<group>"; };
 		EF6326EE169DD9E7009A78C3 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		EF68E9F416DD13CA006A6D84 /* libFlurry.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libFlurry.a; sourceTree = "<group>"; };
 		EF9016EF16AC171D0089C57D /* MenuCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuCell.h; sourceTree = "<group>"; };
 		EF9016F016AC171D0089C57D /* MenuCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MenuCell.m; sourceTree = "<group>"; };
 		EF9016F316AC172B0089C57D /* MenuCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MenuCell.xib; sourceTree = "<group>"; };
@@ -409,7 +409,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EF5FDC0B16DA13F70019E3BA /* libFlurry.a in Frameworks */,
+				EF68E9F516DD13CA006A6D84 /* libFlurry.a in Frameworks */,
 				EFA44FB816B26FA5004D40E7 /* MessageUI.framework in Frameworks */,
 				EFA44FD816B2737F004D40E7 /* AdSupport.framework in Frameworks */,
 				EFA44FC216B271E0004D40E7 /* CoreMotion.framework in Frameworks */,
@@ -441,6 +441,7 @@
 		2750E76114CDB0DF007727A0 = {
 			isa = PBXGroup;
 			children = (
+				EF68E9F416DD13CA006A6D84 /* libFlurry.a */,
 				2750E77614CDB0DF007727A0 /* ECSlidingViewController */,
 				2750E76F14CDB0DF007727A0 /* Frameworks */,
 				2750E76D14CDB0DF007727A0 /* Products */,
@@ -458,7 +459,6 @@
 		2750E76F14CDB0DF007727A0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				EF5FDC0A16DA13F60019E3BA /* libFlurry.a */,
 				EF5FDC0C16DA14130019E3BA /* Flurry.h */,
 				EFA44FD716B2737F004D40E7 /* AdSupport.framework */,
 				EF3D430916AAB79F0064618E /* libsqlite3.dylib */,
@@ -1134,6 +1134,7 @@
 					"\"$(SRCROOT)/ECSlidingViewController\"",
 					"\"$(SRCROOT)/ECSlidingViewController/Mobclix SDK\"",
 					"\"$(SRCROOT)/../../../Downloads/Flurry iPhone SDK v4.1.0/Flurry\"",
+					"\"$(SRCROOT)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -1168,6 +1169,7 @@
 					"\"$(SRCROOT)/ECSlidingViewController\"",
 					"\"$(SRCROOT)/ECSlidingViewController/Mobclix SDK\"",
 					"\"$(SRCROOT)/../../../Downloads/Flurry iPhone SDK v4.1.0/Flurry\"",
+					"\"$(SRCROOT)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",

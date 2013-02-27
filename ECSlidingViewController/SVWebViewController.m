@@ -168,31 +168,31 @@ typedef enum {
 
 - (void)scrollViewDidScroll:(UIScrollView *)sender
 {
-    ScrollDirection scrollDirection = ScrollDirectionDown;
-    if (self.lastContentOffset > mainWebView.scrollView.contentOffset.y)
-        scrollDirection = ScrollDirectionUp;
-    else if (self.lastContentOffset < mainWebView.scrollView.contentOffset.y)
-        scrollDirection = ScrollDirectionDown;
-    
-    self.lastContentOffset = mainWebView.scrollView.contentOffset.y;
-    if (self.lastContentOffset>44) {
-    
-    // do whatever you need to with scrollDirection here.
-    switch (scrollDirection) {
-        case ScrollDirectionUp:
-            [self.navigationController setNavigationBarHidden:NO animated:YES];
-            break;
-        case ScrollDirectionDown:
-            [self.navigationController setNavigationBarHidden:YES animated:YES];
-            break;
-            
-        default:
-            break;
-            
-    }
-    }else{
-          self.topButton.frame = CGRectMake(00, 0, 320, 44);
-    }
+//    ScrollDirection scrollDirection = ScrollDirectionDown;
+//    if (self.lastContentOffset > mainWebView.scrollView.contentOffset.y)
+//        scrollDirection = ScrollDirectionUp;
+//    else if (self.lastContentOffset < mainWebView.scrollView.contentOffset.y)
+//        scrollDirection = ScrollDirectionDown;
+//    
+//    self.lastContentOffset = mainWebView.scrollView.contentOffset.y;
+//    if (self.lastContentOffset>44) {
+//    
+//    // do whatever you need to with scrollDirection here.
+//    switch (scrollDirection) {
+//        case ScrollDirectionUp:
+//            [self.navigationController setNavigationBarHidden:NO animated:YES];
+//            break;
+//        case ScrollDirectionDown:
+//            [self.navigationController setNavigationBarHidden:YES animated:YES];
+//            break;
+//            
+//        default:
+//            break;
+//            
+//    }
+//    }else{
+//          self.topButton.frame = CGRectMake(00, 0, 320, 44);
+//    }
 }
 
 - (void)viewDidLoad {

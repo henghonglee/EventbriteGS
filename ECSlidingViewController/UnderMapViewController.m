@@ -41,7 +41,11 @@ static dispatch_once_t onceToken;
     self.peekLeftAmount = 40.0f;
     [self.slidingViewController setAnchorLeftPeekAmount:self.peekLeftAmount];
        self.slidingViewController.underRightWidthLayout = ECFullWidth;
-
+    UITapGestureRecognizer *tgr = [[UITapGestureRecognizer alloc]
+                                   initWithTarget:self action:@selector(handleGesture:)];
+    tgr.numberOfTapsRequired = 1;
+    tgr.numberOfTouchesRequired = 1;
+    [self.mapView addGestureRecognizer:tgr];
 }
 
 -(void)viewWillAppear:(BOOL)animated
@@ -67,12 +71,20 @@ static dispatch_once_t onceToken;
     [self setInfoPanelView:nil];
     [self setShopButton:nil];
     [self setShopLabel:nil];
+    [self setShopImageView:nil];
     [super viewDidUnload];
 }
-
+-(IBAction)showWebView:(id)sender {
+        NSURL *URL = [NSURL URLWithString:[NSString stringWithFormat:@"%@",self.gsObjSelected.link]];
+    	SVWebViewController *webViewController = [[SVWebViewController alloc] initWithURL:URL];
+        webViewController.gsobj = self.gsObjSelected;
+        webViewController.currentLocation = ((GeoScrollViewController*)self.slidingViewController.topViewController).userLocation;
+    	[self.navigationController pushViewController:webViewController animated:YES];
+    
+ }
 - (IBAction)showGeoscroll:(id)sender {
     NSLog(@"show geoscroll");
-    CGRect slideViewFinalFrame = CGRectMake(self.view.bounds.size.width-320, self.view.bounds.size.height, 320, 45);
+    CGRect slideViewFinalFrame = CGRectMake(self.view.bounds.size.width-320, self.view.bounds.size.height, 320, 60);
     [UIView animateWithDuration:0.2
                           delay:0.1
                         options: UIViewAnimationOptionCurveEaseInOut
@@ -85,13 +97,25 @@ static dispatch_once_t onceToken;
                      }];
     
 
-//    NSURL *URL = [NSURL URLWithString:[NSString stringWithFormat:@"%@",self.gsObjSelected.link]];
-//	SVWebViewController *webViewController = [[SVWebViewController alloc] initWithURL:URL];
-//    webViewController.gsobj = self.gsObjSelected;
-//    webViewController.currentLocation = ((GeoScrollViewController*)self.slidingViewController.topViewController).userLocation;
-//	[self.navigationController pushViewController:webViewController animated:YES];
-//    
+
 }
+- (void)handleGesture:(UIGestureRecognizer *)gestureRecognizer
+{
+    if (gestureRecognizer.state != UIGestureRecognizerStateEnded)
+        return;
+    
+    CGPoint touchPoint = [gestureRecognizer locationInView:mapView];
+    CLLocationCoordinate2D touchMapCoordinate =
+    [mapView convertPoint:touchPoint toCoordinateFromView:mapView];
+    GeoScrollViewController* topVC = ((GeoScrollViewController*)self.slidingViewController.topViewController);
+    [topVC didTouchMapAtCoordinate:touchMapCoordinate];
+//    MKPointAnnotation *pa = [[MKPointAnnotation alloc] init];
+//    pa.coordinate = touchMapCoordinate;
+//    pa.title = @"Hello";
+//    [mapView addAnnotation:pa];
+
+}
+
 
 #pragma mark -
 #pragma mark MKMapViewDelegate
@@ -131,8 +155,8 @@ static dispatch_once_t onceToken;
             
             
             customPinView.image = [UIImage imageNamed:@"pin.png"];
-            customPinView.layer.anchorPoint = CGPointMake(0.6, 1.0);
-            customPinView.centerOffset = CGPointMake(3,-2);
+            customPinView.layer.anchorPoint = CGPointMake(0.5, 1.0);
+            customPinView.centerOffset = CGPointMake(0,0);
             customPinView.canShowCallout = NO;
             [customPinView setUserInteractionEnabled:YES];
             customPinView.clipsToBounds = NO;
@@ -185,10 +209,10 @@ static dispatch_once_t onceToken;
 
 -(void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view
 {
-    if ([view.annotation isKindOfClass:[GScursor class]]||[view isKindOfClass:[MKUserLocation class]] ) {
-        
-        return;
-    }else if([view.annotation isKindOfClass:[GSObject class]]){
+//    if ([view.annotation isKindOfClass:[GScursor class]]||[view isKindOfClass:[MKUserLocation class]] ) {
+//        
+//        return;
+//    }else if([view.annotation isKindOfClass:[GSObject class]]){
 //        if (!callout) {
 //            callout = [[CustomCalloutView alloc]initWithFrame:CGRectMake(-121, -60, 240, 63)];
 //            
@@ -232,8 +256,8 @@ static dispatch_once_t onceToken;
 //                             }];
 //        
 //        }
-    }
-    
+//    }
+//    
     
 }
 
@@ -251,10 +275,11 @@ didAddAnnotationViews:(NSArray *)annotationViews
         if ([annView.annotation isKindOfClass:[GScursor class]])
             return;
         [self.mapView bringSubviewToFront:annView];
-        CGRect endFrame = annView.frame;
-        annView.layer.anchorPoint = CGPointMake(0.6, 1.0);
-        annView.frame = CGRectMake(annView.frame.origin.x+annView.frame.size.width*0.6, annView.frame.origin.y+annView.frame.size.height,0.0f, 0.0f);
-        annView.frame = endFrame;
+        
+//        annView.layer.anchorPoint = CGPointMake(0.5, 1.0);
+//        annView.backgroundColor = [UIColor greenColor];
+//        annView.frame = CGRectMake(annView.frame.origin.x, annView.frame.origin.y-annView.frame.size.height,annView.frame.size.width,annView.frame.size.height);
+        
 
         }
     }
@@ -508,6 +533,8 @@ didAddAnnotationViews:(NSArray *)annotationViews
      
     }
 }
+
+
 -(BOOL)shouldAutorotate{
     return NO;
 }
