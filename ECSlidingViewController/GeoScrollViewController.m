@@ -54,9 +54,10 @@
     self.loadedGSObjectArray = [[NSMutableArray alloc] init];
     self.scopedGSObjectArray = [[NSMutableArray alloc] init];
     
-    self.tableView = [[UITableView alloc]initWithFrame:self.view.bounds];
+    self.tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 44, self.view.bounds.size.width, self.view.bounds.size.height)];
+    self.tableView.frame = self.view.bounds;
     self.tableView.autoresizesSubviews = YES;
-    self.tableView.autoresizingMask = UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleLeftMargin ;
+    self.tableView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin ;
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     self.tableView.scrollsToTop = YES;
@@ -64,6 +65,7 @@
     self.tableView.backgroundColor=[UIColor clearColor];
     [self.view addSubview:self.tableView];
     
+    GSserialQueue = dispatch_queue_create("com.example.GSSerialQueue", NULL);
     
     
     dispatch_async(dispatch_get_main_queue(), ^
@@ -77,9 +79,24 @@
 }
 
 -(void)viewDidAppear:(BOOL)animated {
-    [self.slidingViewController setAnchorLeftPeekAmount:1.0f];
+    NSLog(@"view did appear");
+   
     [super viewDidAppear:animated];
     [self becomeFirstResponder];
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    if (orientation == UIInterfaceOrientationLandscapeLeft||orientation == UIInterfaceOrientationLandscapeRight) {
+        [self.slidingViewController setAnchorLeftPeekAmount:160.0f];
+        [self.slidingViewController resetTopView];        
+    }else{
+        [self.slidingViewController setAnchorLeftPeekAmount:1.0f];
+    }
+
+    if ([[NSUserDefaults standardUserDefaults]objectForKey:@"RightReveal"]==nil) {
+        [self hintRight];
+    }else if ([[NSUserDefaults standardUserDefaults]objectForKey:@"LeftReveal"]==nil) {
+        [self hintLeft];
+    }
+
 }
 
 
@@ -98,7 +115,9 @@
              NSLog(@" enabled");
             if (![[self.boolhash objectForKey:blog] isEqualToString:@"Enabled"])
             {
-                        [self retrieveAndProcessDataFromCacheOrServerForBlog:blog];
+                        dispatch_async(GSserialQueue, ^{
+                            [self retrieveAndProcessDataFromCacheOrServerForBlog:blog];
+                        });
                         [self.boolhash setObject:@"Enabled" forKey:blog];
                 
             }else{
@@ -128,7 +147,10 @@
             }
         }
     }
-    [self prepareDataForDisplay];
+    dispatch_async(GSserialQueue, ^{
+        [self prepareDataForDisplay];
+    });
+    
     dispatch_async(dispatch_get_main_queue(), ^
    {
        NSLog(@"dismissing progress hud");
@@ -203,9 +225,7 @@
 
 -(void)LoadData
 {
-//    [[NSNotificationCenter defaultCenter] addObserver:self
-//                                             selector:@selector(topDidAnchorRight )
-//                                                 name:ECSlidingViewTopDidAnchorRight object:nil];
+
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(underLeftWillDisappear)
                                                  name:ECSlidingViewUnderLeftWillDisappear object:nil];
@@ -227,7 +247,6 @@
 
    
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        self.tableView.frame = self.view.bounds;
         [self.tableView reloadData];
         if ([[UIDevice currentDevice] systemVersion].floatValue < 6.0)
         {
@@ -346,7 +365,6 @@
         }
         if ([[dataObject objectForKey:@"is_post"] isEqualToNumber:[NSNumber numberWithBool:NO]])
         {
-            
             continue;
         }
         
@@ -570,7 +588,7 @@
             
             }
         }
-   
+//    }
 }
 
 -(void)updateCrumbsWithGsObject:(GSObject*)gsObj IntoResultArray:(NSMutableArray*)resultArray withMap:(MKMapView*)map andRegion:(MKCoordinateRegion)region
@@ -663,7 +681,13 @@
 -(void)didReceiveUserLocation:(MKUserLocation*)location
 {
     userLocation = location;
-
+    dispatch_async(GSserialQueue, ^{
+        [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:MKCoordinateRegionMake(CLLocationCoordinate2DMake(location.coordinate.latitude, location.coordinate.longitude), MKCoordinateSpanMake(0.01, 0.01)) AndSearch:@"" IntoArray:self.GSObjectArray WithRefresh:YES];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.tableView reloadData];
+        });
+    });
+    
     [Flurry setLatitude:location.coordinate.latitude
               longitude:location.coordinate.longitude horizontalAccuracy:0.001f verticalAccuracy:0.001f];
 }
@@ -757,7 +781,33 @@
 }
 -(void)topDidAnchorLeft
 {
+    if([[NSUserDefaults standardUserDefaults]objectForKey:@"RightReveal"]==nil)
+    {
+        [[NSUserDefaults standardUserDefaults] setObject:@"Enabled" forKey:@"RightReveal"];
+        //show instructions
+        if ([self.slidingViewController underRightShowing]) {
+            NSLog(@"did shake phone in undermap view controller.. show instructions for undermap here");
+            BOOL removedInstructions = NO;
+            for (UIView* view in self.slidingViewController.underRightViewController.view.subviews) {
+                if ([view isKindOfClass:[UIButton class]])
+                {
+                    if (view.tag == 1) {
+                        [view removeFromSuperview];
+                        removedInstructions = YES;
+                    }
+                }
+            }
+            if (!removedInstructions) {
+                UIButton* MenuInstructions = [UIButton buttonWithType:UIButtonTypeCustom];
+                [MenuInstructions setTag:1];
+                [MenuInstructions setFrame:self.slidingViewController.underRightViewController.view.bounds];
+                [MenuInstructions setImage:[UIImage imageNamed:@"MapInstructions.png"] forState:UIControlStateNormal];
+                [MenuInstructions addTarget:self action:@selector(selectedInstructions:) forControlEvents:UIControlEventTouchDown];
+                [self.slidingViewController.underRightViewController.view addSubview:MenuInstructions];
+            }
+        }
 
+    }
     MKMapView* underMapView = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
     for (id annnote in underMapView.annotations) {
         if ([annnote isKindOfClass:[MKUserLocation class]] || [annnote isKindOfClass:[GScursor class]]) {
@@ -768,17 +818,23 @@
         }
     }
 
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    if (orientation == UIInterfaceOrientationLandscapeLeft||orientation == UIInterfaceOrientationLandscapeRight) {
+        
+    }else{
+    
     UnderMapViewController* menuViewController = ((UnderMapViewController*)self.slidingViewController.underRightViewController);
-    menuViewController.InfoPanelView.frame = CGRectMake(self.view.bounds.size.width-320, self.view.bounds.size.height, 320, 60);
+    menuViewController.InfoPanelView.frame = CGRectMake(self.view.bounds.size.width-320, self.view.bounds.size.height, 320, 75);
     menuViewController.InfoPanelView.hidden = NO;
     menuViewController.shopLabel.hidden = NO;
-    menuViewController.locationButton.hidden = NO;
+    menuViewController.locationButtonView.hidden = NO;
+    menuViewController.resetTopViewButton.hidden = NO;
     menuViewController.allButton.hidden = NO;
 
-    CGRect slideViewFinalFrame = CGRectMake(self.view.bounds.size.width-320, self.view.bounds.size.height-60, 320, 60);
+    CGRect slideViewFinalFrame = CGRectMake(self.view.bounds.size.width-320, self.view.bounds.size.height-75, 320, 75);
     [UIView animateWithDuration:0.2
                           delay:0.1
-                        options: UIViewAnimationOptionCurveEaseInOut
+                        options: UIViewAnimationOptionCurveEaseOut
                      animations:^{
                          menuViewController.InfoPanelView.frame = slideViewFinalFrame;
                      } 
@@ -786,11 +842,8 @@
                          NSLog(@"Done!");
                      }];
     
-    for (UIButton* btn in menuViewController.categoryButtons) {
-        btn.hidden = NO;
-    }
-    menuViewController.categorySelectionButton.hidden = NO;
     menuViewController.shouldShowPinAnimation = YES;
+    }
 }
 
 -(void)underLeftWillAppear
@@ -808,6 +861,7 @@
 {
 
     NSLog(@"underLeftWillDisAppear");
+    
     if (self.selectionChanged) {
         self.selectionChanged=NO;
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -831,13 +885,15 @@
 
 -(void)underRightWillDisappear
 {
+    
     if (self.slidingViewController.underRightShowing) {
         UnderMapViewController* menuViewController = ((UnderMapViewController*)self.slidingViewController.underRightViewController);
         NSLog(@"underright will disappear");
         [menuViewController dismissCallout];
         menuViewController.InfoPanelView.hidden = YES;
         menuViewController.shopLabel.hidden = YES;
-        menuViewController.locationButton.hidden = YES;
+        menuViewController.locationButtonView.hidden = YES;
+        menuViewController.resetTopViewButton.hidden = YES;
         menuViewController.allButton.hidden = YES;
         [menuViewController hideCategoryButtons];
         for (UIButton* btn in menuViewController.categoryButtons) {
@@ -854,7 +910,10 @@
             oldRegion = newRegion;
             //TODO: here we still need to crawl more data
         }
-        
+        if ([[NSUserDefaults standardUserDefaults]objectForKey:@"LeftReveal"]==nil) {
+            [self hintLeft];
+        }
+
 
         
         
@@ -977,14 +1036,17 @@
         [self presentModalViewController:searchViewController animated:YES];
         return NO;
 
+
 }
 
 -(void)searchViewControllerDidFinishWithSearchString:(NSString *)searchString
 {
+    
     if (searchString.length>0) {
         [Flurry endTimedEvent:@"Search_Started" withParameters:nil];
     }
-    
+    self.searchTextField.text = searchString;
+    self.currentSearch = searchString;
     self.tableView.hidden = NO;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(topDidAnchorLeft ) name:ECSlidingViewTopDidAnchorLeft object:nil];
@@ -994,23 +1056,22 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underLeftWillAppear) name:ECSlidingViewUnderLeftWillAppear object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underLeftWillDisappear) name:ECSlidingViewUnderLeftWillDisappear object:nil];
-    ((SorterCell*)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]]).searchTextField.text = searchString;
-    [self textFieldShouldReturn:((SorterCell*)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]]).searchTextField];
+    [self textFieldShouldReturn:self.searchTextField];
 }
 -(BOOL)textFieldShouldReturn:(UITextField *)textField{
+
     [scopedGSObjectArray removeAllObjects];
     if (textField.text.length > 0) {
         MTStatusBarOverlay *overlay = [MTStatusBarOverlay sharedInstance];
         overlay.progress = 1.0;
         [overlay postMessage:[NSString stringWithFormat:@"Current Search: %@",textField.text] animated:YES];
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
             currentSearch = textField.text;
             
             if (currentSearch.length>0) {
                 NSArray* searchterms = [currentSearch componentsSeparatedByString:@"+"];
                 
                 for (NSString* term in searchterms) {
-                    NSLog(@"term - %@",term);
                     if ([term rangeOfString:@"addr="].location!=NSNotFound) {
                         [Flurry logEvent:@"SearchForAddress" timed:NO];
                         //reverse geocode
@@ -1019,7 +1080,7 @@
                         }
                         NSString* searchaddress;
                         searchaddress = [[term stringByReplacingOccurrencesOfString:@"addr=" withString:@""] stringByAppendingString:@" Singapore"];
-                        NSLog(@"found addr %@",searchaddress);
+
                         dispatch_async(dispatch_get_main_queue(), ^{
                             textField.text = @"";
                             currentSearch = @"";
@@ -1030,12 +1091,9 @@
                             
                         });
                         [self.geocoder geocodeAddressString:searchaddress completionHandler:^(NSArray *placemarks, NSError *error) {
-                            NSLog(@"geocoder returned");
                             if ([placemarks count] > 0) {
                                 CLPlacemark *placemark = [placemarks objectAtIndex:0];
                                 NSLog(@"found geocode at %@",placemark);
-
-                                //remember and apply at end
                                 self.shouldZoomToLocation = [[CLLocation alloc]initWithLatitude:placemark.location.coordinate.latitude longitude:placemark.location.coordinate.longitude];
                                 [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:MKCoordinateRegionMake(self.shouldZoomToLocation.coordinate, MKCoordinateSpanMake(0.005, 0.005)) AndSearch:currentSearch IntoArray:self.GSObjectArray WithRefresh:YES];
 
@@ -1046,7 +1104,10 @@
                                     [self.tableView reloadData];
                                     
                                     
-                                    if ([self.GSObjectArray count]>0) {[self didScrollToEntryAtIndex:0];}
+                                    if ([self.GSObjectArray count]>0)
+                                    {
+                                        [self didScrollToEntryAtIndex:0];
+                                    }
                                     MTStatusBarOverlay *overlay = [MTStatusBarOverlay sharedInstance];
                                     [overlay postImmediateFinishMessage:[NSString stringWithFormat:@"Found %d Entries",self.GSObjectArray.count] duration:2.0 animated:YES];
                                     [self updateOverlay];
@@ -1162,10 +1223,53 @@
         });
     }
 }
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    if (orientation == UIInterfaceOrientationLandscapeLeft||orientation == UIInterfaceOrientationLandscapeRight) {
+        return 0;
+    }else{
+        return 64;
+    }
+}
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    if (orientation == UIInterfaceOrientationLandscapeLeft||orientation == UIInterfaceOrientationLandscapeRight) {
+        return nil;
+    }else{
+    UIView* headerView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 300, 64)];
+    [headerView setBackgroundColor:[UIColor clearColor]];
+    UIView* searchView = [[UIView alloc]initWithFrame:CGRectMake(10, 10, 300, 44)];
+    [searchView setBackgroundColor:[UIColor whiteColor]];
+    UIImageView* searchImage = [[UIImageView alloc]initWithFrame:CGRectMake(8, 8, 30, 30)];
+    [searchImage setImage:[UIImage imageNamed:@"search.png"]];
+    [searchView addSubview:searchImage];
+    
+    if (!self.searchTextField) {
+        self.searchTextField = [[UITextField alloc]initWithFrame:CGRectMake(44, 0, 320-10-10-44-44,44)];
+        [self.searchTextField setDelegate:self];
+        [self.searchTextField setBackgroundColor:[UIColor clearColor]];
+        self.searchTextField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+        self.searchTextField.placeholder = @"What's good nearby?";
+
+    }
+    [searchView addSubview:self.searchTextField];
+    
+    UIButton* resetButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [resetButton setBackgroundColor:[UIColor redColor]];
+    [resetButton setFrame:CGRectMake(300-44, 0, 44, 44)];
+    [resetButton addTarget:self action:@selector(cancelSearch) forControlEvents:UIControlEventTouchUpInside];
+    [searchView addSubview:resetButton];
+    [headerView addSubview:searchView];
+    
+    return headerView;
+    }
+}
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if(indexPath.row == 0){
-        return 175;
+        return 131;
     }else if( indexPath.row == [GSObjectArray count]+1){
         if([GSObjectArray count]==0)
         {
@@ -1446,27 +1550,40 @@
     MKMapView* map = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
     CLLocation* touchLocation = [[CLLocation alloc]initWithLatitude:mapTouchCoordinate.latitude longitude:mapTouchCoordinate.longitude];
     MKZoomScale currentZoomScale = map.bounds.size.width / map.visibleMapRect.size.width;
-    
+    UnderMapViewController* menuViewController = ((UnderMapViewController*)self.slidingViewController.underRightViewController);
     
     for (GSObject* gsObj in self.loadedGSObjectArray)
     {
         CLLocation* location = [[CLLocation alloc]initWithLatitude:gsObj.coordinate.latitude longitude:gsObj.coordinate.longitude];
         if ([touchLocation distanceFromLocation:location]< (0.2*MKRoadWidthAtZoomScale(currentZoomScale)))
         {
-//            if ([self.GSObjectArray containsObject:gsObj])
-//            {
-//                [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:[self.GSObjectArray indexOfObject:gsObj]+1 inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
-//                [self animatePin];                
-//            }
-//            else
-//            {
-//                NSLog(@"found not in gsobject array");
-                MKCoordinateRegion region =map.region;
-                [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:self.currentSearch IntoArray:self.GSObjectArray WithRefresh:NO];
-                [self.tableView reloadData];
-                [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:[self.GSObjectArray indexOfObject:gsObj]+1 inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
+                
+                
+            CGRect slideViewFinalFrame = CGRectMake(00, 460, 320, 75);
+            [UIView animateWithDuration:0.2
+                                  delay:0.0
+                                options: UIViewAnimationOptionCurveEaseOut
+                             animations:^{
+                                 menuViewController.InfoPanelView.frame = slideViewFinalFrame;
+                             }
+                             completion:^(BOOL finished){
+                                 MKCoordinateRegion region =map.region;
+                                 [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:self.currentSearch IntoArray:self.GSObjectArray WithRefresh:NO];
+                                 [self.tableView reloadData];
+                                 [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:[self.GSObjectArray indexOfObject:gsObj]+1 inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
+                                 CGRect slideViewFinalFrame = CGRectMake(00, 385, 320, 75);
+                                 [UIView animateWithDuration:0.2
+                                                       delay:0.0
+                                                     options: UIViewAnimationOptionCurveEaseOut
+                                                  animations:^{
+                                                      menuViewController.InfoPanelView.frame = slideViewFinalFrame;
+                                                  }
+                                                  completion:^(BOOL finished){
+                                                      
+                                                  }];
+                             }];
+
                 [self animatePin];
-//            }
             break;
         }
     }
@@ -1485,40 +1602,25 @@
         toInterfaceOrientation == UIInterfaceOrientationLandscapeRight)
     {
 
-        [self.slidingViewController setAnchorLeftPeekAmount:1.0f];
+        [self.slidingViewController setAnchorLeftPeekAmount:160.0f];
         [self.slidingViewController resetTopView];
+        [self.tableView reloadData];
     }
     else
     {
         [self.slidingViewController setAnchorLeftPeekAmount:1.0f];
-        [self.slidingViewController resetTopView];        
+        [self.slidingViewController resetTopView];
+        [self.tableView reloadData];
     }
 }
+
 -(void)animatePin
 {
     MKMapView* underMapView = ((MKMapView*)((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView);
     for (id annote in underMapView.annotations) {
         if ([annote isKindOfClass:[GSObject class]]) { //should only have one
             MKAnnotationView*annView = [underMapView viewForAnnotation:annote];
-            [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-                CATransform3D zRotation;
-                zRotation = CATransform3DMakeRotation(M_PI/6, 0, 0, 1.0);
-                annView.layer.transform = zRotation;
-                
-            }completion:^(BOOL finished) {
-                [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-                    CATransform3D zRotation;
-                    zRotation = CATransform3DMakeRotation(-M_PI/6, 0, 0, 1.0);
-                    annView.layer.transform = zRotation;
-                    
-                }completion:^(BOOL finished) {
                     [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-                        CATransform3D zRotation;
-                        zRotation = CATransform3DMakeRotation(M_PI/6, 0, 0, 1.0);
-                        annView.layer.transform = zRotation;
-                        
-                    }completion:^(BOOL finished) {
-                        [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
                             CATransform3D zRotation;
                             zRotation = CATransform3DMakeRotation(-M_PI/6, 0, 0, 1.0);
                             annView.layer.transform = zRotation;
@@ -1561,11 +1663,54 @@
                                 }];
                             }];
                         }];
-                    }];
-                }];
-            }];
-            
+                  
+    
         }
     }
+}
+
+-(void)hintLeft
+{
+    double delayInSeconds = 1.5;
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+        CGRect slideViewFinalFrame = CGRectMake(15, 0, self.view.bounds.size.width,  self.view.bounds.size.height);
+        CGRect slideViewReturnFrame = CGRectMake(00, 0, self.view.bounds.size.width,  self.view.bounds.size.height);
+        [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            self.slidingViewController.topViewController.view.frame = slideViewFinalFrame;
+        } completion:^(BOOL finished) {
+            [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                self.slidingViewController.topViewController.view.frame = slideViewReturnFrame;
+            } completion:^(BOOL finished) {
+                
+            }];
+        }];
+    });
+
+}
+-(void)hintRight
+{
+    
+    double delayInSeconds = 1.5;
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+        CGRect slideViewFinalFrame = CGRectMake(-15, 0, self.view.bounds.size.width,  self.view.bounds.size.height);
+        CGRect slideViewReturnFrame = CGRectMake(00, 0, self.view.bounds.size.width,  self.view.bounds.size.height);
+        [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            self.slidingViewController.topViewController.view.frame = slideViewFinalFrame;
+        } completion:^(BOOL finished) {
+            [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                self.slidingViewController.topViewController.view.frame = slideViewReturnFrame;
+            } completion:^(BOOL finished) {
+                
+            }];
+        }];
+    });
+
+}
+-(void)cancelSearch
+{
+    self.searchTextField.text = @"";
+    [self textFieldShouldReturn:self.searchTextField];
 }
 @end

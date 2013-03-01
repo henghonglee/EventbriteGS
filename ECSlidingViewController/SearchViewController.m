@@ -48,9 +48,6 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textFieldTextDidChange) name:UITextFieldTextDidChangeNotification object:self.searchTF];
     self.view.opaque = YES;
    self.view.backgroundColor = [UIColor clearColor];
-//    UIBarButtonItem* searchButton = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doSearch)];
-//    self.navigationItem.rightBarButtonItem = searchButton;
-    //[self.searchTF becomeFirstResponder];
     self.searchState = kStateSelectingFood;
     self.finalSearchString = @"";
     [self.underMapView setRegion:self.searchRegion animated:YES];
@@ -80,11 +77,6 @@
         }
         [self.resultList sortUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
         dispatch_async(dispatch_get_main_queue(), ^{
-//            NSMutableArray* indexPaths = [NSMutableArray array];
-//            for (int i=0; i<self.resultList.count; i++) {
-//                [indexPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
-//            }
-            //[self.rsTableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
             [self.rsTableView reloadData];
 
         });

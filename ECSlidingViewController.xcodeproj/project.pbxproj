@@ -23,6 +23,7 @@
 		2750E7AF14CF1306007727A0 /* UIImage+ImageWithUIView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2750E7AD14CF1306007727A0 /* UIImage+ImageWithUIView.m */; };
 		27FC94E014D0C14E0000B18C /* InitialSlidingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 27FC94DF14D0C14E0000B18C /* InitialSlidingViewController.m */; };
 		27FC94E314D105C60000B18C /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27FC94E214D105C60000B18C /* QuartzCore.framework */; };
+		349BC2EA16DBBE9600A45706 /* libFlurry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 349BC2E916DBBE9600A45706 /* libFlurry.a */; };
 		EF0C5E2B16B27C7100288EB3 /* navigation.png in Resources */ = {isa = PBXBuildFile; fileRef = EF0C5E2A16B27C7100288EB3 /* navigation.png */; };
 		EF0C5E5316B28C5500288EB3 /* MTStatusBarOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = EF0C5E5216B28C5500288EB3 /* MTStatusBarOverlay.m */; };
 		EF0C5E5516B2957C00288EB3 /* buttonBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = EF0C5E5416B2957C00288EB3 /* buttonBlue.png */; };
@@ -65,6 +66,7 @@
 		EFA83A7C16B1142100BD8057 /* SearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA83A7A16B1142100BD8057 /* SearchViewController.m */; };
 		EFA83A8416B1197800BD8057 /* TrieNode.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA83A8116B1197800BD8057 /* TrieNode.m */; };
 		EFA83A8516B1197800BD8057 /* Trie.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA83A8316B1197800BD8057 /* Trie.m */; };
+		EFBFAF7116DFB523007C6874 /* slide@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EFBFAF7016DFB523007C6874 /* slide@2x.png */; };
 		EFC3BD8C16CFB651005D133F /* pinLoad-1 (dragged).tiff in Resources */ = {isa = PBXBuildFile; fileRef = EFC3BD8416CFB651005D133F /* pinLoad-1 (dragged).tiff */; };
 		EFC3BD8D16CFB651005D133F /* pinLoad-5 (dragged).tiff in Resources */ = {isa = PBXBuildFile; fileRef = EFC3BD8516CFB651005D133F /* pinLoad-5 (dragged).tiff */; };
 		EFC3BD8E16CFB651005D133F /* pinLoad-2 (dragged).tiff in Resources */ = {isa = PBXBuildFile; fileRef = EFC3BD8616CFB651005D133F /* pinLoad-2 (dragged).tiff */; };
@@ -199,6 +201,7 @@
 		27FC94DE14D0C14E0000B18C /* InitialSlidingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InitialSlidingViewController.h; sourceTree = "<group>"; };
 		27FC94DF14D0C14E0000B18C /* InitialSlidingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InitialSlidingViewController.m; sourceTree = "<group>"; };
 		27FC94E214D105C60000B18C /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		349BC2E916DBBE9600A45706 /* libFlurry.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libFlurry.a; sourceTree = "<group>"; };
 		EF0C5E2A16B27C7100288EB3 /* navigation.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = navigation.png; sourceTree = "<group>"; };
 		EF0C5E5116B28C5500288EB3 /* MTStatusBarOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTStatusBarOverlay.h; sourceTree = "<group>"; };
 		EF0C5E5216B28C5500288EB3 /* MTStatusBarOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTStatusBarOverlay.m; sourceTree = "<group>"; };
@@ -264,6 +267,7 @@
 		EFB7CF55169EBE4600E1AED6 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		EFB7CF56169EBE4600E1AED6 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		EFB7CF57169EBE4600E1AED6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		EFBFAF7016DFB523007C6874 /* slide@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "slide@2x.png"; sourceTree = "<group>"; };
 		EFC3BD8416CFB651005D133F /* pinLoad-1 (dragged).tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "pinLoad-1 (dragged).tiff"; sourceTree = "<group>"; };
 		EFC3BD8516CFB651005D133F /* pinLoad-5 (dragged).tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "pinLoad-5 (dragged).tiff"; sourceTree = "<group>"; };
 		EFC3BD8616CFB651005D133F /* pinLoad-2 (dragged).tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "pinLoad-2 (dragged).tiff"; sourceTree = "<group>"; };
@@ -410,6 +414,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EF68E9F516DD13CA006A6D84 /* libFlurry.a in Frameworks */,
+				349BC2EA16DBBE9600A45706 /* libFlurry.a in Frameworks */,
 				EFA44FB816B26FA5004D40E7 /* MessageUI.framework in Frameworks */,
 				EFA44FD816B2737F004D40E7 /* AdSupport.framework in Frameworks */,
 				EFA44FC216B271E0004D40E7 /* CoreMotion.framework in Frameworks */,
@@ -442,6 +447,7 @@
 			isa = PBXGroup;
 			children = (
 				EF68E9F416DD13CA006A6D84 /* libFlurry.a */,
+				349BC2E916DBBE9600A45706 /* libFlurry.a */,
 				2750E77614CDB0DF007727A0 /* ECSlidingViewController */,
 				2750E76F14CDB0DF007727A0 /* Frameworks */,
 				2750E76D14CDB0DF007727A0 /* Products */,
@@ -758,6 +764,7 @@
 		EFE28FA0167707E700095554 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				EFBFAF7016DFB523007C6874 /* slide@2x.png */,
 				EFCC16D116D3E6AE00A369B7 /* GeoscrollInstructions.png */,
 				EFCC16CF16D3E60000A369B7 /* MapInstructions.png */,
 				EFCC16CD16D3E2D000A369B7 /* MenuInstructions.png */,
@@ -979,6 +986,7 @@
 				EFCC16D016D3E60000A369B7 /* MapInstructions.png in Resources */,
 				EFCC16D216D3E6AE00A369B7 /* GeoscrollInstructions.png in Resources */,
 				EF5FDC0916D92C360019E3BA /* locationBlue@2x.png in Resources */,
+				EFBFAF7116DFB523007C6874 /* slide@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1117,8 +1125,8 @@
 		2750E78514CDB0DF007727A0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Lee Heng Hong (T53AB93G9J)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Lee Heng Hong (T53AB93G9J)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1141,8 +1149,8 @@
 					"-all_load",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE = "BC1121A0-57BD-4FC2-8048-2672EC91E11F";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "BC1121A0-57BD-4FC2-8048-2672EC91E11F";
 				STRIP_INSTALLED_PRODUCT = NO;
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
@@ -1152,8 +1160,8 @@
 		2750E78614CDB0DF007727A0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Lee Heng Hong (T53AB93G9J)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Lee Heng Hong (T53AB93G9J)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1176,8 +1184,8 @@
 					"-all_load",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE = "BC1121A0-57BD-4FC2-8048-2672EC91E11F";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "BC1121A0-57BD-4FC2-8048-2672EC91E11F";
 				STRIP_INSTALLED_PRODUCT = NO;
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;

@@ -29,7 +29,10 @@
 @property (weak, nonatomic) IBOutlet UIView *InfoPanelView;
 @property (nonatomic) BOOL isCalloutHidden;
 @property (strong, nonatomic) IBOutletCollection(UIButton) NSArray *categoryButtons;
+
+@property (weak, nonatomic) IBOutlet UIButton *resetTopViewButton;
 @property (weak, nonatomic) IBOutlet UIImageView *shopImageView;
+@property (weak, nonatomic) IBOutlet UIView *locationButtonView;
 @property (weak, nonatomic) IBOutlet UILabel *shopLabel;
 @property (weak, nonatomic) IBOutlet UIButton *ShopButton;
 @property (strong, nonatomic) CustomCalloutView* callout;

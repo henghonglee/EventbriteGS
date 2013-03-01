@@ -35,6 +35,26 @@ static dispatch_once_t onceToken;
     self.shop2.layer.borderColor = [UIColor blackColor].CGColor;
     self.shop2.layer.borderWidth = 2.0f;
     self.shop2.clipsToBounds =YES;
+    
+
+    UISwipeGestureRecognizer* swipe = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(showGeoscroll:)];
+    swipe.direction = UISwipeGestureRecognizerDirectionRight;
+    [self.resetTopViewButton addGestureRecognizer:swipe];
+    
+    self.locationButtonView.layer.cornerRadius = 5.0f;
+    self.locationButtonView.layer.shadowColor = [UIColor blackColor].CGColor;
+    self.locationButtonView.layer.shadowOpacity = 0.3;
+    self.locationButtonView.layer.shadowOffset = CGSizeMake(-1.0f, -1.0f);
+    self.locationButtonView.layer.shadowRadius = 1.0f;
+    UIBezierPath *path = [UIBezierPath bezierPathWithRect:self.locationButtonView.bounds];
+    self.locationButtonView.layer.shadowPath = path.CGPath;
+    
+    self.InfoPanelView.layer.shadowColor = [UIColor blackColor].CGColor;
+    self.InfoPanelView.layer.shadowOpacity = 0.3;
+    self.InfoPanelView.layer.shadowOffset = CGSizeMake(-1.0f, -1.0f);
+    self.InfoPanelView.layer.shadowRadius = 1.0f;
+    path = [UIBezierPath bezierPathWithRect:self.InfoPanelView.bounds];
+    self.InfoPanelView.layer.shadowPath = path.CGPath;
     self.cursorImage  = [UIImage imageNamed:@"cursor.png"];
     shouldShowPinAnimation = YES;
     onceToken = 0;
@@ -72,6 +92,9 @@ static dispatch_once_t onceToken;
     [self setShopButton:nil];
     [self setShopLabel:nil];
     [self setShopImageView:nil];
+    [self setLocationButtonView:nil];
+    [self setResetTopViewButton:nil];
+    [self setResetTopViewButton:nil];
     [super viewDidUnload];
 }
 -(IBAction)showWebView:(id)sender {
@@ -84,7 +107,7 @@ static dispatch_once_t onceToken;
  }
 - (IBAction)showGeoscroll:(id)sender {
     NSLog(@"show geoscroll");
-    CGRect slideViewFinalFrame = CGRectMake(self.view.bounds.size.width-320, self.view.bounds.size.height, 320, 60);
+    CGRect slideViewFinalFrame = CGRectMake(self.view.bounds.size.width-320, self.view.bounds.size.height, 320, 75);
     [UIView animateWithDuration:0.2
                           delay:0.1
                         options: UIViewAnimationOptionCurveEaseInOut
@@ -133,9 +156,10 @@ static dispatch_once_t onceToken;
         region.span.latitudeDelta = 0.01;
         region.span.longitudeDelta = 0.01;
         [retMapView setRegion:region animated:NO];
+        [((GeoScrollViewController*)self.slidingViewController.topViewController) didReceiveUserLocation:self.mapView.userLocation];
         
     });
-    [((GeoScrollViewController*)self.slidingViewController.topViewController) didReceiveUserLocation:self.mapView.userLocation];
+    ((GeoScrollViewController*)self.slidingViewController.topViewController).userLocation = self.mapView.userLocation;
 }
 
 - (MKAnnotationView *)mapView:(MKMapView *)theMapView viewForAnnotation:(id <MKAnnotation>)annotation
@@ -387,7 +411,8 @@ didAddAnnotationViews:(NSArray *)annotationViews
         
     }
 }
-- (IBAction)showCategoryButtons:(id)sender {
+- (IBAction)showCategoryButtons:(id)sender
+{
     if(!_categoriesShown){
         
    

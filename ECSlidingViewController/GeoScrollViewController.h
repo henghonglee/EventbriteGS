@@ -27,9 +27,11 @@ typedef enum {
         NSMutableArray *loadedGSObjectArray;
         NSMutableArray *scopedGSObjectArray;
         ScopeType currentScopeType;
+        dispatch_queue_t GSserialQueue;
 }
 @property (nonatomic) BOOL random;
 @property (nonatomic) int randomIndex;
+@property (nonatomic,strong)UITextField* searchTextField;
 @property (nonatomic, strong) CLLocation *shouldZoomToLocation;
 @property (nonatomic, strong) CLGeocoder *geocoder;
 @property (nonatomic) BOOL selectionChanged;
@@ -45,4 +47,6 @@ typedef enum {
 -(void)didReceiveUserLocation:(MKUserLocation*)location;
 -(void)LoadData;
 -(void)didTouchMapAtCoordinate:(CLLocationCoordinate2D)mapTouchCoordinate;
+-(void)hintLeft;
+-(void)hintRight;
 @end

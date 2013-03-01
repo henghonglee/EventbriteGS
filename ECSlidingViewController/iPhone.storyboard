@@ -287,50 +287,23 @@
                                 </connections>
                             </mapView>
                             <view hidden="YES" alpha="0.99999999999999989" contentMode="scaleToFill" id="cPQ-Fi-mfQ">
-                                <rect key="frame" x="0.0" y="400" width="320" height="60"/>
+                                <rect key="frame" x="0.0" y="385" width="320" height="75"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <subviews>
                                     <label hidden="YES" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="LabelLabel LabelLabel Label LabelLabel LabelLabel" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="VaO-G4-mrx">
-                                        <rect key="frame" x="123" y="6" width="137" height="48"/>
+                                        <rect key="frame" x="71" y="14" width="179" height="48"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                        <fontDescription key="fontDescription" name="Helvetica-Bold" family="Helvetica" pointSize="15"/>
+                                        <color key="textColor" red="0.34650785765467174" green="0.65793323496647105" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
-                                        <color key="shadowColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                        <size key="shadowOffset" width="1" height="1"/>
+                                        <size key="shadowOffset" width="0.0" height="0.0"/>
                                     </label>
-                                    <button hidden="YES" opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="OUL-NT-o4j">
-                                        <rect key="frame" x="273" y="0.0" width="44" height="60"/>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" id="VXT-b0-fQe">
+                                        <rect key="frame" x="12" y="12" width="51" height="51"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <fontDescription key="fontDescription" type="boldSystem" size="button"/>
-                                        <state key="normal" image="locationBlue.png">
-                                            <color key="titleColor" red="0.1960784314" green="0.30980392159999998" blue="0.52156862749999999" alpha="1" colorSpace="calibratedRGB"/>
-                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                        <state key="highlighted">
-                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="zoomToLoc:" destination="Xzu-tL-m7w" eventType="touchUpInside" id="h7x-gE-gnb"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="mBd-qq-fuR">
-                                        <rect key="frame" x="0.0" y="0.0" width="44" height="60"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <fontDescription key="fontDescription" type="boldSystem" size="button"/>
-                                        <state key="normal" image="back.png">
-                                            <color key="titleColor" red="0.1960784314" green="0.30980392159999998" blue="0.52156862749999999" alpha="1" colorSpace="calibratedRGB"/>
-                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                        <state key="highlighted">
-                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="showGeoscroll:" destination="Xzu-tL-m7w" eventType="touchUpInside" id="0Td-ZE-MxK"/>
-                                        </connections>
-                                    </button>
+                                    </imageView>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="xfS-P2-hzf">
-                                        <rect key="frame" x="46" y="0.0" width="226" height="60"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="75"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                         <state key="normal">
@@ -344,22 +317,49 @@
                                             <action selector="showWebView:" destination="Xzu-tL-m7w" eventType="touchUpInside" id="vla-Bz-GRu"/>
                                         </connections>
                                     </button>
-                                    <view contentMode="scaleToFill" id="W7s-SU-VU2">
-                                        <rect key="frame" x="270" y="0.0" width="2" height="60"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                                    </view>
-                                    <view contentMode="scaleToFill" id="EbJ-Fc-lQp">
-                                        <rect key="frame" x="46" y="0.0" width="2" height="60"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                                    </view>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" id="VXT-b0-fQe">
-                                        <rect key="frame" x="59" y="5" width="56" height="50"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                    </imageView>
                                 </subviews>
-                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                            <button hidden="YES" opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="mBd-qq-fuR">
+                                <rect key="frame" x="0.0" y="329" width="45" height="55"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <fontDescription key="fontDescription" type="boldSystem" size="button"/>
+                                <size key="titleShadowOffset" width="1" height="1"/>
+                                <state key="normal" image="slide@2x.png">
+                                    <color key="titleColor" red="0.1960784314" green="0.30980392159999998" blue="0.52156862749999999" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="showGeoscroll:" destination="Xzu-tL-m7w" eventType="touchUpInside" id="0Td-ZE-MxK"/>
+                                </connections>
+                            </button>
+                            <view hidden="YES" contentMode="scaleToFill" id="Vmr-Eh-05M">
+                                <rect key="frame" x="271" y="336" width="41" height="41"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="OUL-NT-o4j">
+                                        <rect key="frame" x="0.0" y="0.0" width="41" height="41"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <fontDescription key="fontDescription" type="boldSystem" size="button"/>
+                                        <size key="titleShadowOffset" width="2" height="2"/>
+                                        <state key="normal" image="locationBlue.png">
+                                            <color key="titleColor" red="0.1960784314" green="0.30980392159999998" blue="0.52156862749999999" alpha="1" colorSpace="calibratedRGB"/>
+                                            <color key="titleShadowColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <state key="highlighted">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="zoomToLoc:" destination="Xzu-tL-m7w" eventType="touchUpInside" id="h7x-gE-gnb"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                             </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -368,7 +368,9 @@
                         <outlet property="InfoPanelView" destination="cPQ-Fi-mfQ" id="dV7-cl-zWU"/>
                         <outlet property="ShopButton" destination="xfS-P2-hzf" id="d0e-kU-wzi"/>
                         <outlet property="locationButton" destination="OUL-NT-o4j" id="NMB-kV-JG6"/>
+                        <outlet property="locationButtonView" destination="Vmr-Eh-05M" id="FJA-LL-wzU"/>
                         <outlet property="mapView" destination="dw3-qk-cfj" id="GQl-c5-rjz"/>
+                        <outlet property="resetTopViewButton" destination="mBd-qq-fuR" id="4ps-rL-Fyz"/>
                         <outlet property="shop1" destination="LBa-dv-dDC" id="X9O-e3-nKH"/>
                         <outlet property="shop1LoadingIndicator" destination="eCn-5D-dee" id="Gbc-ky-2Dr"/>
                         <outlet property="shop2" destination="3lV-QB-tHu" id="SIe-3I-s8C"/>
@@ -393,7 +395,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="bM4-ON-OZn" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1096" y="-2935"/>
+            <point key="canvasLocation" x="984" y="-2923"/>
         </scene>
         <!--Map Search View Controller-->
         <scene sceneID="UDG-aW-3iH">
@@ -432,9 +434,9 @@
         </scene>
     </scenes>
     <resources>
-        <image name="back.png" width="14" height="17"/>
         <image name="locationBlue.png" width="16" height="16"/>
         <image name="search.png" width="101" height="101"/>
+        <image name="slide@2x.png" width="90" height="110"/>
         <image name="splash1.png" width="640" height="960"/>
     </resources>
     <classes>
@@ -490,21 +492,17 @@
         <class className="UnderMapViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/UnderMapViewController.h"/>
             <relationships>
-                <relationship kind="action" name="backAction:"/>
                 <relationship kind="action" name="selectCategory:"/>
-                <relationship kind="action" name="showCategoryButtons:"/>
-                <relationship kind="action" name="showDetail:"/>
                 <relationship kind="action" name="showGeoscroll:"/>
-                <relationship kind="action" name="showWebView:"/>
-                <relationship kind="action" name="zoomToAll:"/>
-                <relationship kind="action" name="zoomToLoc:"/>
                 <relationship kind="outlet" name="InfoPanelView" candidateClass="UIView"/>
                 <relationship kind="outlet" name="ShopButton" candidateClass="UIButton"/>
                 <relationship kind="outlet" name="allButton" candidateClass="UIButton"/>
                 <relationship kind="outlet" name="categorySelectionButton" candidateClass="UIButton"/>
                 <relationship kind="outlet" name="detailButton" candidateClass="UIView"/>
                 <relationship kind="outlet" name="locationButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="locationButtonView" candidateClass="UIView"/>
                 <relationship kind="outlet" name="mapView" candidateClass="MKMapView"/>
+                <relationship kind="outlet" name="resetTopViewButton" candidateClass="UIButton"/>
                 <relationship kind="outlet" name="shop1" candidateClass="UIImageView"/>
                 <relationship kind="outlet" name="shop1LoadingIndicator" candidateClass="UIActivityIndicatorView"/>
                 <relationship kind="outlet" name="shop2" candidateClass="UIImageView"/>

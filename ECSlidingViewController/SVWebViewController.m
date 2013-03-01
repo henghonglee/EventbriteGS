@@ -206,7 +206,7 @@ typedef enum {
 
 -(void) showActionSheet
 {
-    UIActionSheet* actionSheet = [[UIActionSheet alloc]initWithTitle:@"Actions" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Stall Closed" otherButtonTitles:@"Suggest Changes",@"Directions",@"Email To Friend",@"SMS To Friend", nil];
+    UIActionSheet* actionSheet = [[UIActionSheet alloc]initWithTitle:@"Actions" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Suggest Changes",@"Directions",@"Email To Friend",@"SMS To Friend", nil];
     [actionSheet setActionSheetStyle:UIActionSheetStyleAutomatic];
     [actionSheet showInView:self.view];
 
