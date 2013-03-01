@@ -105,7 +105,8 @@
 {
     self.finalSearchString = @"";
     [self dismissModalViewControllerAnimated:NO];
-     [self.delegate searchViewControllerDidFinishWithSearchString:self.finalSearchString];
+    [self.delegate searchViewControllerDidFinishWithSearchString:self.finalSearchString];   
+    
 }
 -(void)textFieldTextDidChange{
     if ([self.searchTF.text isEqualToString:@""]) {
@@ -227,7 +228,7 @@
     switch (indexPath.section) {
         case 0:
             if (self.resultList.count==0) {
-                tableCell.textLabel.text = [NSString stringWithFormat:@"Search addresses for \"%@ Singapore\" ",self.searchTF.text];
+                tableCell.textLabel.text = [NSString stringWithFormat:@"Search addresses for \"%@\" ",self.searchTF.text];
                 tableCell.detailTextLabel.text = @"";
                 tableCell.textLabel.font = [UIFont fontWithName:@"Helvetica-Light" size:13.0f];
                 tableCell.contentView.backgroundColor = [UIColor whiteColor];

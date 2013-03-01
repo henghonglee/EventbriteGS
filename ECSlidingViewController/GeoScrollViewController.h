@@ -30,6 +30,7 @@ typedef enum {
         dispatch_queue_t GSserialQueue;
 }
 @property (nonatomic) BOOL random;
+@property (nonatomic) BOOL canSearch;
 @property (nonatomic) int randomIndex;
 @property (nonatomic,strong)UITextField* searchTextField;
 @property (nonatomic, strong) CLLocation *shouldZoomToLocation;

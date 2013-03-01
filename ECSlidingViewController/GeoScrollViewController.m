@@ -493,6 +493,7 @@
 //calculates scope and updates loaded array into display array , when region is omitted, all data is used.
 -(void)recalculateScopeFromLoadedArray:(NSMutableArray*)loadedArray WithRegion:(MKCoordinateRegion)region AndSearch:(NSString*)search IntoArray:(NSMutableArray*)resultArray WithRefresh:(BOOL)refresh
 {
+    self.canSearch = NO;
     self.random = NO;
         [resultArray removeAllObjects];
         MKMapView* map = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
@@ -589,6 +590,7 @@
             }
         }
 //    }
+    self.canSearch = YES;
 }
 
 -(void)updateCrumbsWithGsObject:(GSObject*)gsObj IntoResultArray:(NSMutableArray*)resultArray withMap:(MKMapView*)map andRegion:(MKCoordinateRegion)region
@@ -918,7 +920,7 @@
         
         
         //here we recalculate using span and find out which data sets sit in the map enclosed.
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        dispatch_async(GSserialQueue, ^{
             
             MKCoordinateRegion region = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView.region;
             [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:currentSearch IntoArray:self.GSObjectArray WithRefresh:NO];
@@ -1022,6 +1024,7 @@
 
 -(BOOL)textFieldShouldBeginEditing:(UITextField *)textField
 {
+    if (self.canSearch) {
         [Flurry logEvent:@"Search_Started" timed:YES];
         self.random = NO;
         SearchViewController * searchViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"Search"];
@@ -1035,8 +1038,8 @@
         self.tableView.hidden = YES;
         [self presentModalViewController:searchViewController animated:YES];
         return NO;
-
-
+    }
+    return NO;
 }
 
 -(void)searchViewControllerDidFinishWithSearchString:(NSString *)searchString
@@ -1056,7 +1059,25 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underLeftWillAppear) name:ECSlidingViewUnderLeftWillAppear object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underLeftWillDisappear) name:ECSlidingViewUnderLeftWillDisappear object:nil];
-    [self textFieldShouldReturn:self.searchTextField];
+
+    if (searchString.length==0) {
+        MKCoordinateRegion region = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView.region;
+        dispatch_async(GSserialQueue, ^{
+            [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:@"" IntoArray:self.GSObjectArray WithRefresh:YES];
+            
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.tableView reloadData];
+                if ([self.GSObjectArray count]>0) {[self didScrollToEntryAtIndex:0];}
+                
+                MTStatusBarOverlay *overlay = [MTStatusBarOverlay sharedInstance];
+                [overlay postImmediateFinishMessage:[NSString stringWithFormat:@"Found %d Entries",self.GSObjectArray.count] duration:2.0 animated:YES];
+                [self updateOverlay];
+            });
+        });
+    }else{
+            [self textFieldShouldReturn:self.searchTextField];
+    }
 }
 -(BOOL)textFieldShouldReturn:(UITextField *)textField{
 
@@ -1125,32 +1146,35 @@
                     }else{
                         [Flurry logEvent:@"SearchForFood" timed:NO];
                         MKCoordinateRegion region = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView.region;
-                        [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:currentSearch IntoArray:self.GSObjectArray WithRefresh:YES];
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            NSLog(@"%d gsobjectarray , %d scoped",self.GSObjectArray.count,self.scopedGSObjectArray.count);
-                            // if searching for individual stall , assuming not found in current search area
-                            if (self.GSObjectArray.count == 0) {
-                                MKMapView* underMapView = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
-                                GSObject* gsObj = [scopedGSObjectArray objectAtIndex:scopedGSObjectArray.count-1];
-                                [underMapView setRegion:MKCoordinateRegionMake(CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue), MKCoordinateSpanMake(0.005, 0.005)) animated:YES];
+                        dispatch_async(GSserialQueue, ^{
+                            [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:currentSearch IntoArray:self.GSObjectArray WithRefresh:YES];
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                NSLog(@"%d gsobjectarray , %d scoped",self.GSObjectArray.count,self.scopedGSObjectArray.count);
+                                // if searching for individual stall , assuming not found in current search area
+                                if (self.GSObjectArray.count == 0) {
+                                    MKMapView* underMapView = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
+                                    GSObject* gsObj = [scopedGSObjectArray objectAtIndex:scopedGSObjectArray.count-1];
+                                    [underMapView setRegion:MKCoordinateRegionMake(CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue), MKCoordinateSpanMake(0.005, 0.005)) animated:YES];
+                                    
+                                    [self.GSObjectArray removeAllObjects];
+                                    [self.GSObjectArray addObjectsFromArray:self.scopedGSObjectArray];
+                                }
+                                [self.tableView reloadData];
                                 
-                                [self.GSObjectArray removeAllObjects];
-                                [self.GSObjectArray addObjectsFromArray:self.scopedGSObjectArray];
-                            }
-                            [self.tableView reloadData];
-                            
-                            if (self.scopedGSObjectArray.count > 1) {
-                            MKMapView* underMapView = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
-                            [underMapView setVisibleMapRect:MKMapRectInset([underMapView visibleMapRect], [underMapView visibleMapRect].size.width*0.005, [underMapView visibleMapRect].size.height*0.005) animated:YES];
-                            }
-                            
-                            
-                            if ([self.GSObjectArray count]>0) {[self didScrollToEntryAtIndex:0];}
-                            MTStatusBarOverlay *overlay = [MTStatusBarOverlay sharedInstance];
-                            [overlay postImmediateFinishMessage:[NSString stringWithFormat:@"Found %d Entries",self.GSObjectArray.count] duration:2.0 animated:YES];
-                            [self updateOverlay];
-                            
+                                if (self.scopedGSObjectArray.count > 1) {
+                                    MKMapView* underMapView = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
+                                    [underMapView setVisibleMapRect:MKMapRectInset([underMapView visibleMapRect], [underMapView visibleMapRect].size.width*0.005, [underMapView visibleMapRect].size.height*0.005) animated:YES];
+                                }
+                                
+                                
+                                if ([self.GSObjectArray count]>0) {[self didScrollToEntryAtIndex:0];}
+                                MTStatusBarOverlay *overlay = [MTStatusBarOverlay sharedInstance];
+                                [overlay postImmediateFinishMessage:[NSString stringWithFormat:@"Found %d Entries",self.GSObjectArray.count] duration:2.0 animated:YES];
+                                [self updateOverlay];
+                                
+                            });
                         });
+                        
                     }
                 }
             }
@@ -1168,7 +1192,10 @@
         [overlay postImmediateFinishMessage:@"Cleared" duration:1.0 animated:YES];
         
         MKCoordinateRegion region = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView.region;
-        [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:@"" IntoArray:self.GSObjectArray WithRefresh:YES];
+        dispatch_async(GSserialQueue, ^{
+            [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:@"" IntoArray:self.GSObjectArray WithRefresh:YES];
+            
+        
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.tableView reloadData];
             if ([self.GSObjectArray count]>0) {[self didScrollToEntryAtIndex:0];}
@@ -1176,6 +1203,7 @@
             MTStatusBarOverlay *overlay = [MTStatusBarOverlay sharedInstance];
             [overlay postImmediateFinishMessage:[NSString stringWithFormat:@"Found %d Entries",self.GSObjectArray.count] duration:2.0 animated:YES];
             [self updateOverlay];
+        });
         });
 
     }
@@ -1710,7 +1738,9 @@
 }
 -(void)cancelSearch
 {
-    self.searchTextField.text = @"";
-    [self textFieldShouldReturn:self.searchTextField];
+    if (self.searchTextField.text.length >0) {
+        self.searchTextField.text = @"";
+        [self textFieldShouldReturn:self.searchTextField];
+    }
 }
 @end
