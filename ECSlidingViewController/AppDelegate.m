@@ -50,8 +50,28 @@
     [Mobclix startWithApplicationId:@"DD9EE023-DB44-43A2-BE49-8E8EA51459F5"];
     
     
-    [[UINavigationBar appearance] setTintColor:[UIColor lightGrayColor]];
-    [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"navigation.png"] forBarMetrics:UIBarMetricsDefault];
+    [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
+    //    [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"navigation.png"] forBarMetrics:UIBarMetricsDefault];
+    
+    UIImage *backButton = [[UIImage imageNamed:@"back_button.png"]  resizableImageWithCapInsets:UIEdgeInsetsMake(0, 17, 0, 10)];
+    [[UIBarButtonItem appearance] setBackButtonBackgroundImage:backButton forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
+    UIImage *backButtonLandscape = [[UIImage imageNamed:@"back_button_landscape.png"]  resizableImageWithCapInsets:UIEdgeInsetsMake(0, 17, 0, 10)];
+    [[UIBarButtonItem appearance] setBackButtonBackgroundImage:backButtonLandscape forState:UIControlStateNormal barMetrics:UIBarMetricsLandscapePhone];
+    
+    [[UIBarButtonItem appearance] setTitleTextAttributes:     [NSDictionary dictionaryWithObjectsAndKeys:
+                                                               [UIColor colorWithRed:0/255.0 green:0/255.0 blue:0/255.0 alpha:1.0],
+                                                               UITextAttributeTextColor,
+                                                               [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.0],
+                                                               UITextAttributeTextShadowColor,
+                                                               [NSValue valueWithUIOffset:UIOffsetMake(0, -1)],
+                                                               UITextAttributeTextShadowOffset,
+                                                               [UIFont fontWithName:@"Helvetica-Light" size:13.0f],
+                                                               UITextAttributeFont,
+                                                               nil]
+                                                forState:UIControlStateNormal];
+
+//    [[UIBarButtonItem appearance] setBackgroundImage:actionButton forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
+
     [[UINavigationBar appearance] setTitleTextAttributes:
      [NSDictionary dictionaryWithObjectsAndKeys:
       [UIColor colorWithRed:0/255.0 green:0/255.0 blue:0/255.0 alpha:1.0],
@@ -60,7 +80,7 @@
       UITextAttributeTextShadowColor,
       [NSValue valueWithUIOffset:UIOffsetMake(0, -1)],
       UITextAttributeTextShadowOffset,
-      [UIFont fontWithName:@"Helvetica-Light" size:21.0f],
+      [UIFont fontWithName:@"Helvetica-Light" size:17.0f],
       UITextAttributeFont,
       nil]];
     

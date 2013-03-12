@@ -12,6 +12,7 @@
 #import "SVWebViewController.h"
 #import "GeoScrollViewController.h"
 #import "MapNavViewController.h"
+#import "MobclixAds.h"
 #import "MapSlidingViewController.h"
 @interface SVWebViewController () <UIWebViewDelegate, UIActionSheetDelegate, MFMailComposeViewControllerDelegate>
 
@@ -49,7 +50,7 @@ typedef enum {
 @synthesize gsobj;
 @synthesize URL, mainWebView;
 @synthesize backBarButtonItem, forwardBarButtonItem, refreshBarButtonItem, stopBarButtonItem, actionBarButtonItem, pageActionSheet;
-
+@synthesize adView;
 #pragma mark - setters and getters
 
 - (UIBarButtonItem *)backBarButtonItem {
@@ -154,12 +155,13 @@ typedef enum {
     UISwipeGestureRecognizer* swipeGesture = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(backAction)];
     [swipeGesture setDirection:UISwipeGestureRecognizerDirectionRight];
 
-    mainWebView = [[UIWebView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    mainWebView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height)];
     mainWebView.delegate = self;
     mainWebView.scalesPageToFit = YES;
     [mainWebView.scrollView setDelegate:self];
     [mainWebView loadRequest:[NSURLRequest requestWithURL:self.URL]];
     [mainWebView setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
+
     self.view = view;
     [self.view addGestureRecognizer:swipeGesture];    
     [self.view addSubview:mainWebView];
@@ -199,21 +201,85 @@ typedef enum {
 	[super viewDidLoad];
     
     self.isLoading = YES;
-    UIBarButtonItem* barbutton = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(showActionSheet)
-                                  ];
-    self.navigationItem.rightBarButtonItem = barbutton;
-}
+    UIImage *actionButton = [[UIImage imageNamed:@"action.png"]  resizableImageWithCapInsets:UIEdgeInsetsMake(0, 12, 0, 12)];
+    UIButton* barbuttonitem = [UIButton buttonWithType:UIButtonTypeCustom];
+    barbuttonitem.frame = CGRectMake(0.0, 0.0, actionButton.size.width, actionButton.size.height);
 
+    [barbuttonitem setBackgroundImage:actionButton forState:UIControlStateNormal];
+    [barbuttonitem addTarget:self action:@selector(showActionSheet) forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem* barbutton = [[UIBarButtonItem alloc]initWithCustomView:barbuttonitem];
+    self.navigationItem.rightBarButtonItem = barbutton;
+    
+    self.adView = [[MobclixAdViewiPhone_320x50 alloc] initWithFrame:CGRectMake(0,self.view.bounds.size.height-114, self.view.bounds.size.width, 50.0f)];
+    self.adView.hidden = YES;
+    [self.adView setClipsToBounds:NO];
+    UIButton* closeAdButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [closeAdButton setFrame:CGRectMake(270, -10 , 50, 50)];
+    [closeAdButton setBackgroundImage:[UIImage imageNamed:@"closeButton.png"] forState:UIControlStateNormal];
+    [closeAdButton addTarget:self action:@selector(closeAd) forControlEvents:UIControlEventTouchUpInside];
+    [self.adView addSubview:closeAdButton];
+	[self.view addSubview:self.adView];
+}
+-(void)closeAd
+{
+    [self.adView pauseAdAutoRefresh];
+    [self.adView cancelAd];
+    [self.adView removeFromSuperview];
+    self.adView = nil;
+}
 -(void) showActionSheet
 {
-    UIActionSheet* actionSheet = [[UIActionSheet alloc]initWithTitle:@"Actions" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Suggest Changes",@"Directions",@"Email To Friend",@"SMS To Friend", nil];
+    UIActionSheet* actionSheet = [[UIActionSheet alloc]initWithTitle:@"Actions" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Remove Faces" otherButtonTitles:@"Suggest Changes",@"Directions",@"Email To Friend",@"SMS To Friend", nil];
     [actionSheet setActionSheetStyle:UIActionSheetStyleAutomatic];
     [actionSheet showInView:self.view];
 
     
 }
 
+-(void)clearFaces
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [SVProgressHUD showWithStatus:@"Loading"];
+    });
+   
+    NSLog(@"looking for face in %@ images .. ",gsobj.title);
+    for (int i=0; i<gsobj.imageArray.count; i++) {
+        SDWebImageManager *manager = [SDWebImageManager sharedManager];
+        
+        [manager downloadWithURL:[NSURL URLWithString:[gsobj.imageArray objectAtIndex:i]]
+                        delegate:self
+                         options:0
+                         success:^(UIImage *image, BOOL cached) {
+                             NSLog(@"got image, processing now...");
+                             if (i == gsobj.imageArray.count-1) {
+                                 dispatch_async(dispatch_get_main_queue(), ^{
+                                     [SVProgressHUD dismiss];
+                                 });
+                             }
+                             CIImage* ciimage = [CIImage imageWithCGImage:image.CGImage];
+                             CIDetector* detector = [CIDetector detectorOfType:CIDetectorTypeFace
+                                                                       context:nil options:[NSDictionary dictionaryWithObject:CIDetectorAccuracyHigh forKey:CIDetectorAccuracy]];
+                             NSArray* features = [detector featuresInImage:ciimage];
+                             
+                             if (features.count >0)
+                             {
+                                 NSLog(@"face found for %@ at %d",gsobj.title,gsobj.itemId.intValue);
+                                 NSURL *tokenurl = [NSURL URLWithString:@"http://tastebudsapp.herokuapp.com"];
+                                 AFHTTPClient* afclient = [[AFHTTPClient alloc]initWithBaseURL:tokenurl];
+                                 [afclient putPath:[NSString stringWithFormat:@"/items/%d",gsobj.itemId.intValue] parameters:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"%d",i],@"delete", nil] success:^(AFHTTPRequestOperation *operation, id responseObject) {
+                                     NSLog(@"afhttp update success");
+                                 } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+                                     NSLog(@"afhttp update failed");
+                                 }];
+                                 
+                             }else{
+                                 NSLog(@"didnt find any faces, exiting..%@",gsobj.title);
+                             }
+                             
+                         } failure:nil];
+    }
 
+}
 -(void)getDirections
 {
     NSString* saddr = @"Current+Locaton";
@@ -276,6 +342,9 @@ typedef enum {
             [alert show];
         }];
         
+    }
+    if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:@"Remove Faces"]) {
+        [self clearFaces];
     }
     if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:@"Email To Friend"]) {
         [Flurry logEvent:@"EmailtoFriend" timed:NO];                                    
@@ -362,6 +431,8 @@ typedef enum {
     stopBarButtonItem = nil;
     actionBarButtonItem = nil;
     pageActionSheet = nil;
+    self.adView.delegate = nil;
+	self.adView = nil;
 }
 -(void)backButtonAction
 {
@@ -398,6 +469,7 @@ typedef enum {
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
         [self.navigationController setToolbarHidden:YES animated:animated];
     }
+    [self.adView pauseAdAutoRefresh];
     dispatch_async(dispatch_get_main_queue(), ^{
         [SVProgressHUD dismiss];
     });
@@ -405,6 +477,7 @@ typedef enum {
 -(void)viewDidAppear:(BOOL)animated
 {
     [[self navigationController] setNavigationBarHidden:NO animated:YES];
+    [self.adView resumeAdAutoRefresh];
 }
 - (void)viewDidDisappear:(BOOL)animated {
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
@@ -420,6 +493,9 @@ typedef enum {
 
 - (void)dealloc
 {
+    [self.adView cancelAd];
+	self.adView.delegate = nil;
+	self.adView = nil;
     [mainWebView stopLoading];
  	[[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     mainWebView.delegate = nil;

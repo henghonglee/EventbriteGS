@@ -13,11 +13,9 @@
 #import "CrumbPath.h"
 #import "CrumbPathView.h"
 #import <SDWebImage/UIImageView+WebCache.h>
-@interface UnderMapViewController : UIViewController <MKMapViewDelegate,UIGestureRecognizerDelegate>
+@interface UnderMapViewController : UIViewController <MKMapViewDelegate,UIGestureRecognizerDelegate,UITableViewDataSource,UITableViewDelegate>
 {
     MKMapView *mapView;
-    
-
 }
 //@property (nonatomic,strong) MKAnnotationView* lastSelectedAnnotationView;
 @property (nonatomic, strong) CrumbPath *crumbs;
@@ -31,6 +29,7 @@
 @property (strong, nonatomic) IBOutletCollection(UIButton) NSArray *categoryButtons;
 
 @property (weak, nonatomic) IBOutlet UIButton *resetTopViewButton;
+@property (weak, nonatomic) IBOutlet UILabel *distanceLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *shopImageView;
 @property (weak, nonatomic) IBOutlet UIView *locationButtonView;
 @property (weak, nonatomic) IBOutlet UILabel *shopLabel;

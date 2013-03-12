@@ -36,5 +36,5 @@ typedef enum {
 @protocol SearchViewControllerDelegate <NSObject>
 
 - (void)searchViewControllerDidFinishWithSearchString:(NSString*)searchString;
-
+-(IBAction)setBgColorForButton:(UIButton*)sender;
 @end

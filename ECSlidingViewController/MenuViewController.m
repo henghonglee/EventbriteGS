@@ -4,8 +4,9 @@
 
 #import "MapSlidingViewController.h"
 #import "GeoScrollViewController.h"
+#define BLUE_COLOR [UIColor colorWithRed:83.0f/255.0f green:213.0f/255.0f blue:253.0f/255.0f alpha:1.0f]
+#define yellow [UIColor colorWithRed:254.0f/255.0f green:252.0f/255.0f blue:53.0f/255.0f alpha:1.0f]
 
-#define yellow [UIColor colorWithRed:254.0f/255.0f green:252.0f/255.0f blue:53.0f/255.0f alpha:1.0f];
 @interface MenuViewController()
 @property (nonatomic, strong) NSMutableArray *menuItems;
 @end
@@ -15,7 +16,7 @@
 
 - (void)awakeFromNib
 {
-    self.menuItems = [NSMutableArray arrayWithObjects:@"BLOGS",@"SUGGEST A BLOG",nil];
+    self.menuItems = [NSMutableArray arrayWithObjects:@"BLOGS",@"CONTACT US",nil];
 }
 
   
@@ -81,6 +82,7 @@
     cell.bgView.backgroundColor = yellow;
     cell.bgView.alpha = 0.7;
     cell.titleLabel.text = [self.menuItems objectAtIndex:indexPath.row];
+    
     if ([[self.menuItems objectAtIndex:indexPath.row] isEqualToString:@"LADY IRON CHEF"]) {
         cell.colorBar.backgroundColor = [UIColor blueColor];
 
@@ -107,33 +109,35 @@
     if ([self.arrayToAdd containsObject:[self.menuItems objectAtIndex:indexPath.row]])
     {
         //for blogs in array to add
-        cell.titleLabel.font = [UIFont fontWithName:@"Helvetica-Light" size:21.0f];
+        
         if([[[NSUserDefaults standardUserDefaults] objectForKey:[self.menuItems objectAtIndex:indexPath.row]] isEqualToString:@"Enabled"])
         {
             cell.colorBar.hidden = NO;
-            cell.bgView.backgroundColor = yellow;
+            cell.bgView.backgroundColor = BLUE_COLOR;
+            cell.titleLabel.textColor = [UIColor blackColor];
         }else{
             cell.colorBar.hidden = YES;
+            cell.titleLabel.textColor = [UIColor whiteColor];
             cell.bgView.backgroundColor = [UIColor grayColor];
         }
-//        cell.countLabel.hidden = NO;
-#warning disabled countlabel
-        cell.titleLabel.font = [UIFont fontWithName:@"Helvetica-Light" size:17.0f];
-        cell.titleLabel.textColor = [UIColor blackColor];
+        cell.titleLabel.font = [UIFont fontWithName:@"Helvetica-Light" size:15.0f];
+
     }
     else
     {
         if ([cell.titleLabel.text isEqualToString:@"BLOGS"]) {
             cell.vView.hidden = NO;
-            cell.bgView.alpha = 1;
+
         }
-        if ([cell.titleLabel.text isEqualToString:@"SUGGEST A BLOG"]) {
-            cell.vView.hidden = NO;
-            cell.vView.image = [UIImage imageNamed:@"plus.png"];
-            cell.bgView.alpha = 1;
+        if ([cell.titleLabel.text isEqualToString:@"CONTACT US"]) {
+//            cell.vView.hidden = NO;
+//            cell.vView.image = [UIImage imageNamed:@"plus.png"];
+
         }
-        cell.titleLabel.font = [UIFont fontWithName:@"Helvetica-Light" size:25.0f];
+        cell.titleLabel.font = [UIFont fontWithName:@"Helvetica-Light" size:18.0f];
+        cell.bgView.backgroundColor = [UIColor whiteColor];
 //        cell.indicator.hidden = YES;
+        cell.bgView.alpha = 0.7;
         cell.colorBar.hidden = YES;
         cell.countLabel.hidden = YES;
     }

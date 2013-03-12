@@ -37,10 +37,10 @@ static dispatch_once_t onceToken;
     self.shop2.clipsToBounds =YES;
     
 
-    UISwipeGestureRecognizer* swipe = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(showGeoscroll:)];
-    swipe.direction = UISwipeGestureRecognizerDirectionRight;
-    [self.resetTopViewButton addGestureRecognizer:swipe];
-    
+//    UISwipeGestureRecognizer* swipe = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(showGeoscroll:)];
+//    swipe.direction = UISwipeGestureRecognizerDirectionRight;
+//    [self.resetTopViewButton addGestureRecognizer:swipe];
+//    
     self.locationButtonView.layer.cornerRadius = 5.0f;
     self.locationButtonView.layer.shadowColor = [UIColor blackColor].CGColor;
     self.locationButtonView.layer.shadowOpacity = 0.3;
@@ -66,6 +66,9 @@ static dispatch_once_t onceToken;
     tgr.numberOfTapsRequired = 1;
     tgr.numberOfTouchesRequired = 1;
     [self.mapView addGestureRecognizer:tgr];
+}
+- (IBAction)getDirections:(id)sender {
+    [(GeoScrollViewController*)self.slidingViewController.topViewController getDirectionsToSelectedGSObj];
 }
 
 -(void)viewWillAppear:(BOOL)animated
@@ -95,6 +98,7 @@ static dispatch_once_t onceToken;
     [self setLocationButtonView:nil];
     [self setResetTopViewButton:nil];
     [self setResetTopViewButton:nil];
+    [self setDistanceLabel:nil];
     [super viewDidUnload];
 }
 -(IBAction)showWebView:(id)sender {
@@ -108,6 +112,8 @@ static dispatch_once_t onceToken;
 - (IBAction)showGeoscroll:(id)sender {
     NSLog(@"show geoscroll");
     CGRect slideViewFinalFrame = CGRectMake(self.view.bounds.size.width-320, self.view.bounds.size.height, 320, 75);
+    self.shopLabel.hidden=YES;
+    self.shopImageView.hidden= YES;
     [UIView animateWithDuration:0.2
                           delay:0.1
                         options: UIViewAnimationOptionCurveEaseInOut
@@ -530,36 +536,23 @@ didAddAnnotationViews:(NSArray *)annotationViews
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
-    if (toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft ||
-        toInterfaceOrientation == UIInterfaceOrientationLandscapeRight)
-    {
-        for (id annote in self.mapView.annotations) {
-            if ([annote isKindOfClass:[GSObject class]]) {
-                if (((GSObject*)annote).imageArray.count>0) {
-                [self.shop1 setImageWithURL:[((GSObject*)annote).imageArray objectAtIndex:0]];
-                    [self.shop1LoadingIndicator startAnimating];
-                }else{
-                    [self.shop1LoadingIndicator stopAnimating];
-                    [self.shop1 setImageWithURL:[NSURL URLWithString:@""]];
-                }
-                if (((GSObject*)annote).imageArray.count>1) {
-                [self.shop2 setImageWithURL:[((GSObject*)annote).imageArray objectAtIndex:1]];
-                    [self.shop2LoadingIndicator startAnimating];
-                }else{
-                    [self.shop2LoadingIndicator stopAnimating];
-                    [self.shop2 setImageWithURL:[NSURL URLWithString:@""]];
-                }
-
-            }
-        }
-    }
-    else
-    {
-     
-    }
+    
+}
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:@"mycell"];
+    cell.imageView.image = [UIImage imageNamed:@"buttonBlue.png"];
+    return cell;
 }
 
-
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 136;
+}
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 5;
+}
 -(BOOL)shouldAutorotate{
     return NO;
 }

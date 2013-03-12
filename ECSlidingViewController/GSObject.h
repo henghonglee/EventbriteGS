@@ -34,10 +34,13 @@
 }
 @property (nonatomic, strong)  NSNumber* itemId;
 @property (nonatomic, strong) NSString* link;
+@property (nonatomic, strong) NSString* foursquareVenue;
 @property (nonatomic, strong)  NSString* source;
 @property (nonatomic, strong)  NSString* descriptionhtml;
 @property (nonatomic, strong)  UIColor* cursorColor;
 @property (nonatomic, strong)  NSArray* imageArray;
+@property (nonatomic, strong)  NSArray* lowResImageArray;
+@property (nonatomic, strong)  NSArray* midResImageArray;
 @property (nonatomic, strong)  NSArray* foodTypeArray;
 @property (nonatomic, strong)  NSNumber* distanceInMeters;
 @property (nonatomic, strong)  NSNumber *likes;

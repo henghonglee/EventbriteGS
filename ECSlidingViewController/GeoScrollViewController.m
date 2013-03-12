@@ -1,3 +1,4 @@
+#import "ImageCell.h"
 #import "SVWebViewController.h"
 #import "SearchViewController.h"
 #import "GeoScrollViewController.h"
@@ -33,7 +34,7 @@
 #define kCellCornerRad 0.0
 #define IS_IPHONE_5 ( [ [ UIScreen mainScreen ] bounds ].size.height > 500 )
 @implementation GeoScrollViewController
-@synthesize  scopedGSObjectArray,GSObjectArray, loadedGSObjectArray,currentSearch,userLocation;
+@synthesize  scopedGSObjectArray,GSObjectArray, loadedGSObjectArray,currentSearch,userLocation,fullscreenButton;
 
 #pragma mark view load up and data preparation methods
 
@@ -48,16 +49,15 @@
 
 -(void)viewDidLoad
 {
-    
     self.boolhash = [[NSMutableDictionary alloc] init];
     self.GSObjectArray = [[NSMutableArray alloc] init];
     self.loadedGSObjectArray = [[NSMutableArray alloc] init];
     self.scopedGSObjectArray = [[NSMutableArray alloc] init];
-    
+    self.canSearch = NO;
     self.tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 44, self.view.bounds.size.width, self.view.bounds.size.height)];
     self.tableView.frame = self.view.bounds;
     self.tableView.autoresizesSubviews = YES;
-    self.tableView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin ;
+    self.tableView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     self.tableView.scrollsToTop = YES;
@@ -96,6 +96,8 @@
     }else if ([[NSUserDefaults standardUserDefaults]objectForKey:@"LeftReveal"]==nil) {
         [self hintLeft];
     }
+    
+    
 
 }
 
@@ -149,13 +151,24 @@
     }
     dispatch_async(GSserialQueue, ^{
         [self prepareDataForDisplay];
+        if (userLocation) {
+            
+            for (GSObject* gsObj in self.loadedGSObjectArray)
+            {
+                CLLocation *gsLoc = [[CLLocation alloc] initWithLatitude:gsObj.latitude.doubleValue longitude:gsObj.longitude.doubleValue];
+                CLLocationDistance meters = [gsLoc distanceFromLocation:userLocation.location];
+                [gsObj setDistanceInMeters:[NSNumber numberWithDouble:meters]];
+            }
+        }
+        self.canSearch = YES;
+        dispatch_async(dispatch_get_main_queue(), ^
+                       {
+                           NSLog(@"dismissing progress hud");
+                           [SVProgressHUD dismiss];
+                       });
     });
     
-    dispatch_async(dispatch_get_main_queue(), ^
-   {
-       NSLog(@"dismissing progress hud");
-       [SVProgressHUD dismiss];
-   });
+   
     
 }
 
@@ -237,10 +250,7 @@
 {
     @synchronized(self.loadedGSObjectArray) {
         NSLog(@"running prepareDataForDisplay");
-        if(userLocation)
-        {
-            self.loadedGSObjectArray = [self sortLoadedArray:self.loadedGSObjectArray ByVariable:@"distanceInMeters" ascending:YES];
-        }
+        self.loadedGSObjectArray = [self sortLoadedArray:self.loadedGSObjectArray ByVariable:@"distanceInMeters" ascending:NO];
         MKCoordinateRegion region = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView.region;
         [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:currentSearch IntoArray:self.GSObjectArray WithRefresh:YES];
     }
@@ -258,9 +268,8 @@
                     [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:@"" IntoArray:self.GSObjectArray WithRefresh:YES];
                        NSLog(@"loading completed");
                     if(userLocation)
-                    {
-                        self.GSObjectArray = [self sortLoadedArray:self.GSObjectArray ByVariable:@"distanceInMeters" ascending:YES];
-                    }
+                        self.GSObjectArray = [self sortLoadedArray:self.GSObjectArray ByVariable:@"distanceInMeters" ascending:NO];
+                    
                     [self.tableView reloadData];
                     MTStatusBarOverlay *overlay = [MTStatusBarOverlay sharedInstance];
                     [overlay postImmediateFinishMessage:[NSString stringWithFormat:@"Found %d Entries",self.loadedGSObjectArray.count] duration:2.0 animated:YES];
@@ -283,7 +292,7 @@
 {
     if (data==nil)return;
     NSMutableArray* dataArray = [[NSMutableArray alloc]initWithArray:data];
-    
+
     for (NSDictionary* dataObject in dataArray) {
         GSObject *gsObject = [[GSObject alloc] init];
         
@@ -346,6 +355,18 @@
             }            
         }
 
+        if ([[dataObject objectForKey:@"foursqure_venue"] isEqual:[NSNull null]])
+        {
+            gsObject.foursquareVenue = @"";
+        }
+        else
+        {
+            gsObject.foursquareVenue = [dataObject objectForKey:@"foursqure_venue"];
+        }
+            
+            
+
+        
         if ([[dataObject objectForKey:@"images"] isEqual:[NSNull null]])
         {
             gsObject.imageArray = [NSArray array];
@@ -354,6 +375,8 @@
         {
             if (![[dataObject objectForKey:@"images"] isKindOfClass:[NSString class]])
             {
+               
+               
                 gsObject.imageArray = [NSArray arrayWithArray:[dataObject objectForKey:@"images"]];
             }
             else
@@ -363,6 +386,43 @@
             
 
         }
+        if ([[dataObject objectForKey:@"mid_res_images"] isEqual:[NSNull null]])
+        {
+            gsObject.midResImageArray = [NSArray array];
+        }
+        else
+        {
+            if (![[dataObject objectForKey:@"mid_res_images"] isKindOfClass:[NSString class]])
+            {
+                gsObject.midResImageArray = [NSArray arrayWithArray:[dataObject objectForKey:@"mid_res_images"]];
+            }
+            else
+            {
+                gsObject.midResImageArray = [NSArray array];
+            }
+            
+            
+        }
+        if ([[dataObject objectForKey:@"low_res_images"] isEqual:[NSNull null]])
+        {
+            gsObject.lowResImageArray = [NSArray array];
+        }
+        else
+        {
+            if (![[dataObject objectForKey:@"low_res_images"] isKindOfClass:[NSString class]])
+            {
+             
+                gsObject.lowResImageArray = [NSArray arrayWithArray:[dataObject objectForKey:@"low_res_images"]];
+            }
+            else
+            {
+             
+                gsObject.lowResImageArray = [NSArray array];
+            }
+            
+            
+        }
+
         if ([[dataObject objectForKey:@"is_post"] isEqualToNumber:[NSNumber numberWithBool:NO]])
         {
             continue;
@@ -410,6 +470,14 @@
     }
     [self.view addGestureRecognizer:self.slidingViewController.panGesture];
     
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    if (orientation == UIInterfaceOrientationLandscapeLeft||orientation == UIInterfaceOrientationLandscapeRight) {
+        self.imageTableView.hidden = NO;
+    }else{
+        self.imageTableView.hidden = YES;
+    }
+    [self.tableView reloadData];
+    
 }
 -(void)viewWillDisappear:(BOOL)animated
 {
@@ -422,19 +490,9 @@
 //sorts loaded array by gsobject variable, recalculates and adds relavent data to display array
 -(void)sortLoadedArray:(NSMutableArray*)loadedArray ByVariable:(NSString*)variable IntoArray:(NSMutableArray*)resultArray ascending:(BOOL)ascending
 {
+    NSLog(@"sorting");
     if ([variable isEqualToString:@"distanceInMeters"]) {
         currentScopeType = kScopeTypeDistance;
-        //reset location info based on new location
-        if (userLocation) {
-            for (GSObject* gsObj in loadedArray)
-            {
-                CLLocation *gsLoc = [[CLLocation alloc] initWithLatitude:gsObj.latitude.doubleValue longitude:gsObj.longitude.doubleValue];
-#warning check this
-//                NSLog(@"user loc = %@, %@",userLocation,userLocation.location);
-                CLLocationDistance meters = [gsLoc distanceFromLocation:userLocation.location];
-                [gsObj setDistanceInMeters:[NSNumber numberWithDouble:meters]];
-            }
-        }
     }else if([variable isEqualToString:@"likes"]){
         currentScopeType = kScopeTypeLikes;
     }else if([variable isEqualToString:@"dealCount"]){
@@ -442,7 +500,7 @@
     }
     
     NSSortDescriptor * frequencyDescriptor =
-    [[NSSortDescriptor alloc] initWithKey:variable
+    [[NSSortDescriptor alloc] initWithKey:@"foursquareVenue"
                                 ascending:ascending] ;
     NSArray * descriptors = [NSArray arrayWithObjects:frequencyDescriptor, nil];
     NSArray * sortedArray = [loadedArray sortedArrayUsingDescriptors:descriptors];
@@ -457,23 +515,9 @@
 //sorts both loaded and display arrays by gsobject variable
 -(NSMutableArray*) sortLoadedArray:(NSMutableArray*)loadedArray ByVariable:(NSString*)variable  ascending:(BOOL)ascending
 {
+    NSLog(@"sorting");
     if ([variable isEqualToString:@"distanceInMeters"]) {
         currentScopeType = kScopeTypeDistance;
-        if (userLocation ) {
-            for (GSObject* gsObj in loadedArray)
-            {
-
-                if (!(gsObj.distanceInMeters.doubleValue > 0)) {
-                CLLocation *gsLoc = [[CLLocation alloc] initWithLatitude:gsObj.latitude.doubleValue longitude:gsObj.longitude.doubleValue];
-                    if (![gsLoc isEqual:[NSNull null]] && ![userLocation.location isEqual:[NSNull null]]) {
-                        CLLocationDistance meters = [gsLoc distanceFromLocation:userLocation.location];
-                        [gsObj setDistanceInMeters:[NSNumber numberWithDouble:meters]];
-                    }else{
-                        [gsObj setDistanceInMeters:[NSNumber numberWithDouble:99999]];
-                    }
-                }
-            }
-        }
     }else if([variable isEqualToString:@"likes"]){
         currentScopeType = kScopeTypeLikes;
     }else if([variable isEqualToString:@"dealCount"]){
@@ -481,27 +525,30 @@
     }
     
     NSSortDescriptor * frequencyDescriptor =
-    [[NSSortDescriptor alloc] initWithKey:variable
+    [[NSSortDescriptor alloc] initWithKey:@"foursquareVenue"
                                 ascending:ascending] ;
     NSArray * descriptors = [NSArray arrayWithObjects:frequencyDescriptor, nil];
-   return [NSMutableArray arrayWithArray:[loadedArray sortedArrayUsingDescriptors:descriptors]];
-
-    
+    NSArray * sortedArray = [loadedArray sortedArrayUsingDescriptors:descriptors];
+    [loadedArray removeAllObjects];
+    [loadedArray addObjectsFromArray:sortedArray];
+    return loadedArray;
 }
 
 
 //calculates scope and updates loaded array into display array , when region is omitted, all data is used.
 -(void)recalculateScopeFromLoadedArray:(NSMutableArray*)loadedArray WithRegion:(MKCoordinateRegion)region AndSearch:(NSString*)search IntoArray:(NSMutableArray*)resultArray WithRefresh:(BOOL)refresh
 {
-    self.canSearch = NO;
+//    self.canSearch = NO;
     self.random = NO;
-        [resultArray removeAllObjects];
+   [resultArray removeAllObjects];
+    
         MKMapView* map = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
     
-//    @synchronized(loadedArray){
         if (refresh) {
             if (((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs){
+            [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs.pointsArray removeObjectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(1, ((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs.pointsArray.count-1)]];
             [map removeOverlays:map.overlays];
+            //
             memset( ((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs.points, 1, ((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs.pointCount-1);
             ((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs.pointCount = 1;
             }
@@ -551,6 +598,7 @@
                         if (!((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs)
                         {
                             NSLog(@"alloc crumbpath");
+
                             ((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs = [[CrumbPath alloc] initWithCenterCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue)];
                             [map addOverlay:((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs];
                            
@@ -564,17 +612,12 @@
                         
                         if (!MKMapRectIsNull(updateRect))
                         {
-                            // There is a non null update rect.
-                            // Compute the currently visible map zoom scale
                             MKZoomScale currentZoomScale = (CGFloat)(map.bounds.size.width / map.visibleMapRect.size.width);
-                            // Find out the line width at this zoom scale and outset the updateRect by that amount
                             CGFloat lineWidth = MKRoadWidthAtZoomScale(currentZoomScale);
                             updateRect = MKMapRectInset(updateRect, -lineWidth, -lineWidth);
-                            // Ask the overlay view to update just the changed area.
                                 dispatch_async(dispatch_get_main_queue(), ^
                                 {
                                         [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbView setNeedsDisplayInMapRect:updateRect];
-                                        // move the map alittle
                                         MKMapView* underMapView = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
                                         [underMapView setVisibleMapRect:MKMapRectInset([underMapView visibleMapRect], [underMapView visibleMapRect].size.width*0.005, [underMapView visibleMapRect].size.height*0.005) animated:YES];
                                 });
@@ -589,8 +632,7 @@
             
             }
         }
-//    }
-    self.canSearch = YES;
+//    self.canSearch = YES;
 }
 
 -(void)updateCrumbsWithGsObject:(GSObject*)gsObj IntoResultArray:(NSMutableArray*)resultArray withMap:(MKMapView*)map andRegion:(MKCoordinateRegion)region
@@ -682,8 +724,19 @@
 
 -(void)didReceiveUserLocation:(MKUserLocation*)location
 {
+    NSLog(@"did recieve user location");
     userLocation = location;
+    
     dispatch_async(GSserialQueue, ^{
+//        if (userLocation && self.loadedGSObjectArray.count>0) {
+//            for (GSObject* gsObj in self.loadedGSObjectArray)
+//            {
+//                CLLocation *gsLoc = [[CLLocation alloc] initWithLatitude:gsObj.latitude.doubleValue longitude:gsObj.longitude.doubleValue];
+//                CLLocationDistance meters = [gsLoc distanceFromLocation:userLocation.location];
+//                [gsObj setDistanceInMeters:[NSNumber numberWithDouble:meters]];
+//            }
+//        }
+
         [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:MKCoordinateRegionMake(CLLocationCoordinate2DMake(location.coordinate.latitude, location.coordinate.longitude), MKCoordinateSpanMake(0.01, 0.01)) AndSearch:@"" IntoArray:self.GSObjectArray WithRefresh:YES];
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.tableView reloadData];
@@ -829,16 +882,28 @@
     menuViewController.InfoPanelView.frame = CGRectMake(self.view.bounds.size.width-320, self.view.bounds.size.height, 320, 75);
     menuViewController.InfoPanelView.hidden = NO;
     menuViewController.shopLabel.hidden = NO;
+    menuViewController.shopImageView.hidden = NO;
     menuViewController.locationButtonView.hidden = NO;
+    menuViewController.locationButton.hidden = NO;
     menuViewController.resetTopViewButton.hidden = NO;
+    [menuViewController.resetTopViewButton addGestureRecognizer:self.slidingViewController.panGesture];
     menuViewController.allButton.hidden = NO;
+        
+    CGRect shopImageViewFinalFrame = CGRectMake(menuViewController.shopImageView.frame.origin.x, menuViewController.shopImageView.frame.origin.y, menuViewController.shopImageView.frame.size.width, menuViewController.shopImageView.frame.size.height);        
+    CGRect shopLabelFinalFrame = CGRectMake(menuViewController.shopLabel.frame.origin.x, menuViewController.shopLabel.frame.origin.y, menuViewController.shopLabel.frame.size.width, menuViewController.shopLabel.frame.size.height);
 
+    menuViewController.shopLabel.frame = CGRectMake(menuViewController.shopLabel.frame.origin.x, self.view.bounds.size.height, menuViewController.shopLabel.frame.size.width, menuViewController.shopLabel.frame.size.height);
+        
+    menuViewController.shopImageView.frame = CGRectMake(menuViewController.shopImageView.frame.origin.x, self.view.bounds.size.height, menuViewController.shopImageView.frame.size.width, menuViewController.shopImageView.frame.size.height);
+    
     CGRect slideViewFinalFrame = CGRectMake(self.view.bounds.size.width-320, self.view.bounds.size.height-75, 320, 75);
     [UIView animateWithDuration:0.2
                           delay:0.1
                         options: UIViewAnimationOptionCurveEaseOut
                      animations:^{
                          menuViewController.InfoPanelView.frame = slideViewFinalFrame;
+                         menuViewController.shopImageView.frame = shopImageViewFinalFrame;
+                         menuViewController.shopLabel.frame = shopLabelFinalFrame;
                      } 
                      completion:^(BOOL finished){
                          NSLog(@"Done!");
@@ -895,7 +960,11 @@
         menuViewController.InfoPanelView.hidden = YES;
         menuViewController.shopLabel.hidden = YES;
         menuViewController.locationButtonView.hidden = YES;
+        menuViewController.shopImageView.hidden = YES;
+        menuViewController.locationButton.hidden = YES;
         menuViewController.resetTopViewButton.hidden = YES;
+        [menuViewController.resetTopViewButton removeGestureRecognizer:self.slidingViewController.panGesture];
+        [self.view addGestureRecognizer:self.slidingViewController.panGesture];
         menuViewController.allButton.hidden = YES;
         [menuViewController hideCategoryButtons];
         for (UIButton* btn in menuViewController.categoryButtons) {
@@ -978,19 +1047,32 @@
         }
     }
     GSObject* gsObj = [self.GSObjectArray objectAtIndex:idx];
+    self.selectedGsObject = gsObj;
     [underMapView addAnnotation:gsObj];
-    
     UnderMapViewController* menuViewController = ((UnderMapViewController*)self.slidingViewController.underRightViewController);
-    if (gsObj.imageArray.count > 0) {
-        [menuViewController.shopImageView setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@",[gsObj.imageArray objectAtIndex:0]]]];
+    menuViewController.shopLabel.text = gsObj.title;
+    if (gsObj.distanceInMeters.intValue<1000) {
+        menuViewController.distanceLabel.text = [NSString stringWithFormat:@"%d m",gsObj.distanceInMeters.intValue];
+    }else if (gsObj.distanceInMeters.intValue>1000) {
+        menuViewController.distanceLabel.text = [NSString stringWithFormat:@"%.01f km",gsObj.distanceInMeters.floatValue/1000.0f];
+    }else if (gsObj.distanceInMeters.intValue>100000) {
+        menuViewController.distanceLabel.text = [NSString stringWithFormat:@""];
+    }
+    
+    
+    menuViewController.gsObjSelected = gsObj;
+    if (gsObj.lowResImageArray.count>0) {
+        [menuViewController.shopImageView setImageWithURL:[NSURL URLWithString:[gsObj.lowResImageArray objectAtIndex:0]]];
+
     }else{
         [menuViewController.shopImageView setImage:nil];
     }
 
-    menuViewController.shopLabel.text = gsObj.title;
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    if (orientation == UIInterfaceOrientationLandscapeLeft||orientation == UIInterfaceOrientationLandscapeRight) {        
+        [self.imageTableView  reloadData];
+    }
 
-    menuViewController.gsObjSelected = gsObj;
-    [((UnderMapViewController*)self.slidingViewController.underRightViewController) willAnimateRotationToInterfaceOrientation:self.interfaceOrientation duration:0];
 }
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView
@@ -1015,9 +1097,30 @@
     [self animatePin];
     
 }
+-(void)faceDetector
+{
+    // Load the picture for face detection
+    UIImageView* image = [[UIImageView alloc] initWithImage:
+                          [UIImage imageNamed:@"facedetectionpic.jpg"]];
+    
+    
+    // Execute the method used to markFaces in background
+    [self markFaces:image];
+}
 
-
-
+-(void)markFaces:(UIImageView *)facePicture
+{
+    // draw a CI image with the previously loaded face detection picture
+    CIImage* image = [CIImage imageWithCGImage:facePicture.image.CGImage];
+    CIDetector* detector = [CIDetector detectorOfType:CIDetectorTypeFace
+                                              context:nil options:[NSDictionary dictionaryWithObject:CIDetectorAccuracyHigh forKey:CIDetectorAccuracy]];
+    // create an array containing all the detected faces from the detector
+    NSArray* features = [detector featuresInImage:image];
+    if (features.count >0)
+    {
+        NSLog(@"face found");
+    }
+}
 #pragma mark - Search Bar Delegates
 
 
@@ -1061,10 +1164,11 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underLeftWillDisappear) name:ECSlidingViewUnderLeftWillDisappear object:nil];
 
     if (searchString.length==0) {
+
         MKCoordinateRegion region = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView.region;
         dispatch_async(GSserialQueue, ^{
-            [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:@"" IntoArray:self.GSObjectArray WithRefresh:YES];
-            
+        [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:@"" IntoArray:self.GSObjectArray WithRefresh:YES];
+        NSLog(@"finished recalc");            
             
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.tableView reloadData];
@@ -1211,18 +1315,7 @@
 }
 #pragma mark - Table View
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
 
-    if ([GSObjectArray count]>0) {
-        if (self.random) {
-            return 3;
-        }
-        return [GSObjectArray count]+2;
-    }
-    return 2;
-    
-}
 -(void)calculateRandom
 {
     if (self.random) {
@@ -1233,7 +1326,7 @@
     }else{
         dispatch_async(dispatch_get_main_queue(), ^
        {
-           [SVProgressHUD showWithStatus:@"Loading"];
+           [SVProgressHUD showWithStatus:@"Thinking.."];
        });
         double delayInSeconds = 2.0;
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
@@ -1251,75 +1344,123 @@
         });
     }
 }
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    if (tableView == self.imageTableView) {
+        return self.selectedGsObject.lowResImageArray.count;
+    }else{
+        if ([GSObjectArray count]>0) {
+            if (self.random) {
+                return 3;
+            }
+            return [GSObjectArray count]+2;
+        }
+        return 2;
+    }
+}
 -(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
-    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
-    if (orientation == UIInterfaceOrientationLandscapeLeft||orientation == UIInterfaceOrientationLandscapeRight) {
+    if (tableView == self.imageTableView) {
         return 0;
     }else{
-        return 64;
+        UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+        if (orientation == UIInterfaceOrientationLandscapeLeft||orientation == UIInterfaceOrientationLandscapeRight) {
+            return 0;
+        }else{
+            return 64;
+        }
     }
 }
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
-    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
-    if (orientation == UIInterfaceOrientationLandscapeLeft||orientation == UIInterfaceOrientationLandscapeRight) {
+    if (tableView == self.imageTableView) {
         return nil;
     }else{
-    UIView* headerView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 300, 64)];
-    [headerView setBackgroundColor:[UIColor clearColor]];
-    UIView* searchView = [[UIView alloc]initWithFrame:CGRectMake(10, 10, 300, 44)];
-    [searchView setBackgroundColor:[UIColor whiteColor]];
-    UIImageView* searchImage = [[UIImageView alloc]initWithFrame:CGRectMake(8, 8, 30, 30)];
-    [searchImage setImage:[UIImage imageNamed:@"search.png"]];
-    [searchView addSubview:searchImage];
-    
-    if (!self.searchTextField) {
-        self.searchTextField = [[UITextField alloc]initWithFrame:CGRectMake(44, 0, 320-10-10-44-44,44)];
-        [self.searchTextField setDelegate:self];
-        [self.searchTextField setBackgroundColor:[UIColor clearColor]];
-        self.searchTextField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
-        self.searchTextField.placeholder = @"What's good nearby?";
+        UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+        if (orientation == UIInterfaceOrientationLandscapeLeft||orientation == UIInterfaceOrientationLandscapeRight) {
+            return nil;
+        }else{
+        UIView* headerView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 300, 64)];
+        [headerView setBackgroundColor:[UIColor clearColor]];
+        UIView* searchView = [[UIView alloc]initWithFrame:CGRectMake(10, 10, 300, 44)];
+        [searchView setBackgroundColor:[UIColor whiteColor]];
+        UIImageView* searchImage = [[UIImageView alloc]initWithFrame:CGRectMake(8, 8, 30, 30)];
+        [searchImage setImage:[UIImage imageNamed:@"search.png"]];
+        [searchView addSubview:searchImage];
+        
+        if (!self.searchTextField) {
+            self.searchTextField = [[UITextField alloc]initWithFrame:CGRectMake(44, 0, 320-10-10-44-44,44)];
+            [self.searchTextField setDelegate:self];
+            [self.searchTextField setBackgroundColor:[UIColor clearColor]];
+            self.searchTextField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+            self.searchTextField.placeholder = @"What's good nearby?";
 
-    }
-    [searchView addSubview:self.searchTextField];
-    
-    UIButton* resetButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [resetButton setBackgroundColor:[UIColor redColor]];
-    [resetButton setFrame:CGRectMake(300-44, 0, 44, 44)];
-    [resetButton addTarget:self action:@selector(cancelSearch) forControlEvents:UIControlEventTouchUpInside];
-    [searchView addSubview:resetButton];
-    [headerView addSubview:searchView];
-    
-    return headerView;
+        }
+        [searchView addSubview:self.searchTextField];
+        
+        UIButton* resetButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [resetButton setBackgroundColor:[UIColor redColor]];
+        [resetButton setBackgroundImage:[UIImage imageNamed:@"cross.png"] forState:UIControlStateNormal];
+        [resetButton setFrame:CGRectMake(300-44, 0, 44, 44)];
+            [resetButton addTarget:self action:@selector(cancelSearch:) forControlEvents:UIControlEventTouchUpInside];
+            [resetButton addTarget:self action:@selector(setBgColorForButton:) forControlEvents:UIControlEventTouchDown];
+        [searchView addSubview:resetButton];
+        [headerView addSubview:searchView];
+        
+        return headerView;
+        }
     }
 }
+
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if(indexPath.row == 0){
-        return 131;
-    }else if( indexPath.row == [GSObjectArray count]+1){
-        if([GSObjectArray count]==0)
-        {
-            return 285;
+    if (tableView == self.imageTableView) {
+        return 160;
+    }else{
+        if(indexPath.row == 0){
+            return 131;
+        }else if( indexPath.row == [GSObjectArray count]+1){
+            if([GSObjectArray count]==0)
+            {
+                return 285;
+            }
+            else
+            {
+                return 175;
+            }
         }
-        else
-        {
-            return 175;
-        }
+        return ((GSObject*)[GSObjectArray objectAtIndex:indexPath.row-1]).cellHeight.intValue;
     }
-    return ((GSObject*)[GSObjectArray objectAtIndex:indexPath.row-1]).cellHeight.intValue;
-}
-
--(void)showMap
-{
-    [self.slidingViewController anchorTopViewTo:ECLeft];
 }
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    
+    if (tableView == self.imageTableView) {
+
+        static NSString *FromCellIdentifier = @"FromCell";
+        ImageCell* cell = (ImageCell*) [tableView dequeueReusableCellWithIdentifier:FromCellIdentifier];
+        if (cell == nil)
+        {
+            NSArray *topLevelObjects = [[NSBundle mainBundle] loadNibNamed:@"ImageCell" owner:nil options:nil];
+            for(id currentObject in topLevelObjects)
+            {
+                if([currentObject isKindOfClass:[UITableViewCell class]])
+                {
+                    cell = (ImageCell*)currentObject;
+                    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                }
+            }
+        }
+        
+        [cell.imageView setImageWithURL:[NSURL URLWithString:[self.selectedGsObject.lowResImageArray objectAtIndex:indexPath.row]] placeholderImage:nil success:^(UIImage *image, BOOL cached) {
+            [cell.imageView setImage:image];
+        } failure:nil];
+        
+        [cell.activityIndicator startAnimating];
+        return cell;
+    }else{
     if(indexPath.row == 0){
         static NSString *SorterCellIdentifier = @"SorterCell";
         SorterCell* cell = (SorterCell*) [tableView dequeueReusableCellWithIdentifier:SorterCellIdentifier];
@@ -1333,15 +1474,6 @@
                 }
             }
         }
-        //cell.searchBar.selectedScopeButtonIndex = currentScopeType;
-//        UIButton* MenuButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-//        MenuButton.frame = CGRectMake(0,0, 44, 44);
-//        [MenuButton setTitle:@"Menu" forState:UIControlStateNormal];
-//        [MenuButton addTarget:self action:@selector(showMenu) forControlEvents:UIControlEventTouchUpInside];
-//        UIButton* MapButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-//        MapButton.frame = CGRectMake(cell.bounds.size.width-44,0, 44, 44);
-//        [MapButton addTarget:self action:@selector(showMap)  forControlEvents:UIControlEventTouchUpInside];
-//
         if (self.GSObjectArray.count > 2) {
             [cell.randomButton addTarget:self action:@selector(calculateRandom) forControlEvents:UIControlEventTouchUpInside];
             cell.randomContainer.hidden = NO;
@@ -1349,15 +1481,9 @@
             cell.randomContainer.hidden = YES;
 
         }
-        
-//        [cell.navView addSubview:MenuButton];
-//        [cell.navView addSubview:MapButton];
         cell.searchTextField.text = currentSearch;
         cell.searchTextField.delegate = self;
         cell.sorterBackgroundView.layer.cornerRadius = 0;
-        
-        
-        
         return cell;
     
     }
@@ -1370,8 +1496,6 @@
                 if([currentObject isKindOfClass:[UITableViewCell class]]){
                     endcell = (EndTableCell*)currentObject;
                     endcell.selectionStyle = UITableViewCellSelectionStyleNone;
-
-
                 }
             }
         }
@@ -1379,11 +1503,17 @@
         if([SVProgressHUD isVisible])
         {
             endcell.endTableBackgroundView.hidden = YES;
+            endcell.searchImageView.hidden = YES;
+            endcell.searchLabel.hidden = YES;
         }else{
             if (self.GSObjectArray.count==0) {
                 endcell.endTableBackgroundView.hidden = NO;
+                endcell.searchImageView.hidden = NO;
+                endcell.searchLabel.hidden = NO;
             }else{
                 endcell.endTableBackgroundView.hidden = YES;
+                endcell.searchImageView.hidden = YES;
+                endcell.searchLabel.hidden = YES;
             }
         }
         return endcell;
@@ -1432,14 +1562,6 @@
         cell.subTitleLabel.shadowColor = [UIColor blackColor];
         cell.subTitleLabel.shadowOffset = CGSizeMake(1, 1);
         
-//        cell.sourceLabel = [[UILabel alloc]initWithFrame:CGRectMake(kStarLeftPadding,10 + s.height + 5 + subTitleSize.height + 5 ,kCellSubtitleHeightConstraint,sourceSize.height)];
-//        cell.sourceLabel.backgroundColor = [UIColor clearColor];
-//        cell.sourceLabel.textColor = [UIColor whiteColor];
-//        [cell.sourceLabel setFont:kSourceFont];
-//        [cell.sourceLabel setNumberOfLines:0];
-//        cell.sourceLabel.shadowColor = [UIColor blackColor];
-//        cell.sourceLabel.shadowOffset = CGSizeMake(1, 1);
-
         cell.distanceLabel = [[UILabel alloc]initWithFrame:CGRectMake(cell.bounds.size.width-10-5-40,gsObj.cellHeight.intValue-5-30 ,40,30)];
         cell.distanceLabel.backgroundColor = [UIColor clearColor];
         cell.distanceLabel.textColor = [UIColor whiteColor];
@@ -1472,9 +1594,6 @@
     cell.titleLabel.text = gsObj.title;
     cell.subTitleLabel.text = [[gsObj.subTitle stringByReplacingOccurrencesOfString:@": " withString:@""]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     cell.sourceLabel.text = [NSString stringWithFormat:@"source: %@",gsObj.source];
-    CLLocation *gsLoc = [[CLLocation alloc] initWithLatitude:gsObj.latitude.doubleValue longitude:gsObj.longitude.doubleValue];
-    CLLocationDistance meters = [gsLoc distanceFromLocation:userLocation.location];
-    [gsObj setDistanceInMeters:[NSNumber numberWithDouble:meters]];
     if (gsObj.distanceInMeters.intValue<1000) {
      cell.distanceLabel.text = [NSString stringWithFormat:@"%d m",gsObj.distanceInMeters.intValue];
     }else if (gsObj.distanceInMeters.intValue>1000) {
@@ -1485,19 +1604,28 @@
     
     
     cell.mainCellView.layer.cornerRadius = 0;
-    
-//    UIBezierPath* maskPath = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(1, 2, 12, (gsObj.cellHeight.intValue - 10)) byRoundingCorners:UIRectCornerTopLeft|UIRectCornerBottomLeft cornerRadii:CGSizeMake(kCellCornerRad, kCellCornerRad)];
-//    CAShapeLayer *maskLayer = [CAShapeLayer layer];
-//    maskLayer.frame = cell.colorBarView.layer.bounds;
-//    maskLayer.path = maskPath.CGPath;
-//    cell.colorBarView.layer.mask = maskLayer;
-    
     return cell;
+    }
+
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-
+    if (tableView == self.imageTableView) {
+        if ([self.imageTableView cellForRowAtIndexPath:indexPath].imageView.image != nil) {
+            fullscreenButton = [UIButton buttonWithType:UIButtonTypeCustom];
+            [fullscreenButton setBackgroundColor:[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.8]];
+            
+            [fullscreenButton setFrame:self.view.bounds];
+            [fullscreenButton addTarget:self action:@selector(dismissSelf:) forControlEvents:UIControlEventTouchUpInside];
+            UIImageView* newImageView = [[UIImageView alloc]initWithFrame:self.view.bounds];
+            [newImageView setImageWithURL:[NSURL URLWithString:[self.selectedGsObject.imageArray objectAtIndex:indexPath.row]] placeholderImage:[self.imageTableView cellForRowAtIndexPath:indexPath].imageView.image];
+            [newImageView setContentMode:UIViewContentModeScaleAspectFit];
+            [newImageView setUserInteractionEnabled:NO];
+            [fullscreenButton addSubview:newImageView];
+            [self.view addSubview:fullscreenButton];
+        }
+    }else{
     if (indexPath.row == 0 || indexPath.row == [self.GSObjectArray count]+1)
     {
         return;
@@ -1516,8 +1644,8 @@
     webViewController.currentLocation = self.userLocation;
 	[self.navigationController pushViewController:webViewController animated:YES];
     
+    }
 }
-
 
 
 #pragma mark unmark icloudbackup
@@ -1585,14 +1713,17 @@
         CLLocation* location = [[CLLocation alloc]initWithLatitude:gsObj.coordinate.latitude longitude:gsObj.coordinate.longitude];
         if ([touchLocation distanceFromLocation:location]< (0.2*MKRoadWidthAtZoomScale(currentZoomScale)))
         {
-                
-                
-            CGRect slideViewFinalFrame = CGRectMake(00, 460, 320, 75);
+            
+            CGRect shopImageViewFinalFrame = CGRectMake(menuViewController.shopImageView.frame.origin.x, menuViewController.shopImageView.frame.origin.y, menuViewController.shopImageView.frame.size.width, menuViewController.shopImageView.frame.size.height);
+            CGRect shopLabelFinalFrame = CGRectMake(menuViewController.shopLabel.frame.origin.x, menuViewController.shopLabel.frame.origin.y, menuViewController.shopLabel.frame.size.width, menuViewController.shopLabel.frame.size.height);
+            CGRect slideViewFinalFrame = CGRectMake(00, self.view.bounds.size.height, 320, 75);
             [UIView animateWithDuration:0.2
                                   delay:0.0
                                 options: UIViewAnimationOptionCurveEaseOut
                              animations:^{
                                  menuViewController.InfoPanelView.frame = slideViewFinalFrame;
+                                 menuViewController.shopLabel.frame = CGRectMake(menuViewController.shopLabel.frame.origin.x, self.view.bounds.size.height, menuViewController.shopLabel.frame.size.width, menuViewController.shopLabel.frame.size.height);
+                                 menuViewController.shopImageView.frame = CGRectMake(menuViewController.shopImageView.frame.origin.x, self.view.bounds.size.height, menuViewController.shopImageView.frame.size.width, menuViewController.shopImageView.frame.size.height);
                              }
                              completion:^(BOOL finished){
                                  MKCoordinateRegion region =map.region;
@@ -1605,6 +1736,8 @@
                                                      options: UIViewAnimationOptionCurveEaseOut
                                                   animations:^{
                                                       menuViewController.InfoPanelView.frame = slideViewFinalFrame;
+                                                    menuViewController.shopLabel.frame = shopLabelFinalFrame;
+                                                    menuViewController.shopImageView.frame = shopImageViewFinalFrame;
                                                   }
                                                   completion:^(BOOL finished){
                                                       
@@ -1617,7 +1750,13 @@
     }
 }
 
+-(void)dismissSelf:(UIButton*) sender
+{
+    [sender removeFromSuperview];
+}
+
 -(BOOL)shouldAutorotate{
+
     return NO;
 }
 -(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
@@ -1626,21 +1765,33 @@
 }
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
+    if (fullscreenButton) {
+        [fullscreenButton removeFromSuperview];
+        fullscreenButton = nil;
+    }
     if (toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft ||
         toInterfaceOrientation == UIInterfaceOrientationLandscapeRight)
     {
-
+        
+        self.imageTableView.hidden = NO;
         [self.slidingViewController setAnchorLeftPeekAmount:160.0f];
+        
         [self.slidingViewController resetTopView];
         [self.tableView reloadData];
     }
     else
     {
+        self.imageTableView.hidden = YES;
         [self.slidingViewController setAnchorLeftPeekAmount:1.0f];
         [self.slidingViewController resetTopView];
         [self.tableView reloadData];
     }
 }
+-(void)showMap
+{
+    [self.slidingViewController anchorTopViewTo:ECLeft];
+}
+
 
 -(void)animatePin
 {
@@ -1736,11 +1887,67 @@
     });
 
 }
--(void)cancelSearch
+-(void)setBgColorForButton:(UIButton*)sender
 {
+    NSLog(@"changing background color");
+    [sender setBackgroundColor:[UIColor blackColor]];
+}
+-(void)cancelSearch:(UIButton*)sender
+{
+    NSLog(@"cancelling search");
+    double delayInSeconds = 0.2;
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+        [sender setBackgroundColor:[UIColor redColor]];
+    });
+
     if (self.searchTextField.text.length >0) {
         self.searchTextField.text = @"";
         [self textFieldShouldReturn:self.searchTextField];
     }
 }
+
+-(void)getDirectionsToSelectedGSObj
+{
+
+        NSString* saddr = @"Current+Locaton";
+        NSString* daddr = @"";
+        
+        if([[UIApplication sharedApplication] canOpenURL:
+            [NSURL URLWithString:@"comgooglemaps://"]]){
+            saddr = [NSString stringWithFormat:@"%f,%f", self.userLocation.coordinate.latitude,self.userLocation.coordinate.longitude];
+            daddr = [NSString stringWithFormat:@"%f,%f", self.selectedGsObject.latitude.doubleValue,self.selectedGsObject.longitude.doubleValue];
+            NSLog(@"");
+            [[UIApplication sharedApplication]openURL:[NSURL URLWithString:[NSString stringWithFormat:@"comgooglemaps://?saddr=%@&daddr=%@&zoom=14&directionsmode=driving",saddr,daddr]]];
+        }else{
+            
+            NSString* urlStr;
+            
+            if ([[[UIDevice currentDevice] systemVersion] floatValue] >=6) {
+                //iOS 6+, Should use map.apple.com. Current Location doesn't work in iOS 6 . Must provide the coordinate.
+                if ((self.userLocation.coordinate.latitude != kCLLocationCoordinate2DInvalid.latitude) && (self.userLocation.coordinate.longitude != kCLLocationCoordinate2DInvalid.longitude)) {
+                    //Valid location.
+                    saddr = [NSString stringWithFormat:@"%f,%f", self.userLocation.coordinate.latitude,self.userLocation.coordinate.longitude];
+                    urlStr = [NSString stringWithFormat:@"http://maps.apple.com/maps?saddr=%@&daddr=%@", saddr, daddr];
+                } else {
+                    //Invalid location. Location Service disabled.
+                    urlStr = [NSString stringWithFormat:@"http://maps.apple.com/maps?daddr=%@", daddr];
+                }
+            } else {
+                // < iOS 6. Use maps.google.com
+                urlStr = [NSString stringWithFormat:@"http://maps.google.com/maps?saddr=%@&daddr=%@", saddr,daddr];
+            }
+            
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlStr]];
+            
+        }
+        
+        
+    
+}
+- (void)viewDidUnload {
+    [self setImageTableView:nil];
+    [super viewDidUnload];
+}
+
 @end

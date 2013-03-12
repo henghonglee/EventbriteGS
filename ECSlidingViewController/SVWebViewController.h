@@ -10,10 +10,14 @@
 
 #import "SVModalWebViewController.h"
 #import "GSObject.h"
+#import "MobclixAds.h"
 @interface SVWebViewController : UIViewController <UIActionSheetDelegate,UIScrollViewDelegate,MFMessageComposeViewControllerDelegate>
-
+{
+    MobclixAdView* adView;
+}
 - (id)initWithAddress:(NSString*)urlString;
 - (id)initWithURL:(NSURL*)URL;
+@property (nonatomic,strong) MobclixAdView* adView;
 @property (nonatomic, strong) GSObject* gsobj;
 @property (nonatomic) BOOL isLoading;
 @property (nonatomic, strong) CLLocation* currentLocation;

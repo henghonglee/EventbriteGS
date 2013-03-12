@@ -32,7 +32,6 @@
                 
             
             CGContextSetStrokeColorWithColor(context, ((CrumbObj*)[crumbs.pointsArray objectAtIndex:i]).pointColor.CGColor);
-//            CGContextSetRGBStrokeColor(context, 1.0f, 0.0f, 0.0f, 1.0f);
             CGContextSetLineWidth(context, lineWidth/4);
             CGContextStrokePath(context);
         }

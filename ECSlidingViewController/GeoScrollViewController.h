@@ -14,6 +14,7 @@
 #import <SDWebImage/UIImageView+WebCache.h>
 #import "MTStatusBarOverlay.h"
 #import "SearchViewController.h"
+#import <CoreImage/CoreImage.h>
 typedef enum {
     kScopeTypeLikes,
     kScopeTypeDeals,
@@ -29,11 +30,15 @@ typedef enum {
         ScopeType currentScopeType;
         dispatch_queue_t GSserialQueue;
 }
+@property (weak, nonatomic) IBOutlet UIButton *resetTopViewButton;
 @property (nonatomic) BOOL random;
 @property (nonatomic) BOOL canSearch;
 @property (nonatomic) int randomIndex;
+@property (nonatomic,strong)UIButton*fullscreenButton;
+@property (nonatomic,strong)GSObject* selectedGsObject;
 @property (nonatomic,strong)UITextField* searchTextField;
 @property (nonatomic, strong) CLLocation *shouldZoomToLocation;
+@property (weak, nonatomic) IBOutlet UITableView *imageTableView;
 @property (nonatomic, strong) CLGeocoder *geocoder;
 @property (nonatomic) BOOL selectionChanged;
 @property (nonatomic,strong) MKUserLocation* userLocation;
@@ -50,4 +55,5 @@ typedef enum {
 -(void)didTouchMapAtCoordinate:(CLLocationCoordinate2D)mapTouchCoordinate;
 -(void)hintLeft;
 -(void)hintRight;
+-(void)getDirectionsToSelectedGSObj;
 @end

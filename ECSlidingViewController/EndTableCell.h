@@ -10,5 +10,7 @@
 
 @interface EndTableCell : UITableViewCell
 @property (weak, nonatomic) IBOutlet UIView *endTableBackgroundView;
+@property (weak, nonatomic) IBOutlet UIImageView *searchImageView;
+@property (weak, nonatomic) IBOutlet UILabel *searchLabel;
 
 @end

@@ -59,11 +59,10 @@
             if([self coordinate:CLLocationCoordinate2DMake(gsobj.latitude.doubleValue, gsobj.longitude.doubleValue) ContainedinRegion:self.searchRegion])
             {
                 for (NSString* foodtype in gsobj.foodTypeArray) {
-                    
-                    if ([self.suggestedFood objectForKey:foodtype]) {
-                        [self.suggestedFood setObject:[NSNumber numberWithInt:(((NSNumber*)[self.suggestedFood objectForKey:foodtype]).intValue + 1)] forKey:foodtype];
+                    if ([self.suggestedFood objectForKey:[NSString stringWithFormat:@"type=%@",foodtype]]) {
+                        [self.suggestedFood setObject:[NSNumber numberWithInt:(((NSNumber*)[self.suggestedFood objectForKey:[NSString stringWithFormat:@"type=%@",foodtype]]).intValue + 1)] forKey:[NSString stringWithFormat:@"type=%@",foodtype]];
                     }else{
-                        [self.suggestedFood setObject:[NSNumber numberWithInt:1] forKey:foodtype];
+                        [self.suggestedFood setObject:[NSNumber numberWithInt:1] forKey:[NSString stringWithFormat:@"type=%@",foodtype ]];
                         
                     }
                     
@@ -98,14 +97,23 @@
 
 -(void)doSearch
 {
+    [self.delegate searchViewControllerDidFinishWithSearchString:[self.finalSearchString stringByReplacingOccurrencesOfString:@"type=" withString:@""]];
     [self dismissModalViewControllerAnimated:NO];
-    [self.delegate searchViewControllerDidFinishWithSearchString:self.finalSearchString];
+
 }
 -(IBAction)cancelSearch:(id)sender
 {
+    NSLog(@"cancelling search");
+    double delayInSeconds = 0.2;
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+        [sender setBackgroundColor:[UIColor redColor]];
+    });
+    
     self.finalSearchString = @"";
+    [self.delegate searchViewControllerDidFinishWithSearchString:[self.finalSearchString stringByReplacingOccurrencesOfString:@"type=" withString:@""]];
     [self dismissModalViewControllerAnimated:NO];
-    [self.delegate searchViewControllerDidFinishWithSearchString:self.finalSearchString];   
+      
     
 }
 -(void)textFieldTextDidChange{
@@ -205,14 +213,15 @@
 }
 -(BOOL)textFieldShouldReturn:(UITextField *)textField
 {
-    [self dismissModalViewControllerAnimated:NO];
+    
     if (self.resultList.count>0) {
-        [self.delegate searchViewControllerDidFinishWithSearchString:[self.resultList objectAtIndex:0]];
+        [self.delegate searchViewControllerDidFinishWithSearchString:[[self.resultList objectAtIndex:0] stringByReplacingOccurrencesOfString:@"type=" withString:@""]];
     }else if(self.shopResultList.count>0){
-        [self.delegate searchViewControllerDidFinishWithSearchString:[self.shopResultList objectAtIndex:0]];
+        [self.delegate searchViewControllerDidFinishWithSearchString:[[self.shopResultList objectAtIndex:0] stringByReplacingOccurrencesOfString:@"type=" withString:@""]];
     }else{
-        [self.delegate searchViewControllerDidFinishWithSearchString:[NSString stringWithFormat:@"addr=%@",self.searchTF.text]];
+        [self.delegate searchViewControllerDidFinishWithSearchString:[NSString stringWithFormat:@"addr=%@",[self.searchTF.text stringByReplacingOccurrencesOfString:@"type=" withString:@""]]];
     }
+    [self dismissModalViewControllerAnimated:NO];
     return YES;
 }
 
@@ -244,8 +253,8 @@
             {
                 cell.indicatorImage.hidden = YES;
             }
-            cell.titleLabel.text = [self.resultList objectAtIndex:indexPath.row];
-            cell.subTitleLabel.text = [NSString stringWithFormat:@"%@ listings",[(NSMutableDictionary*)self.suggestedFood objectForKey:[self.resultList objectAtIndex:indexPath.row]] ];
+            cell.titleLabel.text = [[self.resultList objectAtIndex:indexPath.row] stringByReplacingOccurrencesOfString:@"type=" withString:@""];
+            cell.subTitleLabel.text = [NSString stringWithFormat:@"%@ listings",[(NSMutableDictionary*)self.suggestedFood objectForKey:[self.resultList objectAtIndex:indexPath.row]]];
             cell.contentView.backgroundColor = [UIColor whiteColor];
             cell.contentView.alpha = 0.8;
             return cell;
@@ -350,7 +359,7 @@
         {
             NSLog(@"selected location");
             
-            self.finalSearchString = [self.finalSearchString stringByAppendingFormat:@"addr=%@",[self.resultList objectAtIndex:indexPath.row]];
+            self.finalSearchString = [self.finalSearchString stringByAppendingFormat:@"addr=%@",[[self.resultList objectAtIndex:indexPath.row] stringByReplacingOccurrencesOfString:@"type=" withString:@""]];
             NSLog(@"searchString = %@",self.finalSearchString);
             self.searchTF.text = @"";
             self.searchState = kStateSelectingFood;
@@ -361,14 +370,14 @@
         else if ((int)self.searchState == kStateSelectingFood)
         {
             if (self.resultList.count==0) {
-                [self.delegate searchViewControllerDidFinishWithSearchString:[NSString stringWithFormat:@"addr=%@",self.searchTF.text]];
+                [self.delegate searchViewControllerDidFinishWithSearchString:[NSString stringWithFormat:@"addr=%@",[self.searchTF.text stringByReplacingOccurrencesOfString:@"type=" withString:@""]]];
                 self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
                 [self dismissModalViewControllerAnimated:YES];
                 return;
             }
             
-            self.finalSearchString = [self.resultList objectAtIndex:indexPath.row];
-            [self.delegate searchViewControllerDidFinishWithSearchString:self.finalSearchString];
+            self.finalSearchString = [[self.resultList objectAtIndex:indexPath.row]stringByReplacingOccurrencesOfString:@"type=" withString:@""];
+            [self.delegate searchViewControllerDidFinishWithSearchString:[self.finalSearchString stringByReplacingOccurrencesOfString:@"type=" withString:@""]];
             self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
             [self dismissModalViewControllerAnimated:YES];
             }
@@ -379,7 +388,7 @@
         {
             NSLog(@"selected location");
             
-            self.finalSearchString = [self.finalSearchString stringByAppendingFormat:@"addr=%@",[self.resultList objectAtIndex:indexPath.row]];
+            self.finalSearchString = [self.finalSearchString stringByAppendingFormat:@"addr=%@",[[self.resultList objectAtIndex:indexPath.row]stringByReplacingOccurrencesOfString:@"type=" withString:@""]];
             NSLog(@"searchString = %@",self.finalSearchString);
             self.searchTF.text = @"";
             self.searchState = kStateSelectingFood;
@@ -389,8 +398,8 @@
         }
         else if ((int)self.searchState == kStateSelectingFood)
         {
-            self.finalSearchString = [self.shopResultList objectAtIndex:indexPath.row];
-            [self.delegate searchViewControllerDidFinishWithSearchString:self.finalSearchString];
+            self.finalSearchString = [[self.shopResultList objectAtIndex:indexPath.row]stringByReplacingOccurrencesOfString:@"type=" withString:@""];
+            [self.delegate searchViewControllerDidFinishWithSearchString:[self.finalSearchString stringByReplacingOccurrencesOfString:@"type=" withString:@""]];
             self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
             [self dismissModalViewControllerAnimated:YES];
 
@@ -452,6 +461,10 @@
     }
 }
 
-
+-(IBAction)setBgColorForButton:(UIButton*)sender
+{
+    NSLog(@"changing background color");
+    [sender setBackgroundColor:[UIColor blackColor]];
+}
 
 @end
