@@ -304,10 +304,6 @@
 		EFA83A8216B1197800BD8057 /* Trie.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Trie.h; sourceTree = "<group>"; };
 		EFA83A8316B1197800BD8057 /* Trie.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Trie.m; sourceTree = "<group>"; };
 		EFACA57F16F6FFC000F2BB1C /* FoodItem.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = FoodItem.sqlite; sourceTree = "<group>"; };
-<<<<<<< HEAD
-		EFACA58416F7573500F2BB1C /* icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon@2x.png"; sourceTree = "<group>"; };
-=======
->>>>>>> 786ed2d591c2fbd6dc7a1e72a212b956bbbba406
 		EFB71D7516F4D13F00C6BC20 /* FoodType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FoodType.h; sourceTree = "<group>"; };
 		EFB71D7616F4D13F00C6BC20 /* FoodType.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FoodType.m; sourceTree = "<group>"; };
 		EFB71D7B16F4D14000C6BC20 /* FoodDescription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FoodDescription.h; sourceTree = "<group>"; };
@@ -514,10 +510,7 @@
 		2750E76114CDB0DF007727A0 = {
 			isa = PBXGroup;
 			children = (
-<<<<<<< HEAD
-=======
 				34CE4A9A16FF27CD00ABCB92 /* icon@2x.png */,
->>>>>>> 786ed2d591c2fbd6dc7a1e72a212b956bbbba406
 				EFDE5DF016F4A6250014C0AF /* CoreData.framework */,
 				EFEE06F916F2E6FE00710EA3 /* Social.framework */,
 				EF68E9F416DD13CA006A6D84 /* libFlurry.a */,
@@ -871,10 +864,7 @@
 			isa = PBXGroup;
 			children = (
 				EF9A294C16FC847F00FF89DD /* howtonavigatecopy.png */,
-<<<<<<< HEAD
-				EFACA58416F7573500F2BB1C /* icon@2x.png */,
-=======
->>>>>>> 786ed2d591c2fbd6dc7a1e72a212b956bbbba406
+
 				EFD30AF016ECC5C100B2751A /* locationBlue.png */,
 				EFE5B33116EB9159009F9EDD /* back_button_landscape@2x.png */,
 				EF13153A16ED113F00BED347 /* closeButton.png */,
@@ -1110,19 +1100,13 @@
 				EF13153B16ED113F00BED347 /* closeButton.png in Resources */,
 				EF13153D16ED134D00BED347 /* closeButton@2x.png in Resources */,
 				EFACA58016F6FFC000F2BB1C /* FoodItem.sqlite in Resources */,
-<<<<<<< HEAD
-				EFACA58516F7573500F2BB1C /* icon@2x.png in Resources */,
-=======
->>>>>>> 786ed2d591c2fbd6dc7a1e72a212b956bbbba406
+
 				EF9A293F16FC473600FF89DD /* rope.jpg in Resources */,
 				EF9A294116FC4C3500FF89DD /* shadow.png in Resources */,
 				EF9A294416FC74C300FF89DD /* bakuteh.jpg in Resources */,
 				EF9A294516FC74C300FF89DD /* chillycrab.jpg in Resources */,
 				EF9A294D16FC847F00FF89DD /* howtonavigatecopy.png in Resources */,
-<<<<<<< HEAD
-=======
 				34CE4A9B16FF27CD00ABCB92 /* icon@2x.png in Resources */,
->>>>>>> 786ed2d591c2fbd6dc7a1e72a212b956bbbba406
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
