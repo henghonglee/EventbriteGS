@@ -20,5 +20,6 @@
 //@property (strong, nonatomic) HHStarView* starView;
 @property (strong, nonatomic) NSNumber* itemIndex;
 @property (strong, nonatomic) UIView *colorBarView;
+@property (strong, nonatomic) UIView *distanceColorBarView;
 @property (strong, nonatomic) HHStarView* starview;
 @end

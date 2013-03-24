@@ -29,11 +29,18 @@ typedef enum {
         NSMutableArray *scopedGSObjectArray;
         ScopeType currentScopeType;
         dispatch_queue_t GSserialQueue;
+        dispatch_queue_t GSdataSerialQueue;
 }
+@property (readonly, strong, nonatomic) NSManagedObjectContext *dataManagedObjectContext;
+@property (readonly, strong, nonatomic) NSManagedObjectModel *dataManagedObjectModel;
+@property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *dataPersistentStoreCoordinator;
+
+
 @property (weak, nonatomic) IBOutlet UIButton *resetTopViewButton;
 @property (nonatomic) BOOL random;
 @property (nonatomic) BOOL canSearch;
 @property (nonatomic) int randomIndex;
+@property (nonatomic) float alphaValue;
 @property (nonatomic,strong)UIButton*fullscreenButton;
 @property (nonatomic,strong)GSObject* selectedGsObject;
 @property (nonatomic,strong)UITextField* searchTextField;
@@ -45,6 +52,8 @@ typedef enum {
 @property (nonatomic, strong)NSMutableDictionary* boolhash;
 @property (nonatomic,strong) UIView* coverView;
 @property (nonatomic,strong) NSString* currentSearch;
+@property (nonatomic,strong) NSMutableArray *ongoingRequests;
+
 @property (nonatomic,strong) NSMutableArray *loadedGSObjectArray;
 @property (nonatomic,strong) NSMutableArray *GSObjectArray;
 @property (nonatomic,strong) NSMutableArray *scopedGSObjectArray;
@@ -56,4 +65,5 @@ typedef enum {
 -(void)hintLeft;
 -(void)hintRight;
 -(void)getDirectionsToSelectedGSObj;
+
 @end

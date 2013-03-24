@@ -38,30 +38,6 @@
             </objects>
             <point key="canvasLocation" x="-952" y="-908"/>
         </scene>
-        <!--Shop Detail View Controller-->
-        <scene sceneID="V5l-V3-yC8">
-            <objects>
-                <viewController storyboardIdentifier="ShopDetail" id="N0H-V7-Szz" customClass="ShopDetailViewController" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="nEg-XN-eXD">
-                        <rect key="frame" x="0.0" y="20" width="320" height="460"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <subviews>
-                            <webView contentMode="scaleToFill" restorationIdentifier="ShopDetail" id="R7i-29-Crj">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="460"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                            </webView>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                    </view>
-                    <connections>
-                        <outlet property="descriptionWebView" destination="R7i-29-Crj" id="PFs-J2-isP"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="1I9-w4-WJw" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1497" y="-2276"/>
-        </scene>
         <!--Search View Controller-->
         <scene sceneID="4IA-br-Ptl">
             <objects>
@@ -168,7 +144,7 @@
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="h6N-xp-GfL">
                                         <rect key="frame" x="256" y="0.0" width="44" height="44"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <color key="backgroundColor" red="1" green="0.058288523709999998" blue="0.01111188175" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                         <state key="normal">
                                             <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
@@ -181,6 +157,10 @@
                                             <action selector="cancelSearch:" destination="BAm-ya-St5" eventType="touchUpInside" id="O7l-VQ-mo0"/>
                                         </connections>
                                     </button>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="cross.png" id="ph1-ts-FTE">
+                                        <rect key="frame" x="256" y="0.0" width="44" height="44"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    </imageView>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                             </view>
@@ -414,6 +394,146 @@
             </objects>
             <point key="canvasLocation" x="1014" y="-2957"/>
         </scene>
+        <!--Shop Detail View Controller-->
+        <scene sceneID="Xzc-6R-oTf">
+            <objects>
+                <viewController storyboardIdentifier="ShopDetail" id="yG0-qy-GRx" customClass="ShopDetailViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="CMQ-cf-eZ9">
+                        <rect key="frame" x="0.0" y="20" width="320" height="460"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <webView contentMode="scaleToFill" id="cHY-bg-q9P">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="460"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                            </webView>
+                            <view contentMode="scaleToFill" id="KxT-FP-i1T">
+                                <rect key="frame" x="0.0" y="385" width="320" height="75"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <connections>
+                        <outlet property="descriptionWebView" destination="cHY-bg-q9P" id="fDx-lm-rxX"/>
+                        <outlet property="editView" destination="KxT-FP-i1T" id="1tX-wu-UdI"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Xht-9g-J8k" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1019" y="-2346"/>
+        </scene>
+        <!--Loading View Controller-->
+        <scene sceneID="avf-ld-Ek5">
+            <objects>
+                <viewController storyboardIdentifier="LoadingView" id="B1v-XN-wzY" customClass="LoadingViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Juc-Cf-ym5">
+                        <rect key="frame" x="0.0" y="20" width="320" height="460"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" image="bakuteh.jpg" id="B00-gj-8b3">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="460"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView userInteractionEnabled="NO" alpha="0.80000000000000004" contentMode="scaleAspectFill" image="shadow.png" id="WEm-CS-7Tz">
+                                <rect key="frame" x="-20" y="218" width="351" height="198"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <scrollView autoresizesSubviews="NO" multipleTouchEnabled="YES" contentMode="scaleToFill" id="MvA-Gu-o7l">
+                                <rect key="frame" x="10" y="-950" width="300" height="310"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" id="Ja8-K4-ajX">
+                                        <rect key="frame" x="0.0" y="316" width="300" height="300"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    </view>
+                                    <view contentMode="scaleToFill" id="VWa-uf-NeZ">
+                                        <rect key="frame" x="0.0" y="626" width="300" height="300"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    </view>
+                                    <view contentMode="scaleToFill" id="Ut7-X7-Hm3">
+                                        <rect key="frame" x="0.0" y="6" width="300" height="300"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <subviews>
+                                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="howtonavigatecopy.png" id="sDE-du-rvE">
+                                                <rect key="frame" x="0.0" y="0.0" width="300" height="300"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            </imageView>
+                                        </subviews>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    </view>
+                                </subviews>
+                            </scrollView>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="naN-4w-koN">
+                                <rect key="frame" x="0.0" y="416" width="320" height="44"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <items>
+                                    <barButtonItem systemItem="organize" id="hQq-VH-1aZ">
+                                        <connections>
+                                            <action selector="instructionButton:" destination="B1v-XN-wzY" id="8we-2i-LK0"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem width="179" style="plain" systemItem="fixedSpace" id="YPW-nB-bzb"/>
+                                    <barButtonItem title="Continue" id="GEI-rQ-554">
+                                        <connections>
+                                            <action selector="continueButton:" destination="B1v-XN-wzY" id="jnz-aG-T79"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Tastebuds" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="u6Z-0x-o67">
+                                <rect key="frame" x="0.0" y="343" width="320" height="48"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" name="Helvetica" family="Helvetica" pointSize="26"/>
+                                <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                                <color key="shadowColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                <size key="shadowOffset" width="3" height="3"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <connections>
+                        <outlet property="imageView" destination="B00-gj-8b3" id="1mj-d5-F25"/>
+                        <outlet property="instructionScrollView" destination="MvA-Gu-o7l" id="QIq-YF-bdS"/>
+                        <outlet property="tbLabel" destination="u6Z-0x-o67" id="eew-lw-xZQ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="S6g-Ci-l3Y" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="500" y="-1589"/>
+        </scene>
+        <!--Edit Tags View Controller-->
+        <scene sceneID="bgi-p3-Lql">
+            <objects>
+                <viewController storyboardIdentifier="EditTags" id="BwW-1d-x5a" customClass="EditTagsViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Ehl-P1-ue6">
+                        <rect key="frame" x="0.0" y="20" width="320" height="460"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="Oo0-wZ-0bV">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="460"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="BwW-1d-x5a" id="JxW-3a-GMH"/>
+                                    <outlet property="delegate" destination="BwW-1d-x5a" id="eZX-14-Kuj"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <connections>
+                        <outlet property="tagTableView" destination="Oo0-wZ-0bV" id="r20-Zc-cdN"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dmD-al-slA" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="861" y="-1776"/>
+        </scene>
         <!--Map Search View Controller-->
         <scene sceneID="UDG-aW-3iH">
             <objects>
@@ -452,8 +572,12 @@
     </scenes>
     <resources>
         <image name="MAP2.png" width="109" height="88"/>
+        <image name="bakuteh.jpg" width="1067" height="1600"/>
+        <image name="cross.png" width="44" height="44"/>
+        <image name="howtonavigatecopy.png" width="600" height="600"/>
         <image name="locationBlue.png" width="24" height="24"/>
         <image name="search.png" width="101" height="101"/>
+        <image name="shadow.png" width="717" height="374"/>
         <image name="slide@2x.png" width="90" height="130"/>
         <image name="splash1.png" width="640" height="960"/>
     </resources>
@@ -464,6 +588,12 @@
         <class className="ECSlidingViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ECSlidingViewController.h"/>
         </class>
+        <class className="EditTagsViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/EditTagsViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="tagTableView" candidateClass="UITableView"/>
+            </relationships>
+        </class>
         <class className="GeoScrollViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/GeoScrollViewController.h"/>
             <relationships>
@@ -473,6 +603,16 @@
         </class>
         <class className="InitialSlidingViewController" superclassName="ECSlidingViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/InitialSlidingViewController.h"/>
+        </class>
+        <class className="LoadingViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/LoadingViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="continueButton:"/>
+                <relationship kind="action" name="instructionButton:"/>
+                <relationship kind="outlet" name="imageView" candidateClass="UIImageView"/>
+                <relationship kind="outlet" name="instructionScrollView" candidateClass="UIScrollView"/>
+                <relationship kind="outlet" name="tbLabel" candidateClass="UILabel"/>
+            </relationships>
         </class>
         <class className="MapNavViewController" superclassName="UINavigationController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/MapNavViewController.h"/>
@@ -510,6 +650,10 @@
         </class>
         <class className="ShopDetailViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ShopDetailViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="descriptionWebView" candidateClass="UIWebView"/>
+                <relationship kind="outlet" name="editView" candidateClass="UIView"/>
+            </relationships>
         </class>
         <class className="UnderMapViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/UnderMapViewController.h"/>

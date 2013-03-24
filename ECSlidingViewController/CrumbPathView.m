@@ -16,6 +16,7 @@
           zoomScale:(MKZoomScale)zoomScale
           inContext:(CGContextRef)context
 {
+
     CrumbPath *crumbs = (CrumbPath *)(self.overlay);
     CGFloat lineWidth = MKRoadWidthAtZoomScale(zoomScale);
     [crumbs lockForReading];
@@ -26,13 +27,14 @@
         point = crumbs.points[i];
         CGPoint lastCGPoint = [self pointForMapPoint:point];
         
-        if (MKMapRectContainsPoint(mapRect, point)) {
+        if (MKMapRectContainsPoint(mapRect, point))
+        {
+            CGContextSetFillColorWithColor(context, ((CrumbObj*)[crumbs.pointsArray objectAtIndex:i]).pointColor.CGColor); // Or any other color.
+            CGContextFillEllipseInRect(context, (CGRectMake (lastCGPoint.x-lineWidth/4, lastCGPoint.y-lineWidth/4, lineWidth/2, lineWidth/2 )));
             
-                CGContextAddEllipseInRect(context,(CGRectMake (lastCGPoint.x-lineWidth/4, lastCGPoint.y-lineWidth/4, lineWidth/2, lineWidth/2 )));
-                
-            
-            CGContextSetStrokeColorWithColor(context, ((CrumbObj*)[crumbs.pointsArray objectAtIndex:i]).pointColor.CGColor);
-            CGContextSetLineWidth(context, lineWidth/4);
+            CGContextAddEllipseInRect(context,(CGRectMake (lastCGPoint.x-lineWidth/4, lastCGPoint.y-lineWidth/4, lineWidth/2, lineWidth/2 )));
+            CGContextSetStrokeColorWithColor(context, [UIColor blackColor].CGColor);
+            CGContextSetLineWidth(context, 2);
             CGContextStrokePath(context);
         }
     }

@@ -262,7 +262,7 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
         
         CGPoint translation = [recognizer translationInView:self.view];
         if (translation.x >0 && !self.underRightShowing) {
-            NSLog(@"showing menu");
+           // NSLog(@"showing menu");
             [[NSNotificationCenter defaultCenter]postNotificationName:@"SHOWMENU" object:nil];
         }else {
             if(fabs(translation.x) > fabs(translation.y))

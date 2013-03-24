@@ -1,10 +1,10 @@
 #import "MenuViewController.h"
 #import "MapNavViewController.h"
 #import "MenuCell.h"
-
+#import "LoadingViewController.h"
 #import "MapSlidingViewController.h"
 #import "GeoScrollViewController.h"
-#define BLUE_COLOR [UIColor colorWithRed:83.0f/255.0f green:213.0f/255.0f blue:253.0f/255.0f alpha:1.0f]
+#define BLUE_COLOR [UIColor colorWithRed:100.0f/255.0f green:185.0f/255.0f blue:250.0f/255.0f alpha:1.0f]
 #define yellow [UIColor colorWithRed:254.0f/255.0f green:252.0f/255.0f blue:53.0f/255.0f alpha:1.0f]
 
 @interface MenuViewController()
@@ -22,6 +22,7 @@
   
 - (void)viewDidLoad
 {
+    
   [super viewDidLoad];
     //@"DANIEL'S FOOD DIARY",@"KEROPOKMAN",
     self.isBlogsRevealed = YES;
@@ -113,7 +114,7 @@
         if([[[NSUserDefaults standardUserDefaults] objectForKey:[self.menuItems objectAtIndex:indexPath.row]] isEqualToString:@"Enabled"])
         {
             cell.colorBar.hidden = NO;
-            cell.bgView.backgroundColor = BLUE_COLOR;
+            cell.bgView.backgroundColor = yellow;
             cell.titleLabel.textColor = [UIColor blackColor];
         }else{
             cell.colorBar.hidden = YES;
@@ -130,8 +131,8 @@
 
         }
         if ([cell.titleLabel.text isEqualToString:@"CONTACT US"]) {
-//            cell.vView.hidden = NO;
-//            cell.vView.image = [UIImage imageNamed:@"plus.png"];
+            cell.vView.hidden = NO;
+            cell.vView.image = [UIImage imageNamed:@"plus.png"];
 
         }
         cell.titleLabel.font = [UIFont fontWithName:@"Helvetica-Light" size:18.0f];
@@ -150,7 +151,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-
+    
     if (indexPath.row == 0) {
 
         if (!self.isBlogsRevealed) {
@@ -195,7 +196,18 @@
 
             self.isBlogsRevealed = NO;
             }
-    }else{
+    }else if([[self.menuItems objectAtIndex:indexPath.row]isEqualToString:@"TUTORIAL"]){
+        dispatch_async(dispatch_get_main_queue(), ^
+       {
+           LoadingViewController* loadingViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"LoadingView"];
+           [self.navigationController.topViewController presentViewController:loadingViewController animated:YES completion:^{
+               
+           }];
+       });
+    }
+    else
+    {
+        
         if([[[NSUserDefaults standardUserDefaults] objectForKey:[self.menuItems objectAtIndex:indexPath.row]] isEqualToString:@"Enabled"])
         {
             ((GeoScrollViewController*)((MapSlidingViewController*)((MapNavViewController*)[MapNavViewController sharedInstance]).topViewController).topViewController).selectionChanged = YES;
@@ -207,10 +219,10 @@
             [[NSUserDefaults standardUserDefaults] setObject:@"Enabled" forKey:[self.menuItems objectAtIndex:indexPath.row]];
         }
         [[NSUserDefaults standardUserDefaults]synchronize];
-            [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
     }
 
-
+    
  
 }
 -(BOOL)shouldAutorotate{

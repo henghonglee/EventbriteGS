@@ -28,7 +28,7 @@
     NSNumber *longitude;
     UIColor* cursorColor;
     NSArray* imageArray;
-    NSArray* foodTypeArray;
+    NSMutableArray* foodTypeArray;
     NSString* link;
     NSNumber* itemId;    
 }
@@ -41,7 +41,7 @@
 @property (nonatomic, strong)  NSArray* imageArray;
 @property (nonatomic, strong)  NSArray* lowResImageArray;
 @property (nonatomic, strong)  NSArray* midResImageArray;
-@property (nonatomic, strong)  NSArray* foodTypeArray;
+@property (nonatomic, strong)  NSMutableArray* foodTypeArray;
 @property (nonatomic, strong)  NSNumber* distanceInMeters;
 @property (nonatomic, strong)  NSNumber *likes;
 @property (nonatomic, strong)  NSNumber *shopScore;
