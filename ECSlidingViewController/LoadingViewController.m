@@ -26,7 +26,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.imageNameArray = [NSArray arrayWithObjects:@"rope.jpg",@"bakuteh.jpg",@"chillycrab.jpg", nil];
+    self.imageNameArray = [NSArray arrayWithObjects:@"bakuteh.jpg",@"chillycrab.jpg", nil];
     [self.tbLabel setText:@"Tastebuds"];
     [self.tbLabel setFont:[UIFont fontWithName:@"Miss Claude" size:75.0f]];
     [self.instructionScrollView setClipsToBounds:NO];
