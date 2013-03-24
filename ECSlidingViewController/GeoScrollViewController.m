@@ -82,13 +82,13 @@
     GSserialQueue = dispatch_queue_create("com.example.GSSerialQueue", NULL);
     GSdataSerialQueue = dispatch_queue_create("com.example.GSDataSerialQueue", NULL);
     
-    dispatch_async(dispatch_get_main_queue(), ^
-   {
-       LoadingViewController* loadingViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"LoadingView"];
-       [self.navigationController.topViewController presentViewController:loadingViewController animated:YES completion:^{
-           
-       }];
-   });
+//    dispatch_async(dispatch_get_main_queue(), ^
+//   {
+//       LoadingViewController* loadingViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"LoadingView"];
+//       [self.navigationController.topViewController presentViewController:loadingViewController animated:YES completion:^{
+//           
+//       }];
+//   });
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         [self LoadData];
     });
@@ -134,9 +134,9 @@
             if (![[self.boolhash objectForKey:blog] isEqualToString:@"Enabled"])
             {
                        
-//                        dispatch_async(GSdataSerialQueue, ^{
-//                            [self retrieveAndProcessDataFromCacheOrServerForBlog:blog];
-//                        });
+                        dispatch_async(GSdataSerialQueue, ^{
+                            [self retrieveAndProcessDataFromCacheOrServerForBlog:blog];
+                        });
                         [involvedBlogs addObject:blog];
                         [self.boolhash setObject:@"Enabled" forKey:blog];
                 
@@ -173,29 +173,16 @@
     });
     NSLog(@"ADDING to serial queue");
     dispatch_async(GSserialQueue, ^{
+        
         [self prepareDataForDisplay];
-        if (userLocation) {
-            CLLocation* defensiveUserLocation = [userLocation.location copy];
-            for (GSObject* gsObj in self.loadedGSObjectArray)
-            {
-                CLLocation *gsLoc = [[CLLocation alloc] initWithLatitude:gsObj.latitude.doubleValue longitude:gsObj.longitude.doubleValue];
-                CLLocationDistance meters = [gsLoc distanceFromLocation:defensiveUserLocation];
-                [gsObj setDistanceInMeters:[NSNumber numberWithDouble:meters]];
-            }
-        }
         self.canSearch = YES;
         dispatch_async(dispatch_get_main_queue(), ^
        {
            NSLog(@"dismissing progress hud");
            [SVProgressHUD dismiss];
-
-
        });
 
     });
-    
-   
-    
 }
 
 -(void)retrieveAndProcessDataFromCacheOrServerForBlog:(NSString*)blog //withCompletion:(void)(^))
@@ -374,12 +361,21 @@
 
 -(void)prepareDataForDisplay
 {
-    @synchronized(self.loadedGSObjectArray) {
         NSLog(@"running prepareDataForDisplay");
-        self.loadedGSObjectArray = [self sortLoadedArray:self.loadedGSObjectArray ByVariable:@"distanceInMeters" ascending:NO];
-//        MKCoordinateRegion region = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView.region;
-//        [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:currentSearch IntoArray:self.GSObjectArray WithRefresh:YES];
-    }
+        if (userLocation) {
+            CLLocation* defensiveUserLocation = [userLocation.location copy];
+            for (GSObject* gsObj in self.loadedGSObjectArray)
+            {
+                CLLocation *gsLoc = [[CLLocation alloc] initWithLatitude:gsObj.latitude.doubleValue longitude:gsObj.longitude.doubleValue];
+                CLLocationDistance meters = [gsLoc distanceFromLocation:defensiveUserLocation];
+                [gsObj setDistanceInMeters:[NSNumber numberWithDouble:meters]];
+            }
+        }
+        self.loadedGSObjectArray = [self sortLoadedArray:self.loadedGSObjectArray ByVariable:@"distanceInMeters" ascending:YES];
+        MKCoordinateRegion region = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView.region;
+        [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:region AndSearch:currentSearch IntoArray:self.GSObjectArray WithRefresh:YES];
+   
+    
 
    dispatch_async(dispatch_get_main_queue(), ^{
             [self.tableView reloadData];
@@ -803,7 +799,7 @@
     }
     
     NSSortDescriptor * frequencyDescriptor =
-    [[NSSortDescriptor alloc] initWithKey:@"foursquareVenue"
+    [[NSSortDescriptor alloc] initWithKey:@"distanceInMeters"
                                 ascending:ascending] ;
     NSArray * descriptors = [NSArray arrayWithObjects:frequencyDescriptor, nil];
     NSArray * sortedArray = [loadedArray sortedArrayUsingDescriptors:descriptors];
@@ -818,7 +814,7 @@
 //sorts both loaded and display arrays by gsobject variable
 -(NSMutableArray*) sortLoadedArray:(NSMutableArray*)loadedArray ByVariable:(NSString*)variable  ascending:(BOOL)ascending
 {
-    NSLog(@"sorting");
+    NSLog(@"sorting by %@",variable);
     if ([variable isEqualToString:@"distanceInMeters"]) {
         currentScopeType = kScopeTypeDistance;
     }else if([variable isEqualToString:@"likes"]){
@@ -828,7 +824,7 @@
     }
     
     NSSortDescriptor * frequencyDescriptor =
-    [[NSSortDescriptor alloc] initWithKey:@"foursquareVenue"
+    [[NSSortDescriptor alloc] initWithKey:@"distanceInMeters"
                                 ascending:ascending] ;
     NSArray * descriptors = [NSArray arrayWithObjects:frequencyDescriptor, nil];
     NSArray * sortedArray = [loadedArray sortedArrayUsingDescriptors:descriptors];
@@ -924,24 +920,22 @@
             
             }
         }
-    if(refresh){
-        if (!MKMapRectIsNull(updateRect))
+        if (refresh)
         {
             NSLog(@"drawing map rect");
-            MKZoomScale currentZoomScale = (CGFloat)(map.bounds.size.width / map.visibleMapRect.size.width);
-            CGFloat lineWidth = MKRoadWidthAtZoomScale(currentZoomScale);
-            updateRect = MKMapRectInset(updateRect, -lineWidth, -lineWidth);
             dispatch_async(dispatch_get_main_queue(), ^
-                           {
-                               [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbView setNeedsDisplayInMapRect:updateRect];
-                               MKMapView* underMapView = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
-                               [underMapView setVisibleMapRect:MKMapRectInset([underMapView visibleMapRect], [underMapView visibleMapRect].size.width*0.005, [underMapView visibleMapRect].size.height*0.005) animated:YES];
-                               
-                               
-                           });
+           {
+               [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbView setNeedsDisplayInMapRect:MKMapRectWorld];
+              MKMapView* underMapView = ((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView;
+               [underMapView setVisibleMapRect:MKMapRectInset([underMapView visibleMapRect], [underMapView visibleMapRect].size.width*0.005, [underMapView visibleMapRect].size.height*0.005) animated:YES];
+               NSLog(@"resizing..");
+               
+           });
             
+        
+        }else{
+            NSLog(@"not refresh");
         }
-    }
 //    self.canSearch = YES;
 }
 
@@ -1038,16 +1032,7 @@
     userLocation = location;
     
     dispatch_async(GSserialQueue, ^{
-//        if (userLocation && self.loadedGSObjectArray.count>0) {
-//            for (GSObject* gsObj in self.loadedGSObjectArray)
-//            {
-//                CLLocation *gsLoc = [[CLLocation alloc] initWithLatitude:gsObj.latitude.doubleValue longitude:gsObj.longitude.doubleValue];
-//                CLLocationDistance meters = [gsLoc distanceFromLocation:userLocation.location];
-//                [gsObj setDistanceInMeters:[NSNumber numberWithDouble:meters]];
-//            }
-//        }
-
-        [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:MKCoordinateRegionMake(CLLocationCoordinate2DMake(location.coordinate.latitude, location.coordinate.longitude), MKCoordinateSpanMake(0.01, 0.01)) AndSearch:@"" IntoArray:self.GSObjectArray WithRefresh:YES];
+        [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:MKCoordinateRegionMake(CLLocationCoordinate2DMake(location.coordinate.latitude, location.coordinate.longitude), MKCoordinateSpanMake(0.01, 0.01)) AndSearch:@"" IntoArray:self.GSObjectArray WithRefresh:NO];
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.tableView reloadData];
         });
