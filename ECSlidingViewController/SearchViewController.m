@@ -41,6 +41,9 @@
     
     if (!serialQueue)
         serialQueue = dispatch_queue_create("com.example.MyQueue", NULL);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [SVProgressHUD showWithStatus:@"Loading"];
+    });
 
 }
 -(void)viewWillAppear:(BOOL)animated
@@ -77,7 +80,7 @@
         [self.resultList sortUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.rsTableView reloadData];
-
+            [SVProgressHUD dismiss];
         });
         
     });
@@ -107,7 +110,7 @@
     double delayInSeconds = 0.2;
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-        [sender setBackgroundColor:[UIColor redColor]];
+        [sender setBackgroundColor:[UIColor whiteColor]];
     });
     
     self.finalSearchString = @"";
@@ -464,7 +467,7 @@
 -(IBAction)setBgColorForButton:(UIButton*)sender
 {
     NSLog(@"changing background color");
-    [sender setBackgroundColor:[UIColor blackColor]];
+    [sender setBackgroundColor:[UIColor lightGrayColor]];
 }
 
 @end

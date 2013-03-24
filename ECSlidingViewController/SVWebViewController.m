@@ -5,6 +5,7 @@
 //  Copyright 2010 Sam Vermette. All rights reserved.
 //
 //  https://github.com/samvermette/SVWebViewController
+#import "ShopDetailViewController.h"
 #import "Flurry.h"
 #import "MapSearchViewController.h"
 #import "ShopDetailViewController.h"
@@ -14,6 +15,7 @@
 #import "MapNavViewController.h"
 #import "MobclixAds.h"
 #import "MapSlidingViewController.h"
+#import "AppDelegate.h"
 @interface SVWebViewController () <UIWebViewDelegate, UIActionSheetDelegate, MFMailComposeViewControllerDelegate>
 
 @property (nonatomic, strong, readonly) UIBarButtonItem *backBarButtonItem;
@@ -52,7 +54,7 @@ typedef enum {
 @synthesize backBarButtonItem, forwardBarButtonItem, refreshBarButtonItem, stopBarButtonItem, actionBarButtonItem, pageActionSheet;
 @synthesize adView;
 #pragma mark - setters and getters
-
+static dispatch_once_t onceToken;
 - (UIBarButtonItem *)backBarButtonItem {
     
     if (!backBarButtonItem) {
@@ -199,7 +201,7 @@ typedef enum {
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
-    
+    onceToken = 0;
     self.isLoading = YES;
     UIImage *actionButton = [[UIImage imageNamed:@"action.png"]  resizableImageWithCapInsets:UIEdgeInsetsMake(0, 12, 0, 12)];
     UIButton* barbuttonitem = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -210,8 +212,9 @@ typedef enum {
     UIBarButtonItem* barbutton = [[UIBarButtonItem alloc]initWithCustomView:barbuttonitem];
     self.navigationItem.rightBarButtonItem = barbutton;
     
-    self.adView = [[MobclixAdViewiPhone_320x50 alloc] initWithFrame:CGRectMake(0,self.view.bounds.size.height-114, self.view.bounds.size.width, 50.0f)];
+    self.adView = [[MobclixAdViewiPhone_320x50 alloc] initWithFrame:CGRectMake(0,self.view.bounds.size.height-114+60.0f, self.view.bounds.size.width, 50.0f)];
     self.adView.hidden = YES;
+    [self.adView setDelegate:self];
     [self.adView setClipsToBounds:NO];
     UIButton* closeAdButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [closeAdButton setFrame:CGRectMake(270, -10 , 50, 50)];
@@ -220,16 +223,84 @@ typedef enum {
     [self.adView addSubview:closeAdButton];
 	[self.view addSubview:self.adView];
 }
+-(void)adViewDidFinishLoad:(MobclixAdView *)adView
+{
+    CGRect slideViewFinalFrame = CGRectMake(0,self.view.bounds.size.height-50, self.view.bounds.size.width, 50.0f);
+    [UIView animateWithDuration:0.2
+                          delay:0.1
+                        options: UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         self.adView.frame = slideViewFinalFrame;
+                     } 
+                     completion:^(BOOL finished){
+                         NSLog(@"Done!");
+                     }];
+    
+}
+-(void)closeMessage:(UIButton*)sender
+{
+        CGRect slideViewFinalFrame = CGRectMake(0,-44.0f, self.view.bounds.size.width, 44.0f);
+        [UIView animateWithDuration:0.2
+                              delay:0.1
+                            options: UIViewAnimationOptionCurveEaseInOut
+                         animations:^{
+                             sender.superview.frame = slideViewFinalFrame;
+                         }
+                         completion:^(BOOL finished){
+                             [sender.superview removeFromSuperview];
+                             [sender removeFromSuperview];
+                         }];
+}
+-(void)displayMessage
+{
+    UIView* displayView = [[UIView alloc]initWithFrame:CGRectMake(0,-44.0f, self.view.bounds.size.width, 44.0f)];
+    UILabel* displayLabel = [[UILabel alloc]initWithFrame:CGRectMake(15, 0, self.view.bounds.size.width-30, 44.0f)];
+    [displayLabel setFont:[UIFont systemFontOfSize:12.0f]];
+    [displayLabel setNumberOfLines:0];
+    [displayLabel setText:@"we saved this post so that you can read it offline later"];
+    [displayLabel setTextColor:[UIColor whiteColor]];
+    [displayLabel setBackgroundColor:[UIColor clearColor]];
+    [displayView setBackgroundColor:[UIColor colorWithRed:0.0f green:0.0f blue:0.0f alpha:0.5f]];
+    UIButton* closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [closeButton addTarget:self action:@selector(closeMessage:) forControlEvents:UIControlEventTouchUpInside];
+    [closeButton setFrame:CGRectMake(0, 0, self.view.bounds.size.width, 44)];
+    [displayView addSubview:displayLabel];
+    [displayView addSubview:closeButton];
+    [displayView setClipsToBounds:NO];
+    [displayView setAutoresizesSubviews:YES];
+    displayView.autoresizingMask=UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+    [self.navigationController.view addSubview:displayView];
+    CGRect slideViewFinalFrame = CGRectMake(0,0, self.view.bounds.size.width, 44.0f);
+    [UIView animateWithDuration:0.2
+                          delay:0.1
+                        options: UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         displayView.frame = slideViewFinalFrame;
+                     }
+                     completion:^(BOOL finished){
+                         NSLog(@"Done!");
+                     }];
+}
 -(void)closeAd
 {
-    [self.adView pauseAdAutoRefresh];
-    [self.adView cancelAd];
-    [self.adView removeFromSuperview];
-    self.adView = nil;
+    CGRect slideViewFinalFrame = CGRectMake(0,self.view.bounds.size.height+80, self.view.bounds.size.width, 50.0f);
+    [UIView animateWithDuration:0.2
+                          delay:0.1
+                        options: UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         self.adView.frame = slideViewFinalFrame;
+                     }
+                     completion:^(BOOL finished){
+                         [self.adView pauseAdAutoRefresh];
+                         [self.adView cancelAd];
+                         [self.adView removeFromSuperview];
+                         self.adView = nil;
+                     }];
+
 }
 -(void) showActionSheet
 {
-    UIActionSheet* actionSheet = [[UIActionSheet alloc]initWithTitle:@"Actions" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Remove Faces" otherButtonTitles:@"Suggest Changes",@"Directions",@"Email To Friend",@"SMS To Friend", nil];
+    UIActionSheet* actionSheet = [[UIActionSheet alloc]initWithTitle:@"Actions" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Flag as incorrect" otherButtonTitles:@"Read Offline",@"Directions",@"Email To Friend",@"SMS To Friend", nil];
     [actionSheet setActionSheetStyle:UIActionSheetStyleAutomatic];
     [actionSheet showInView:self.view];
 
@@ -283,8 +354,6 @@ typedef enum {
 -(void)getDirections
 {
     NSString* saddr = @"Current+Locaton";
-    
-    
     if([[UIApplication sharedApplication] canOpenURL:
         [NSURL URLWithString:@"comgooglemaps://"]]){
         saddr = [NSString stringWithFormat:@"%f,%f", self.currentLocation.coordinate.latitude,self.currentLocation.coordinate.longitude];
@@ -343,8 +412,9 @@ typedef enum {
         }];
         
     }
-    if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:@"Remove Faces"]) {
-        [self clearFaces];
+    if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:@"Read Offline"]) {
+        //[self clearFaces];
+        [self showShopDetailView];
     }
     if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:@"Email To Friend"]) {
         [Flurry logEvent:@"EmailtoFriend" timed:NO];                                    
@@ -472,6 +542,7 @@ typedef enum {
     [self.adView pauseAdAutoRefresh];
     dispatch_async(dispatch_get_main_queue(), ^{
         [SVProgressHUD dismiss];
+        
     });
 }
 -(void)viewDidAppear:(BOOL)animated
@@ -511,9 +582,10 @@ typedef enum {
 
 - (void)webViewDidStartLoad:(UIWebView *)webView {
 	[[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-  //  NSLog(@"is loading");
+    webViewLoads_++;
     self.isLoading = YES;
 //    [self updateToolbarItems];
+    
 }
 
 
@@ -523,10 +595,19 @@ typedef enum {
     self.navigationItem.title = [webView stringByEvaluatingJavaScriptFromString:@"document.title"];
     
     if (webView == mainWebView) {
-    //    NSLog(@"done loading");
-        self.isLoading = NO;
+        webViewLoads_--;
         dispatch_async(dispatch_get_main_queue(), ^{
             [SVProgressHUD dismiss];
+        });
+        if (webViewLoads_ > 0) {
+            return;
+        }
+        self.isLoading = NO;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            dispatch_once(&onceToken, ^{
+               // [self displayMessage];
+            });
+            
         });
     }
 //    [self updateToolbarItems];
@@ -535,7 +616,7 @@ typedef enum {
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
 	[[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     NSLog(@"stopped loading");    
-
+    webViewLoads_--;
 //    [self updateToolbarItems];
 }
 
@@ -633,6 +714,16 @@ typedef enum {
 #else
     [self dismissViewControllerAnimated:YES completion:NULL];
 #endif
+}
+
+
+-(void)showShopDetailView
+{
+    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"iPhone"
+                                                             bundle: nil];
+    ShopDetailViewController* shopVC = [mainStoryboard instantiateViewControllerWithIdentifier:@"ShopDetail"];
+    shopVC.gsObject = self.gsobj;
+    [self.navigationController pushViewController:shopVC animated:YES];
 }
 
 @end

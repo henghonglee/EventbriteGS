@@ -320,13 +320,13 @@ didAddAnnotationViews:(NSArray *)annotationViews
 {
     if (self.slidingViewController.underRightShowing) {
         self.locationButton.hidden = NO;
-        
-        if (_isCalloutHidden) {
-            NSLog(@"callout was hidden");
-        }else{
-            [self showCallout];
-        }
-        
+//        
+//        if (_isCalloutHidden) {
+//            NSLog(@"callout was hidden");
+//        }else{
+//            [self showCallout];
+//        }
+//        
     }
 
     if(animated){

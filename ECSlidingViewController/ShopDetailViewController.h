@@ -9,10 +9,11 @@
 #import <UIKit/UIKit.h>
 #import <SDWebImage/UIImageView+WebCache.h>
 #import "GSObject.h"
-@interface ShopDetailViewController : UIViewController
+@interface ShopDetailViewController : UIViewController <UIWebViewDelegate,UIScrollViewDelegate>
 
-@property (strong, nonatomic) UIWebView *descriptionWebView;
+@property (strong, nonatomic) IBOutlet UIWebView *descriptionWebView;
 @property (strong,nonatomic) GSObject* gsObject;
+@property (weak, nonatomic) IBOutlet UIView *editView;
 
 
 @end
