@@ -1031,13 +1031,13 @@
     NSLog(@"did recieve user location");
     userLocation = location;
     
-    dispatch_async(GSserialQueue, ^{
-        [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:MKCoordinateRegionMake(CLLocationCoordinate2DMake(location.coordinate.latitude, location.coordinate.longitude), MKCoordinateSpanMake(0.01, 0.01)) AndSearch:@"" IntoArray:self.GSObjectArray WithRefresh:NO];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.tableView reloadData];
-        });
-    });
-    
+//    dispatch_async(GSserialQueue, ^{
+//        [self recalculateScopeFromLoadedArray:self.loadedGSObjectArray WithRegion:MKCoordinateRegionMake(CLLocationCoordinate2DMake(location.coordinate.latitude, location.coordinate.longitude), MKCoordinateSpanMake(0.01, 0.01)) AndSearch:@"" IntoArray:self.GSObjectArray WithRefresh:NO];
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            [self.tableView reloadData];
+//        });
+//    });
+//    
     [Flurry setLatitude:location.coordinate.latitude
               longitude:location.coordinate.longitude horizontalAccuracy:0.001f verticalAccuracy:0.001f];
 }
