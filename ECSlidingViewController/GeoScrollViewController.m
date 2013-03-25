@@ -317,42 +317,6 @@
                     [fooditem setValue:fooddescription forKey:@"descriptionHTML"];
 
 
-                    
-                    if (![context save:&error]) {
-                        NSLog(@"Whoops, couldn't save: %@", [error localizedDescription]);
-                    }else{
-                        NSLog(@"saved");
-                    }
-                }
-                
-                
-                NSLog(@"done with blog = %@",blog);
-
-                [self.ongoingRequests removeObject:blog];
-                
-     });
-     } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON)
-     {
-         NSLog(@"failed with error = %@",error);
-         [self.ongoingRequests removeObject:blog];
-     }];
-     [operation start];
-    }
-    
-    /*            NSData *retrieveddata = [NSKeyedArchiver archivedDataWithRootObject:JSON];
-    //            if (![retrieveddata isEqualToData:data])
-    //            {
-    //                [retrieveddata writeToFile:yourArrayFileName atomically:YES];
-    //                [[self class]addSkipBackupAttributeToItemAtURL:[NSURL fileURLWithPath:dataArrayName]];
-    //                NSLog(@"wrotedata to file %@",dataArrayName);
-    //            }
-    //            else
-    //            {
-    //                NSLog(@"data is duplicate, not saved");
-    //            }
-     */
-
-=======
 
                     
                     if (![context save:&error]) {
@@ -389,7 +353,6 @@
     //            }
      */
 
->>>>>>> 786ed2d591c2fbd6dc7a1e72a212b956bbbba406
 }
 
 -(void)LoadData
