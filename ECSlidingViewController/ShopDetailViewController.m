@@ -5,6 +5,7 @@
 //  Created by HengHong on 14/11/12.
 //
 //
+#import "FoodType.h"
 #import "EditTagsViewController.h"
 #import <SDWebImage/SDWebImageManager.h>
 #import "ShopDetailViewController.h"
@@ -58,46 +59,36 @@
 //    [self.view addSubview:self.descriptionWebView];
 
 
-    [_editView setFrame:CGRectMake(0, self.view.bounds.size.height-100,self.view.bounds.size.width, 100)];
-    float headx, heady;
-    headx = 0;
-    heady = 5;
-    for (NSString* type in gsObject.foodTypeArray) {
-        CGSize s = [type sizeWithFont:[UIFont fontWithName:@"Helvetica" size:16.0f] constrainedToSize:CGSizeMake(999, 999) lineBreakMode:NSLineBreakByCharWrapping];
-        if (heady + s.width + 20 + 10 > self.view.bounds.size.width) {
-            //next line
-            heady = heady + 20;
-            headx = 0;
-        }
-        
-        UILabel* typelabel = [[UILabel alloc]initWithFrame:CGRectMake(headx, heady, s.width+20, s.height)];
-        [typelabel setBackgroundColor:[UIColor whiteColor]];
-        [typelabel setTextColor:[UIColor grayColor]];
-        [typelabel setText:type];
-        [typelabel setTextAlignment:NSTextAlignmentCenter];
-        [typelabel setFont:[UIFont fontWithName:@"Helvetica" size:16.0f]];
-        headx = headx + s.width+20 + 10;
-        [_editView addSubview:typelabel];
-    }
-    UIButton* editButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [editButton setFrame:self.editView.bounds];
-    [editButton addTarget:self action:@selector(editTags) forControlEvents:UIControlEventTouchUpInside];
-    [editButton setBackgroundColor:[UIColor clearColor]];
-    [self.editView addSubview:editButton];
+//    [_editView setFrame:CGRectMake(0, self.view.bounds.size.height-100,self.view.bounds.size.width, 100)];
+//    float headx, heady;
+//    headx = 0;
+//    heady = 5;
+//    for (FoodType* type in gsObject.foodtypes) {
+//        CGSize s = [type.type sizeWithFont:[UIFont fontWithName:@"Helvetica" size:16.0f] constrainedToSize:CGSizeMake(999, 999) lineBreakMode:NSLineBreakByCharWrapping];
+//        if (heady + s.width + 20 + 10 > self.view.bounds.size.width) {
+//            //next line
+//            heady = heady + 20;
+//            headx = 0;
+//        }
+//        
+//        UILabel* typelabel = [[UILabel alloc]initWithFrame:CGRectMake(headx, heady, s.width+20, s.height)];
+//        [typelabel setBackgroundColor:[UIColor whiteColor]];
+//        [typelabel setTextColor:[UIColor grayColor]];
+//        [typelabel setText:type.type];
+//        [typelabel setTextAlignment:NSTextAlignmentCenter];
+//        [typelabel setFont:[UIFont fontWithName:@"Helvetica" size:16.0f]];
+//        headx = headx + s.width+20 + 10;
+//        [_editView addSubview:typelabel];
+//    }
+//    UIButton* editButton = [UIButton buttonWithType:UIButtonTypeCustom];
+//    [editButton setFrame:self.editView.bounds];
+//    [editButton addTarget:self action:@selector(editTags) forControlEvents:UIControlEventTouchUpInside];
+//    [editButton setBackgroundColor:[UIColor clearColor]];
+//    [self.editView addSubview:editButton];
     
     [_descriptionWebView setDelegate:self];
-    NSManagedObjectContext *context = ((AppDelegate*)[UIApplication sharedApplication].delegate).managedObjectContext;
+
     
-    FoodItem *fooditem = nil;
-    NSFetchRequest *request = [[NSFetchRequest alloc] init];
-    request.entity = [NSEntityDescription entityForName:@"FoodItem" inManagedObjectContext:context];
-    request.predicate = [NSPredicate predicateWithFormat:@"item_id = %d", [gsObject.itemId intValue]];
-    
-    NSError *executeFetchError = nil;
-    fooditem = [[context executeFetchRequest:request error:&executeFetchError] lastObject];
-    if (executeFetchError) {
-        NSLog(@"fetch Error");
-    }
     
     
     NSString *cssString = @"<style type='text/css'>img {width:300px; height: auto;} body {font-family:helvetica;}</style>";
@@ -118,7 +109,7 @@
     
     NSMutableString *htmlString = [NSMutableString string];
 
-    [htmlString appendFormat:@"<h3>%@</h3>%@%@",gsObject.title,cssString,[fooditem.descriptionHTML.descriptionHTML stringByReplacingOccurrencesOfString:@"''" withString:@"'"]];
+    [htmlString appendFormat:@"<h3>%@</h3>%@%@",gsObject.title,cssString,[gsObject.descriptionHTML.descriptionHTML stringByReplacingOccurrencesOfString:@"''" withString:@"'"]];
     [regex replaceMatchesInString:htmlString options:0 range:NSMakeRange(0, [htmlString length]) withTemplate:@"WIDTH: 300px;"];
     [regex2 replaceMatchesInString:htmlString options:0 range:NSMakeRange(0, [htmlString length]) withTemplate:@"HEIGHT: auto;"];
     [regex3 replaceMatchesInString:htmlString options:0 range:NSMakeRange(0, [htmlString length]) withTemplate:@"WIDTH: 300px;"];
@@ -142,9 +133,11 @@
 }
 - (void)didReceiveMemoryWarning
 {
+    NSLog(@"did recieve memory warning");
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
 
 - (void)viewDidUnload {
 

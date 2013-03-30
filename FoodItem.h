@@ -2,7 +2,7 @@
 //  FoodItem.h
 //  ECSlidingViewController
 //
-//  Created by HengHong on 17/3/13.
+//  Created by HengHong on 30/3/13.
 //
 //
 
@@ -14,6 +14,7 @@
 @interface FoodItem : NSManagedObject
 
 @property (nonatomic, retain) NSNumber * cell_height;
+@property (nonatomic, retain) NSDate * created_at;
 @property (nonatomic, retain) NSNumber * distance_in_meters;
 @property (nonatomic, retain) NSString * foursquare_venue;
 @property (nonatomic, retain) NSNumber * is_post;
@@ -26,10 +27,10 @@
 @property (nonatomic, retain) NSString * sub_title;
 @property (nonatomic, retain) NSString * title;
 @property (nonatomic, retain) NSDate * updated_at;
-@property (nonatomic, retain) NSDate * created_at;
 @property (nonatomic, retain) FoodDescription *descriptionHTML;
 @property (nonatomic, retain) NSSet *foodtypes;
 @property (nonatomic, retain) NSSet *images;
+@property (nonatomic, retain) NSManagedObject *place;
 @end
 
 @interface FoodItem (CoreDataGeneratedAccessors)

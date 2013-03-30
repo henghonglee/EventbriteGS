@@ -163,9 +163,9 @@ static dispatch_once_t onceToken;
         region.span.longitudeDelta = 0.01;
         [retMapView setRegion:region animated:NO];
         [((GeoScrollViewController*)self.slidingViewController.topViewController) didReceiveUserLocation:self.mapView.userLocation];
-        
+        NSLog(@"setting region");
     });
-    ((GeoScrollViewController*)self.slidingViewController.topViewController).userLocation = self.mapView.userLocation;
+    ((GeoScrollViewController*)self.slidingViewController.topViewController).userLocation = userLocation;
 }
 
 - (MKAnnotationView *)mapView:(MKMapView *)theMapView viewForAnnotation:(id <MKAnnotation>)annotation
@@ -174,7 +174,7 @@ static dispatch_once_t onceToken;
     if ([annotation isKindOfClass:[MKUserLocation class]])
         return nil;
 
-    if ([annotation isKindOfClass:[GSObject class]]){
+    if ([annotation isKindOfClass:[FoodItem class]]){
         static NSString* pinIdentifier = @"pinIdentifierString";
         MKAnnotationView* pinView =(MKAnnotationView *)
         [mapView dequeueReusableAnnotationViewWithIdentifier:pinIdentifier];
@@ -469,7 +469,7 @@ didAddAnnotationViews:(NSArray *)annotationViews
 {
 
     for (id annote in self.mapView.annotations) {
-        if ([annote isKindOfClass:[GSObject class]]) {
+        if ([annote isKindOfClass:[FoodItem class]]) {
             for (UIView* view in ((MKAnnotationView*)[mapView viewForAnnotation:annote]).subviews) {
                 if ([view isKindOfClass:[CustomCalloutView class]]) {
                     [UIView animateWithDuration:0.1
@@ -491,7 +491,7 @@ didAddAnnotationViews:(NSArray *)annotationViews
 -(void)hideCallout
 {
     for (id annote in self.mapView.annotations) {
-        if ([annote isKindOfClass:[GSObject class]]) {
+        if ([annote isKindOfClass:[FoodItem class]]) {
             for (UIView* view in ((MKAnnotationView*)[mapView viewForAnnotation:annote]).subviews) {
                 if ([view isKindOfClass:[CustomCalloutView class]]) {
                     [UIView animateWithDuration:0.1
@@ -512,7 +512,7 @@ didAddAnnotationViews:(NSArray *)annotationViews
 -(void)showCallout
 {
     for (id annote in self.mapView.annotations) {
-        if ([annote isKindOfClass:[GSObject class]]) {
+        if ([annote isKindOfClass:[FoodItem class]]) {
             for (UIView* view in ((MKAnnotationView*)[mapView viewForAnnotation:annote]).subviews) {
                 if ([view isKindOfClass:[CustomCalloutView class]]) {
                     [UIView animateWithDuration:0.1

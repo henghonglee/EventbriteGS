@@ -310,7 +310,7 @@ static dispatch_once_t onceToken;
 -(void)clearFaces
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [SVProgressHUD showWithStatus:@"Loading"];
+            [SVProgressHUD showWithStatus:@"Loading" maskType:SVProgressHUDMaskTypeGradient];
     });
    
     NSLog(@"looking for face in %@ images .. ",gsobj.title);
@@ -552,6 +552,7 @@ static dispatch_once_t onceToken;
 }
 - (void)viewDidDisappear:(BOOL)animated {
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+   
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {

@@ -5,7 +5,7 @@
 //  Created by Michael Enriquez on 1/23/12.
 //  Copyright (c) 2012 EdgeCase. All rights reserved.
 //
-
+#import "FoodItem.h"
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
 #import "ECSlidingViewController.h"
@@ -42,7 +42,7 @@ typedef enum {
 @property (nonatomic) int randomIndex;
 @property (nonatomic) float alphaValue;
 @property (nonatomic,strong)UIButton*fullscreenButton;
-@property (nonatomic,strong)GSObject* selectedGsObject;
+@property (nonatomic,strong)FoodItem* selectedGsObject;
 @property (nonatomic,strong)UITextField* searchTextField;
 @property (nonatomic, strong) CLLocation *shouldZoomToLocation;
 @property (weak, nonatomic) IBOutlet UITableView *imageTableView;

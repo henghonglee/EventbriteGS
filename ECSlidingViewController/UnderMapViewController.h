@@ -5,7 +5,7 @@
 //  Created by Michael Enriquez on 1/23/12.
 //  Copyright (c) 2012 EdgeCase. All rights reserved.
 //
-
+#import "FoodItem.h"
 #import <UIKit/UIKit.h>
 #import "ECSlidingViewController.h"
 #import <MapKit/MapKit.h>
@@ -44,7 +44,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *locationButton;
 @property (weak, nonatomic) IBOutlet UIImageView *shop1;
 @property (weak, nonatomic) IBOutlet UIImageView *shop2;
-@property (nonatomic,strong) GSObject* gsObjSelected;
+@property (nonatomic,strong) FoodItem* gsObjSelected;
 - (IBAction)selectCategory:(id)sender;
 -(void)dismissCallout;
 -(void)hideCategoryButtons;

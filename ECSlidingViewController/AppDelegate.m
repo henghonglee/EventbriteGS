@@ -5,7 +5,8 @@
 //  Created by Michael Enriquez on 1/23/12.
 //  Copyright (c) 2012 EdgeCase. All rights reserved.
 //
-
+#import "MapSlidingViewController.h"
+#import "MapNavViewController.h"
 #import "AppDelegate.h"
 #import "Mobclix.h"
 #import "Flurry.h"
@@ -113,6 +114,14 @@
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
+//    for (UIViewController* controller in ((MapNavViewController*)[MapNavViewController sharedInstance]).viewControllers) {
+//        if (![controller isKindOfClass:[MapSlidingViewController class]]) {
+//
+//        }
+//    }
+//    [((MapNavViewController*)[MapNavViewController sharedInstance]) popToRootViewControllerAnimated:NO];
+    
+    
   /*
    Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
    If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
@@ -170,6 +179,7 @@
     if (coordinator != nil) {
         _managedObjectContext = [[NSManagedObjectContext alloc] init];
         [_managedObjectContext setPersistentStoreCoordinator:coordinator];
+        [_managedObjectContext setUndoManager:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_mocDidSaveNotification:) name:NSManagedObjectContextDidSaveNotification object:nil];
         NSLog(@"got managed context with notification enabled");
     }

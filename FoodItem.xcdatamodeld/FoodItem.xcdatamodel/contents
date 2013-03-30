@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model name="" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="2057" systemVersion="12C60" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+<model name="" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="2061" systemVersion="12D78" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="FoodDescription" representedClassName="FoodDescription" syncable="YES">
         <attribute name="descriptionHTML" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="info" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="FoodItem" inverseName="descriptionHTML" inverseEntity="FoodItem" syncable="YES"/>
@@ -21,22 +21,31 @@
         <attribute name="link" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="location_string" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
-        <attribute name="source" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="source" optional="YES" attributeType="String" indexed="YES" syncable="YES"/>
         <attribute name="sub_title" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="updated_at" optional="YES" attributeType="Date" syncable="YES"/>
         <relationship name="descriptionHTML" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="FoodDescription" inverseName="info" inverseEntity="FoodDescription" syncable="YES"/>
         <relationship name="foodtypes" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="FoodType" inverseName="info" inverseEntity="FoodType" syncable="YES"/>
         <relationship name="images" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="FoodImage" inverseName="info" inverseEntity="FoodImage" syncable="YES"/>
+        <relationship name="place" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="FoodPlace" inverseName="items" inverseEntity="FoodPlace" syncable="YES"/>
+    </entity>
+    <entity name="FoodPlace" representedClassName="FoodPlace" syncable="YES">
+        <attribute name="current_rating" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="foursquare_venue" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="item_id" attributeType="Integer 64" defaultValueString="0" indexed="YES" syncable="YES"/>
+        <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FoodItem" inverseName="place" inverseEntity="FoodItem" syncable="YES"/>
     </entity>
     <entity name="FoodType" representedClassName="FoodType" syncable="YES">
         <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="info" optional="YES" minCount="1" maxCount="1" deletionRule="Cascade" destinationEntity="FoodItem" inverseName="foodtypes" inverseEntity="FoodItem" syncable="YES"/>
     </entity>
     <elements>
-        <element name="FoodDescription" positionX="-5348" positionY="837" width="128" height="73"/>
-        <element name="FoodImage" positionX="-5393" positionY="954" width="128" height="103"/>
-        <element name="FoodItem" positionX="-5598" positionY="695" width="128" height="298"/>
+        <element name="FoodDescription" positionX="-5375" positionY="855" width="128" height="73"/>
+        <element name="FoodImage" positionX="-5420" positionY="1040" width="128" height="103"/>
+        <element name="FoodItem" positionX="-5645" positionY="695" width="128" height="313"/>
         <element name="FoodType" positionX="-5391" positionY="692" width="128" height="73"/>
+        <element name="FoodPlace" positionX="-5825" positionY="839" width="128" height="118"/>
     </elements>
 </model>

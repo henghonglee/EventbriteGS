@@ -58,6 +58,8 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>miss-claude.ttf</string>
+		<string>ProximaNova-Light.ttf</string>
+		<string>Lato-Regular.ttf</string>
 	</array>
 	<key>UIMainStoryboardFile</key>
 	<string>iPhone</string>

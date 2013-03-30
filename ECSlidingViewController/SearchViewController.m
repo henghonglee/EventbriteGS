@@ -5,6 +5,7 @@
 //  Created by HengHong on 24/1/13.
 //
 //
+#import "FoodType.h"
 #import "SearchCell.h"
 #import "GeoScrollViewController.h"
 #import "SearchViewController.h"
@@ -42,7 +43,7 @@
     if (!serialQueue)
         serialQueue = dispatch_queue_create("com.example.MyQueue", NULL);
     dispatch_async(dispatch_get_main_queue(), ^{
-        [SVProgressHUD showWithStatus:@"Loading"];
+            [SVProgressHUD showWithStatus:@"Loading" maskType:SVProgressHUDMaskTypeGradient];
     });
 
 }
@@ -57,15 +58,15 @@
     
     
     dispatch_async(serialQueue, ^{
-        for (GSObject* gsobj in self.dataArray) {
+        for (FoodItem* gsobj in self.dataArray) {
             //check if data is within search area
             if([self coordinate:CLLocationCoordinate2DMake(gsobj.latitude.doubleValue, gsobj.longitude.doubleValue) ContainedinRegion:self.searchRegion])
             {
-                for (NSString* foodtype in gsobj.foodTypeArray) {
-                    if ([self.suggestedFood objectForKey:[NSString stringWithFormat:@"type=%@",foodtype]]) {
-                        [self.suggestedFood setObject:[NSNumber numberWithInt:(((NSNumber*)[self.suggestedFood objectForKey:[NSString stringWithFormat:@"type=%@",foodtype]]).intValue + 1)] forKey:[NSString stringWithFormat:@"type=%@",foodtype]];
+                for (FoodType* foodtype in gsobj.foodtypes) {
+                    if ([self.suggestedFood objectForKey:[NSString stringWithFormat:@"type=%@",foodtype.type]]) {
+                        [self.suggestedFood setObject:[NSNumber numberWithInt:(((NSNumber*)[self.suggestedFood objectForKey:[NSString stringWithFormat:@"type=%@",foodtype.type]]).intValue + 1)] forKey:[NSString stringWithFormat:@"type=%@",foodtype.type]];
                     }else{
-                        [self.suggestedFood setObject:[NSNumber numberWithInt:1] forKey:[NSString stringWithFormat:@"type=%@",foodtype ]];
+                        [self.suggestedFood setObject:[NSNumber numberWithInt:1] forKey:[NSString stringWithFormat:@"type=%@",foodtype.type ]];
                         
                     }
                     
@@ -74,8 +75,8 @@
         }
         [self.resultList addObjectsFromArray:self.suggestedFood.allKeys];
         self.initialArray = [NSArray arrayWithArray:self.suggestedFood.allKeys];
-        for (GSObject* gsobj in self.dataArray) {
-            [self.suggestedFood setObject:[NSString stringWithFormat:@"%.01f km",(gsobj.distanceInMeters.doubleValue)/1000.0f] forKey:gsobj.title];
+        for (FoodItem* gsobj in self.dataArray) {
+            [self.suggestedFood setObject:[NSString stringWithFormat:@"%.01f km",(gsobj.distance_in_meters.doubleValue)/1000.0f] forKey:gsobj.title];
         }
         [self.resultList sortUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -412,9 +413,11 @@
 }
 - (void)didReceiveMemoryWarning
 {
+    NSLog(@"did recieve memory warning");
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
 
 - (void)viewDidUnload {
     [self setSearchTF:nil];
