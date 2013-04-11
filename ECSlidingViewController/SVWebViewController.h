@@ -9,7 +9,7 @@
 #import <MessageUI/MessageUI.h>
 
 #import "SVModalWebViewController.h"
-#import "GSObject.h"
+#import <CoreLocation/CoreLocation.h>
 #import "FoodItem.h"
 #import "MobclixAds.h"
 @interface SVWebViewController : UIViewController <UIActionSheetDelegate,UIScrollViewDelegate,MFMessageComposeViewControllerDelegate,MobclixAdViewDelegate>

@@ -20,7 +20,7 @@
 #import "MapSlidingViewController.h"
 #import "MapNavViewController.h"
 #import <NewRelicAgent/NewRelicAgent.h>
-#import "SimpleKeychain.h"
+
 #define VERSION 1.0
 #define APP_NAME [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"]
 @implementation AppDelegate

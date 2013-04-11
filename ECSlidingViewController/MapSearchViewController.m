@@ -120,7 +120,7 @@
     
     NSURL *tokenurl = [NSURL URLWithString:@"http://tastebudsapp.herokuapp.com"];
     AFHTTPClient* afclient = [[AFHTTPClient alloc]initWithBaseURL:tokenurl];
-    [afclient putPath:[NSString stringWithFormat:@"/items/%d",self.gsobj.itemId.intValue] parameters:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"%f",item.placemark.location.coordinate.latitude],@"item[latitude]",[NSString stringWithFormat:@"%f",item.placemark.location.coordinate.longitude],@"item[longitude]",[NSString stringWithFormat:@"%@",addressString],@"item[location]", nil] success:^(AFHTTPRequestOperation *operation, id responseObject) {
+    [afclient putPath:[NSString stringWithFormat:@"/items/%d",self.gsobj.item_id.intValue] parameters:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"%f",item.placemark.location.coordinate.latitude],@"item[latitude]",[NSString stringWithFormat:@"%f",item.placemark.location.coordinate.longitude],@"item[longitude]",[NSString stringWithFormat:@"%@",addressString],@"item[location]", nil] success:^(AFHTTPRequestOperation *operation, id responseObject) {
         UIAlertView* alert = [[UIAlertView alloc]initWithTitle:@"Success!" message:[NSString stringWithFormat:@"%f,%f,%@",item.placemark.location.coordinate.latitude,item.placemark.location.coordinate.longitude,[NSString stringWithFormat:@"%@",addressString]] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
         

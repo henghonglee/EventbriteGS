@@ -9,7 +9,7 @@
 #import "Flurry.h"
 #import "MapSearchViewController.h"
 #import "ShopDetailViewController.h"
-#import "CorrectionViewController.h"
+//#import "CorrectionViewController.h"
 #import "SVWebViewController.h"
 #import "GeoScrollViewController.h"
 #import "MapNavViewController.h"

@@ -7,18 +7,18 @@
 #import "GeoScrollViewController.h"
 #import <CoreLocation/CoreLocation.h>
 #import "CrumbObj.h"
-#import "GSObject.h"
+
 #import "GScursor.h"
 #import "SorterCell.h"
 #import "EndTableCell.h"
 #import "RotatingTableCell.h"
 #import "MapSlidingViewController.h"
 #import "UnderMapViewController.h"
-#import "CustomCalloutView.h"
+
 #import "AFNetworking.h"
 #import "AFHTTPClient.h"
 #import "HHStarView.h"
-#import "ViewController.h"
+
 #import "CircleLayout.h"
 #import "ShopDetailViewController.h"
 #import "Flurry.h"

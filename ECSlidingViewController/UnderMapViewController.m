@@ -2,9 +2,9 @@
 #import <SDWebImage/UIImageView+WebCache.h>
 #import <UIKit/UIKit.h>
 #import "GScursor.h"
-#import "GSObject.h"
+
 #import "UnderMapViewController.h"
-#import "ViewController.h"
+
 #import "GeoScrollViewController.h"
 #import "ShopDetailViewController.h"
 #import "MapSlidingViewController.h"
@@ -20,7 +20,7 @@
 @end
 
 @implementation UnderMapViewController
-@synthesize mapView,shouldShowPinAnimation,callout;
+@synthesize mapView,shouldShowPinAnimation;
 static dispatch_once_t onceToken;
 
 - (void)viewDidLoad
@@ -339,15 +339,7 @@ didAddAnnotationViews:(NSArray *)annotationViews
 
 -(void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
 {
-    if (callout.alpha == 0.0f) {
-        _isCalloutHidden = YES;
-    }else{
-        _isCalloutHidden = NO;
-        [self hideCallout];
-    }
-//
-//    [self hideCategoryButtons];
-//    self.locationButton.hidden = YES;
+
 }
 
 #pragma mark Custom Methods
@@ -368,23 +360,7 @@ didAddAnnotationViews:(NSArray *)annotationViews
 - (IBAction)zoomToAll:(id)sender
 {
     
-//    self.crumbs.points = nil;
- //   self.crumbs = nil;
-    for (UIView* views in self.view.subviews) {
-        if ([views isKindOfClass:[CustomCalloutView class]]) {
-            [UIView animateWithDuration:0.1
-                                  delay:0.0
-                                options: UIViewAnimationOptionCurveEaseOut
-                             animations:^{
-                                 views.alpha =0;
-                             }
-                             completion:^(BOOL finished){
-                                 [views removeFromSuperview];
-                             }];
-            
-        }
-    }
-    
+
     
 }
 
@@ -398,8 +374,6 @@ didAddAnnotationViews:(NSArray *)annotationViews
 {
     ShopDetailViewController* viewController = [self.storyboard instantiateViewControllerWithIdentifier:@"ShopDetail"];
     
-    
-    viewController.gsObject = callout.gsObject;
     [self.navigationController pushViewController:viewController animated:YES];
 }
 - (IBAction)selectCategory:(UIButton*)sender
@@ -451,84 +425,7 @@ didAddAnnotationViews:(NSArray *)annotationViews
        
     }
 }
--(void)hideCategoryButtons
-{
-//    for (UIButton* btn in _categoryButtons) {
-//        CGRect slideViewFinalFrame = CGRectMake(270,405, 45, 45);
-//        [UIView animateWithDuration:0.3
-//                              delay:0.2
-//                            options: UIViewAnimationOptionCurveEaseOut
-//                         animations:^{
-//                             btn.frame = slideViewFinalFrame;
-//                         }
-//                         completion:^(BOOL finished){
-//                             _categoriesShown = NO;
-//                         }];
-//    }
-}
--(void)dismissCallout
-{
 
-    for (id annote in self.mapView.annotations) {
-        if ([annote isKindOfClass:[FoodPlace class]]) {
-            for (UIView* view in ((MKAnnotationView*)[mapView viewForAnnotation:annote]).subviews) {
-                if ([view isKindOfClass:[CustomCalloutView class]]) {
-                    [UIView animateWithDuration:0.1
-                                          delay:0.0
-                                        options: UIViewAnimationOptionCurveEaseOut
-                                     animations:^{
-                                         callout.alpha = 0;
-                                     }
-                                     completion:^(BOOL finished){
-                                         [callout removeFromSuperview];
-                                         callout = nil;
-                                     }];
-                    
-                }
-            }
-        }
-    }
-}
--(void)hideCallout
-{
-    for (id annote in self.mapView.annotations) {
-        if ([annote isKindOfClass:[FoodPlace class]]) {
-            for (UIView* view in ((MKAnnotationView*)[mapView viewForAnnotation:annote]).subviews) {
-                if ([view isKindOfClass:[CustomCalloutView class]]) {
-                    [UIView animateWithDuration:0.1
-                                          delay:0.0
-                                        options: UIViewAnimationOptionCurveEaseOut
-                                     animations:^{
-                                         callout.alpha = 0;
-                                     }
-                                     completion:^(BOOL finished){
-                                         
-                                     }];
-                    
-                }
-            }
-        }
-    }
-}
--(void)showCallout
-{
-    for (id annote in self.mapView.annotations) {
-        if ([annote isKindOfClass:[FoodPlace class]]) {
-            for (UIView* view in ((MKAnnotationView*)[mapView viewForAnnotation:annote]).subviews) {
-                if ([view isKindOfClass:[CustomCalloutView class]]) {
-                    [UIView animateWithDuration:0.1
-                                          delay:0.0
-                                        options: UIViewAnimationOptionCurveEaseOut
-                                     animations:^{
-                                         callout.alpha = 1;
-                                     }
-                                     completion:^(BOOL finished){
-                                     }];
-                }
-            }
-        }
-    }
-}
 
 -(void)resetOverlay
 {

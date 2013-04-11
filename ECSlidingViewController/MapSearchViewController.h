@@ -9,9 +9,9 @@
 #import <UIKit/UIKit.h>
 #import <MapKit/MapKit.h>
 #import "AFHTTPClient.h"
-#import "GSObject.h"
+#import "FoodItem.h"
 @interface MapSearchViewController : UIViewController
 @property (strong, nonatomic) IBOutlet UISearchBar *ibSearchBar;
 //@property (strong, nonatomic) IBOutlet MKMapView *ibMapView;
-@property (nonatomic,strong) GSObject* gsobj;
+@property (nonatomic,strong) FoodItem* gsobj;
 @end

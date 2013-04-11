@@ -6,7 +6,6 @@
 //
 //
 #import "FoodType.h"
-#import "EditTagsViewController.h"
 #import <SDWebImage/SDWebImageManager.h>
 #import "ShopDetailViewController.h"
 #import <QuartzCore/QuartzCore.h>
@@ -159,10 +158,6 @@
 
 -(void)editTags
 {
-    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"iPhone"
-                                                             bundle: nil];
-    EditTagsViewController* editTagVC = [mainStoryboard instantiateViewControllerWithIdentifier:@"EditTags"];
-    [editTagVC setSelectedGSObject:gsObject];
-    [self.navigationController  pushViewController:editTagVC animated:YES];
+
 }
 @end

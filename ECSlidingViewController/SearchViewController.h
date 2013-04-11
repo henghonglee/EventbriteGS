@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "Trie.h"
+#import <MapKit/MapKit.h>
+#import <CoreLocation/CoreLocation.h>
 @protocol SearchViewControllerDelegate;
 
 @interface SearchViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate>

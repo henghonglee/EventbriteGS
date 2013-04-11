@@ -10,7 +10,7 @@
 #import <UIKit/UIKit.h>
 #import "ECSlidingViewController.h"
 #import <MapKit/MapKit.h>
-#import "CustomCalloutView.h"
+
 #import "CrumbPath.h"
 #import "CrumbPathView.h"
 #import <SDWebImage/UIImageView+WebCache.h>
@@ -35,7 +35,7 @@
 @property (weak, nonatomic) IBOutlet UIView *locationButtonView;
 @property (weak, nonatomic) IBOutlet UILabel *shopLabel;
 @property (weak, nonatomic) IBOutlet UIButton *ShopButton;
-@property (strong, nonatomic) CustomCalloutView* callout;
+
 @property (weak, nonatomic) IBOutlet UIButton *allButton;
 @property (strong, nonatomic) IBOutlet MKMapView *mapView;
 @property (weak, nonatomic) IBOutlet UIView *detailButton;
@@ -50,5 +50,5 @@
 -(void)dismissCallout;
 -(void)hideCategoryButtons;
 - (IBAction)showGeoscroll:(id)sender;
--(void)resetCalloutForAnnotationView:(MKAnnotationView*)view andGSObject:(GSObject*)gsObj;
+
 @end

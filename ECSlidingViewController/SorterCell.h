@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "FirstTopViewController.h"
+
 
 
 @interface SorterCell : UITableViewCell
@@ -15,7 +15,7 @@
 @property (weak, nonatomic) IBOutlet UIView *navView;
 
 @property (weak, nonatomic) IBOutlet UITextField *searchTextField;
-@property (nonatomic, retain) FirstTopViewController* parentViewController;
+
 @property (weak, nonatomic) IBOutlet UIView *randomContainer;
 @property (weak, nonatomic) IBOutlet UIStepper *alphaStepper;
 

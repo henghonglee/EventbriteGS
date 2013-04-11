@@ -8,7 +8,7 @@
 #import <SDWebImage/SDWebImageManager.h>
 #import <UIKit/UIKit.h>
 #import <SDWebImage/UIImageView+WebCache.h>
-#import "GSObject.h"
+
 #import "FoodItem.h"
 @interface ShopDetailViewController : UIViewController <UIWebViewDelegate,UIScrollViewDelegate>
 
