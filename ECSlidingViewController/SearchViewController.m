@@ -58,7 +58,7 @@
     
     
     dispatch_async(serialQueue, ^{
-        for (FoodItem* gsobj in self.dataArray) {
+        for (FoodPlace* gsobj in self.dataArray) {
             //check if data is within search area
             if([self coordinate:CLLocationCoordinate2DMake(gsobj.latitude.doubleValue, gsobj.longitude.doubleValue) ContainedinRegion:self.searchRegion])
             {
@@ -75,7 +75,7 @@
         }
         [self.resultList addObjectsFromArray:self.suggestedFood.allKeys];
         self.initialArray = [NSArray arrayWithArray:self.suggestedFood.allKeys];
-        for (FoodItem* gsobj in self.dataArray) {
+        for (FoodPlace* gsobj in self.dataArray) {
             [self.suggestedFood setObject:[NSString stringWithFormat:@"%.01f km",(gsobj.distance_in_meters.doubleValue)/1000.0f] forKey:gsobj.title];
         }
         [self.resultList sortUsingSelector:@selector(localizedCaseInsensitiveCompare:)];

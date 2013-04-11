@@ -1,3 +1,5 @@
+#import "touchScrollView.h"
+#import "FoodPlaceViewController.h"
 #import "LoadingViewController.h"
 #import "ImageCell.h"
 #import "SVWebViewController.h"
@@ -24,8 +26,12 @@
 #import "FoodItem.h"
 #import "FoodImage.h"
 #import "FoodPlace.h"
+#import "FoodRating.h"
 #import "FoodType.h"
 #import "FoodDescription.h"
+
+
+#define sqlUpdateDate @"2013-04-11T08:24:30Z"
 #define kMainFont [UIFont systemFontOfSize:27.0]
 #define kSubtitleFont [UIFont systemFontOfSize:11.0f]
 #define kSourceFont [UIFont systemFontOfSize:12.0f]
@@ -59,8 +65,24 @@
 -(void)viewDidLoad
 {
     NSLog(@"view didload");
-    
-    //    self.queryArray = NSArray arrayWithObjects:@"try 'Bak Chor Mee'",@"try 'Ramen'",@"try 'East Coast Road'", nil
+//    NSManagedObjectContext* myContext = [self dataManagedObjectContext];
+//    NSFetchRequest * allCars = [[NSFetchRequest alloc] init];
+//    [allCars setEntity:[NSEntityDescription entityForName:@"FoodPlace" inManagedObjectContext:myContext]];
+//    [allCars setIncludesPropertyValues:NO]; //only fetch the managedObjectID
+//    
+//    NSError * error = nil;
+//    NSArray * cars = [myContext executeFetchRequest:allCars error:&error];
+//    
+//    //error handling goes here
+//    for (NSManagedObject * car in cars) {
+//        [car setValue:[NSNumber numberWithInt:0] forKey:@"current_rating"];
+//         [car setValue:[NSNumber numberWithInt:0] forKey:@"rate_count"];
+//        [car setValue:[NSNumber numberWithBool:NO] forKey:@"current_user_rated"];
+//    }
+//    NSError *saveError = nil;
+//    [myContext save:&saveError];
+
+
     self.alphaValue = 0.3f;
     self.ongoingRequests =[[NSMutableArray alloc] init];
     self.boolhash = [[NSMutableDictionary alloc] init];
@@ -93,7 +115,9 @@
     //       }];
     //   });
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self LoadData];
+        
+
+            [self LoadData];
     });
     
     
@@ -125,87 +149,320 @@
 
 -(void)didRefreshTable:(id)sender
 {
-    //NSArray* menuItems = [NSArray arrayWithObjects:@"LADY IRON CHEF", nil];
-    NSArray* menuItems = [NSArray arrayWithObjects:@"IEATISHOOTIPOST",@"LADY IRON CHEF",@"LOVE SG FOOD",@"SGFOODONFOOT",@"DANIEL FOOD DIARY", nil];
-    NSMutableArray* delarray = [[NSMutableArray alloc]init];
-    NSMutableArray* involvedBlogs = [[NSMutableArray alloc]init];
-    [involvedBlogs removeAllObjects];
-    for (NSString* blog in menuItems)
-    {
-        if([[[NSUserDefaults standardUserDefaults] objectForKey:blog] isEqualToString:@"Enabled"])
-        {
-            
-            if (![[self.boolhash objectForKey:blog] isEqualToString:@"Enabled"])
-            {
-                
-                dispatch_async(GSdataSerialQueue, ^{
-                    [self retrieveAndProcessDataFromCacheOrServerForBlog:blog];
-                });
-                [involvedBlogs addObject:blog];
-                [self.boolhash setObject:@"Enabled" forKey:blog];
-                
-                
-            }else{
-                //                NSLog(@"already enabled");
-            }
-        }
-        else
-        {
-            if ([[self.boolhash objectForKey:blog] isEqualToString:@"Enabled"])
-            {
-                
-                for (FoodItem* gsobj in self.loadedGSObjectArray)
-                {
-                    if ([gsobj.source isEqualToString:blog])
-                    {
-                        [delarray addObject:gsobj];
-                    }
-                }
-                
-                [self.boolhash setObject:@"Disabled" forKey:blog];
-                
-                for (FoodItem* delgs in delarray)
-                {
-                    [self.loadedGSObjectArray removeObject:delgs];
-                }
-                
-            }
-        }
-    }
+    //retrieve food places and rating
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.tableView setAlpha:0.0f];
+    });
+    
+    
+    dispatch_async(GSdataSerialQueue, ^{
+        [self retrieveAndProcessDataFromFoodPlace];
+    });
+    
+
     NSLog(@"ADDING to serial queue");
     dispatch_async(GSserialQueue, ^{
-        [self processDataWithCoreDataForSources:involvedBlogs withCompletionBlock:nil];
+        [self processDataWithCoreDataForSourcesWithCompletionBlock:nil];
     });
     NSLog(@"ADDING to serial queue");
     dispatch_async(GSserialQueue, ^{
-        
         [self prepareDataForDisplay];
-        
-        
         self.canSearch = YES;
-        dispatch_async(dispatch_get_main_queue(), ^
-       {
-           NSLog(@"dismissing progress hud");
-           [SVProgressHUD dismiss];
-       });
-        
     });
     
 }
+/*
+-(void)retrieveAndProcessDataFromFoodRatingOfLoadedUser
+{
+    
+
+
+     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://tastebudsapp.herokuapp.com/userratings?auth_token=%@",[[NSUserDefaults standardUserDefaults] objectForKey:@"auth_token"]]];
+//    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://tastebudsapp.herokuapp.com/allratings/%@.json",dateEscaped]];
+    
+    
+    if ([self.ongoingRequests containsObject:@"ratingupdate"]) {
+        NSLog(@"skipping");
+    }else{
+        [self.ongoingRequests addObject:@"ratingupdate"];
+
+        NSURLRequest *request = [NSURLRequest requestWithURL:url cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:600.0f];
+        
+        NSLog(@"url = %@",url);
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+        AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON)
+         {
+             
+             NSLog(@"recieved response json");
+             dispatch_async(GSdataSerialQueue, ^
+            {
+                NSError *error;
+                NSManagedObjectContext* context = [self dataManagedObjectContext];
+                
+                
+                NSMutableArray* jsonArray = [[NSMutableArray alloc]initWithArray:[JSON objectForKey:@"items"]];
+                
+                for (NSDictionary* item in jsonArray) {
+                    
+                    NSLog(@"got item  = %@",item);
+                    FoodRating *foodrating = nil;
+                    foodrating = [NSEntityDescription insertNewObjectForEntityForName:@"FoodRating"
+                                                                  inManagedObjectContext:context];
+                        
+                    NSDateFormatter *format = [[NSDateFormatter alloc] init];
+                    [format setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
+
+                    NSDate *updatedDate = [format dateFromString:[item objectForKey:@"updated_at"]];
+                    NSDate* lastUpdated = [foodrating valueForKey:@"updated_at"];                    
+                    if (([updatedDate compare:lastUpdated] == NSOrderedAscending)||[updatedDate isEqualToDate:lastUpdated])  {
+                        NSLog(@"skipping save");
+                        continue;
+                    }
+                    foodrating.item_id = [NSNumber numberWithInt:[[item objectForKey:@"id"] intValue]];
+                    foodrating.place_id = [NSNumber numberWithInt:[[item objectForKey:@"place_id"] intValue]];
+                    [foodrating setValue:updatedDate forKey:@"updated_at"];
+                    
+
+                    NSError *executeFetchError = nil;
+                    FoodPlace *foodplace = nil;
+                    NSFetchRequest *placeRequest = [[NSFetchRequest alloc] init];
+                    placeRequest.includesPropertyValues = YES;
+                    placeRequest.entity = [NSEntityDescription entityForName:@"FoodPlace" inManagedObjectContext:context];
+                    NSLog(@"pred = item id = %d",[[item objectForKey:@"place_id"] intValue]);
+                    placeRequest.predicate = [NSPredicate predicateWithFormat:@"item_id = %d", [[item objectForKey:@"place_id"] intValue]];
+                    
+                    foodplace = [[context executeFetchRequest:placeRequest error:&executeFetchError] lastObject];
+                    if (executeFetchError) {
+                        
+                    } else if (!foodplace) {
+                        NSLog(@"got rating without place");
+                        NSAssert(false, @"We've got a rating without a food place ... shouldnt happen");
+                    }
+                    
+                    BOOL placeIsRated = NO;
+                    for (FoodRating *placeRating in foodplace.ratings) {
+                        if ([placeRating.item_id isEqualToNumber:foodrating.item_id]) {
+                            NSLog(@"rating already has foodplace");
+                            placeIsRated = YES;
+                        }
+                    }
+                    if (!placeIsRated) {
+                        NSLog(@"adding rating to foodplace");
+                        [foodplace addRatingsObject:foodrating];
+                    }
+                            
+
+                    foodrating.score = [NSNumber numberWithInt:[[item objectForKey:@"score"] intValue]];
+
+                    
+                    
+                }
+                if (![context save:&error]) {
+                    NSLog(@"Whoops, couldn't save: %@", [error localizedDescription]);
+                }else{
+                    NSLog(@"saved");
+                }
+                
+                
+                NSLog(@"done with blog = %@",@"ratingupdate");
+                
+                [self.ongoingRequests removeObject:@"ratingupdate"];
+                [self LoadData];
+                
+            });
+         } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON)
+         {
+             NSLog(@"failed with error = %@",error);
+             [self.ongoingRequests removeObject:@"ratingupdate"];
+         }];
+        [operation start];
+    }
+    
+    
+    
+}
+*/
+
+
+-(void)retrieveAndProcessDataFromFoodPlace
+{
+
+    
+    NSString *stringFromDate;
+    if([[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"lastupdatedplaces"]] != NULL)
+    {
+        stringFromDate = [[NSUserDefaults standardUserDefaults]objectForKey:[NSString stringWithFormat:@"lastupdatedplaces"]];
+    }else{
+        stringFromDate = sqlUpdateDate;
+    }
+    
+    NSString* dateEscaped = (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(
+                                                                                                  NULL,
+                                                                                                  (__bridge CFStringRef) stringFromDate,
+                                                                                                  NULL,
+                                                                                                  CFSTR("!*'();:@&=+$,/?%#[]"),
+                                                                                                  kCFStringEncodingUTF8));
+//   NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://tastebudsapp.herokuapp.com/allplaces"]];
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://tastebudsapp.herokuapp.com/allplaces/%@.json",dateEscaped]];
+    
+    
+    if ([self.ongoingRequests containsObject:@"placeupdate"]) {
+        NSLog(@"skipping");
+    }else{
+        [self.ongoingRequests addObject:@"placeupdate"];
+
+        NSURLRequest *request = [NSURLRequest requestWithURL:url cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:600.0f];
+        
+        NSLog(@"url = %@",url);
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+        AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON)
+         {
+             
+             NSLog(@"recieved response json");
+             dispatch_async(GSdataSerialQueue, ^
+            {
+                NSError *error;
+                NSManagedObjectContext* context = [((AppDelegate*)[UIApplication sharedApplication].delegate) dataManagedObjectContext];
+                
+                NSMutableArray* jsonArray = [[NSMutableArray alloc]initWithArray:JSON];
+                
+                for (NSDictionary* item in jsonArray) {
+
+                    FoodPlace *foodplace = nil;
+                    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+                    request.includesPropertyValues = NO;
+                    request.entity = [NSEntityDescription entityForName:@"FoodPlace" inManagedObjectContext:context];
+                    request.predicate = [NSPredicate predicateWithFormat:@"item_id = %d", [[item objectForKey:@"id"] intValue]];
+                    
+                    NSError *executeFetchError = nil;
+                    foodplace = [[context executeFetchRequest:request error:&executeFetchError] lastObject];
+                    if (executeFetchError) {
+                        
+                    } else if (!foodplace) {
+                        foodplace = [NSEntityDescription insertNewObjectForEntityForName:@"FoodPlace"
+                                                                 inManagedObjectContext:context];
+                    }
+                    
+                    NSDateFormatter *format = [[NSDateFormatter alloc] init];
+                    [format setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
+                    NSDate *createdDate = [format dateFromString:[item objectForKey:@"created_at"]];
+                    
+                    NSDate *updatedDate = [format dateFromString:[item objectForKey:@"updated_at"]];
+                    NSDate* lastUpdated = [foodplace valueForKey:@"updated_at"];
+                    
+                    if (([updatedDate compare:lastUpdated] == NSOrderedAscending)||[updatedDate isEqualToDate:lastUpdated])  {
+                        continue;
+                    }
+                    [foodplace setValue:updatedDate forKey:@"updated_at"];
+                    [foodplace setValue:createdDate forKey:@"created_at"];
+                    [foodplace setValue:[item objectForKey:@"current_rating"] forKey:@"current_rating"];
+                    [foodplace setValue:[item objectForKey:@"rate_count"] forKey:@"rate_count"];                    
+                    [foodplace setValue:[item objectForKey:@"title"] forKey:@"title"];
+                    foodplace.item_id = [NSNumber numberWithInt:[[item objectForKey:@"id"] intValue]];
+                    if (![[item objectForKey:@"foursquare_venue"] isEqual:[NSNull null]])
+                    {
+                        [foodplace setValue:[item objectForKey:@"foursquare_venue"] forKey:@"foursquare_venue"];
+                    }
+                    double lat = [[item objectForKey:@"latitude"] doubleValue];
+                    double lon = [[item objectForKey:@"longitude"] doubleValue];
+                    [foodplace setValue:[NSNumber numberWithDouble:lat] forKey:@"latitude"];
+                    [foodplace setValue:[NSNumber numberWithDouble:lon] forKey:@"longitude"];
+                    
+                    
+                    CGSize s = [foodplace.title sizeWithFont:kMainFont constrainedToSize:CGSizeMake(kCellHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
+                    foodplace.cell_height = [NSNumber numberWithInt:0];
+                    foodplace.cell_height = [NSNumber numberWithInt:(foodplace.cell_height.intValue + 10)];
+                    foodplace.cell_height = [NSNumber numberWithInt:(foodplace.cell_height.intValue + MAX(30,s.height))];
+                    foodplace.cell_height = [NSNumber numberWithInt:(foodplace.cell_height.intValue + 5)];
+                    foodplace.cell_height = [NSNumber numberWithInt:(foodplace.cell_height.intValue + 5)];
+                    foodplace.cell_height = [NSNumber numberWithInt:(foodplace.cell_height.intValue + 30)];
+                    
+                    [foodplace setValue:[NSNumber numberWithInt:(foodplace.cell_height.intValue + 10)]forKey:@"cell_height"];
+                   
+                    
+                    
+                    if ([[item objectForKey:@"foodtype"] isKindOfClass:[NSArray class]]) {
+                        
+                        NSArray* foodtypeArray = [item objectForKey:@"foodtype"];
+                        if (foodtypeArray.count>0) {
+                            [foodplace removeFoodtypes:foodplace.foodtypes];
+                            for (NSString* foodstring in foodtypeArray) {
+                                FoodType *foodtype = [NSEntityDescription
+                                                      insertNewObjectForEntityForName:@"FoodType"
+                                                      inManagedObjectContext:context];
+                                [foodtype setValue:foodstring forKey:@"type"];
+                                [foodplace addFoodtypesObject:foodtype];
+                            }
+                        }
+                    }
+                    if ([[item objectForKey:@"images"] isKindOfClass:[NSArray class]]) {
+                        
+                        NSArray* imagesArray = [item objectForKey:@"images"];
+                        if (imagesArray.count>0) {
+                            [foodplace removeImages:foodplace.images];
+                            for (NSString* foodstring in imagesArray) {
+                                FoodImage* image = [NSEntityDescription
+                                                    insertNewObjectForEntityForName:@"FoodImage"
+                                                    inManagedObjectContext:context];
+                                [image setValue:foodstring forKey:@"high_res_image"];
+                                [foodplace addImagesObject:image];
+                            }
+                        }
+                    }
+                    
+                    
+                    
+                 
+                }
+                if (![context save:&error]) {
+                    NSLog(@"Whoops, couldn't save: %@", [error localizedDescription]);
+                }else{
+                    NSLog(@"saved");
+                }
+                
+                
+                NSLog(@"settnig last updated date to  %@",[self currentDateString]);
+                
+                [[NSUserDefaults standardUserDefaults] setObject:[self currentDateString] forKey:[NSString stringWithFormat:@"lastupdatedplaces"]];
+                [[NSUserDefaults standardUserDefaults]synchronize];
+                
+                NSLog(@"done with blog = %@",@"placeupdate");
+                
+                [self.ongoingRequests removeObject:@"placeupdate"];
+//                dispatch_async(GSdataSerialQueue, ^{
+//                    [self retrieveAndProcessDataFromFoodRating];
+//                });
+                NSArray* menuItems = [NSArray arrayWithObjects:@"IEATISHOOTIPOST",@"LADY IRON CHEF",@"LOVE SG FOOD",@"SGFOODONFOOT",@"DANIEL FOOD DIARY", nil];
+                for (NSString* blog in menuItems)
+                {
+                    dispatch_async(GSdataSerialQueue, ^{
+                        [self retrieveAndProcessDataFromCacheOrServerForBlog:blog];
+                    });
+                }
+            });
+         } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON)
+         {
+             NSLog(@"failed with error = %@",error);
+             [self.ongoingRequests removeObject:@"placeupdate"];
+         }];
+        [operation start];
+    }
+    
+
+    
+}
+
 
 -(void)retrieveAndProcessDataFromCacheOrServerForBlog:(NSString*)blog //withCompletion:(void)(^))
 {
-    
-    NSDateFormatter *format = [[NSDateFormatter alloc] init];
-    [format setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
+
 
     NSString *stringFromDate;
     if([[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"lastupdated%@",blog]] != NULL)
     {
         stringFromDate = [[NSUserDefaults standardUserDefaults]objectForKey:[NSString stringWithFormat:@"lastupdated%@",blog]];
     }else{
-    //   stringFromDate = [format stringFromDate:[NSDate date]];
-        stringFromDate = @"2013-03-30T11:43:00Z";
+        stringFromDate = sqlUpdateDate;
     }
     
     NSString* dateEscaped = (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(
@@ -217,12 +474,12 @@
     
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://tastebudsapp.herokuapp.com/%@/%@.json",[blog stringByReplacingOccurrencesOfString:@" " withString:@"%20"],dateEscaped]];
     
-    if ([self.ongoingRequests containsObject:blog]) {
+        if ([self.ongoingRequests containsObject:blog]) {
         NSLog(@"skipping");
     }else{
         [self.ongoingRequests addObject:blog];
-        NSLog(@"added %@ to the list of ongoing = %@",blog,self.ongoingRequests);
-        NSURLRequest *request = [NSURLRequest requestWithURL:url cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:60.0f];
+
+        NSURLRequest *request = [NSURLRequest requestWithURL:url cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:600.0f];
         
         NSLog(@"url = %@",url);
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
@@ -231,186 +488,162 @@
              
              NSLog(@"recieved response json");
              dispatch_async(GSdataSerialQueue, ^
-                            {
-                                NSError *error;
-                                //            NSManagedObjectContext *context = ((AppDelegate*)[UIApplication sharedApplication].delegate).managedObjectContext;
-                                NSManagedObjectContext* context = [self dataManagedObjectContext];
+            {
+                NSError *error;
+                //            NSManagedObjectContext *context = ((AppDelegate*)[UIApplication sharedApplication].delegate).managedObjectContext;
+                NSManagedObjectContext* context = [((AppDelegate*)[UIApplication sharedApplication].delegate) dataManagedObjectContext];
+                
+                
+                NSMutableArray* jsonArray = [[NSMutableArray alloc]initWithArray:JSON];
+                
+                for (NSDictionary* item in jsonArray) {
+//                    NSLog(@"items = %@",item);
+                        FoodItem *fooditem = nil;
+                        NSFetchRequest *request = [[NSFetchRequest alloc] init];
+                        request.includesPropertyValues = NO;
+                        request.entity = [NSEntityDescription entityForName:@"FoodItem" inManagedObjectContext:context];
+                        request.predicate = [NSPredicate predicateWithFormat:@"item_id = %d", [[item objectForKey:@"id"] intValue]];
+                        
+                        NSError *executeFetchError = nil;
+                        fooditem = [[context executeFetchRequest:request error:&executeFetchError] lastObject];
+                        if (executeFetchError) {
+                            
+                        } else if (!fooditem) {
+                            fooditem = [NSEntityDescription insertNewObjectForEntityForName:@"FoodItem"
+                                                                     inManagedObjectContext:context];
+                        }
+
+                        NSDateFormatter *format = [[NSDateFormatter alloc] init];
+                        [format setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
+                        NSDate *createdDate = [format dateFromString:[item objectForKey:@"created_at"]];
+                        
+                        NSDate *updatedDate = [format dateFromString:[item objectForKey:@"updated_at"]];
+                        NSDate* lastUpdated = [fooditem valueForKey:@"updated_at"];
+                        
+                        if (([updatedDate compare:lastUpdated] == NSOrderedAscending)||[updatedDate isEqualToDate:lastUpdated])  {
+                            continue;
+                        }
+                        [fooditem setValue:updatedDate forKey:@"updated_at"];
+                        [fooditem setValue:createdDate forKey:@"created_at"];
+                        [fooditem setValue:[item objectForKey:@"title"] forKey:@"title"];
+                    
+
+                        CGSize s = [fooditem.title sizeWithFont:kMainFont constrainedToSize:CGSizeMake(kCellHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
+                        CGSize x = [fooditem.sub_title sizeWithFont:kSubtitleFont constrainedToSize:CGSizeMake(kCellSubtitleHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
+                        fooditem.cell_height = [NSNumber numberWithInt:0];
+                        fooditem.cell_height = [NSNumber numberWithInt:(fooditem.cell_height.intValue + 10)];//padding btw title and subtitle;
+                        fooditem.cell_height = [NSNumber numberWithInt:(fooditem.cell_height.intValue + MAX(30,s.height))];
+                        fooditem.cell_height = [NSNumber numberWithInt:(fooditem.cell_height.intValue + 5)];//padding btw title and subtitle;
+                        fooditem.cell_height = [NSNumber numberWithInt:(fooditem.cell_height.intValue + x.height)];
+                        fooditem.cell_height = [NSNumber numberWithInt:(fooditem.cell_height.intValue + 5)];//padding btw title and subtitle;
+                        fooditem.cell_height = [NSNumber numberWithInt:(fooditem.cell_height.intValue + 10)];//padding btw title and subtitle;
+                    
+                        [fooditem setValue:[NSNumber numberWithInt:(fooditem.cell_height.intValue + 10)]forKey:@"cell_height"];//padding btw title and subtitle;
+                        //gsObject.descriptionhtml = [foodItem valueForKey:@"descriptionHTML"];
+                        
+                        
+                        [fooditem setValue:[NSNumber numberWithBool:[[item objectForKey:@"is_post"] boolValue]] forKey:@"is_post"];
+                        [fooditem setValue:[item objectForKey:@"source"] forKey:@"source"];
+                        [fooditem setValue:[item objectForKey:@"id"] forKey:@"item_id"];
+                        [fooditem setValue:[item objectForKey:@"location"] forKey:@"location_string"];
+                        [fooditem setValue:[item objectForKey:@"link"] forKey:@"link"];
+                        
+                        if (![[item objectForKey:@"foursqure_venue"] isEqual:[NSNull null]])
+                        {
+                            [fooditem setValue:[item objectForKey:@"foursqure_venue"] forKey:@"foursquare_venue"];
+                        }
+                        if (![[item objectForKey:@"place_id"] isEqual:[NSNull null]])
+                        {
+                            FoodPlace *foodplace = nil;
+                            NSFetchRequest *request = [[NSFetchRequest alloc] init];
+                            request.includesPropertyValues = NO;
+                            request.entity = [NSEntityDescription entityForName:@"FoodPlace" inManagedObjectContext:context];
+                            request.predicate = [NSPredicate predicateWithFormat:@"item_id = %d", [[item objectForKey:@"place_id"] intValue]];
+                            NSError *executeFetchError = nil;
+                            foodplace = [[context executeFetchRequest:request error:&executeFetchError] lastObject];
+                            
+                            if (executeFetchError) {
+                                NSLog(@"fetch error");
+                            } else if (!foodplace) {
                                 
-                                //    NSLog(@"processing data = %@",JSON);
+                                //if no foodplace found create one
+                                NSLog(@"should not reach here");
                                 
-                                NSMutableArray* jsonArray = [[NSMutableArray alloc]initWithArray:JSON];
-                                
-                                for (NSDictionary* item in jsonArray) {
+                            }else if(foodplace){
+                                //found a foodplace with the correct id, add fooditem to foodplace and foodplace to fooditem
 
-                                        FoodItem *fooditem = nil;
-                                        NSFetchRequest *request = [[NSFetchRequest alloc] init];
-                                        request.includesPropertyValues = NO;
-                                        request.entity = [NSEntityDescription entityForName:@"FoodItem" inManagedObjectContext:context];
-                                        request.predicate = [NSPredicate predicateWithFormat:@"item_id = %d", [[item objectForKey:@"id"] intValue]];
-                                        
-                                        NSError *executeFetchError = nil;
-                                        fooditem = [[context executeFetchRequest:request error:&executeFetchError] lastObject];
-                                        if (executeFetchError) {
-                                            
-                                        } else if (!fooditem) {
-                                            fooditem = [NSEntityDescription insertNewObjectForEntityForName:@"FoodItem"
-                                                                                     inManagedObjectContext:context];
-                                        }
+                                [foodplace addItemsObject:fooditem];
+                                fooditem.place = foodplace;
+                            }else{
+                                NSLog(@"unknown error");
+                            }
 
-                                        NSDateFormatter *format = [[NSDateFormatter alloc] init];
-                                        [format setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
-                                        NSDate *createdDate = [format dateFromString:[item objectForKey:@"created_at"]];
-                                        
-                                        NSDate *updatedDate = [format dateFromString:[item objectForKey:@"updated_at"]];
-                                        NSDate* lastUpdated = [fooditem valueForKey:@"updated_at"];
-                                        
-                                        if (([updatedDate compare:lastUpdated] == NSOrderedAscending)||[updatedDate isEqualToDate:lastUpdated])  {
-                                            continue;
-                                        }
-                                        [fooditem setValue:updatedDate forKey:@"updated_at"];
-                                        [fooditem setValue:createdDate forKey:@"created_at"];
-                                        [fooditem setValue:[item objectForKey:@"title"] forKey:@"title"];
-                                        if ([[item objectForKey:@"subtitle"] isEqual:[NSNull null]])
-                                        {
-                                            [fooditem setValue:@"" forKey:@"sub_title"];
-                                        }else{
-                                            [fooditem setValue:[item objectForKey:@"subtitle"] forKey:@"sub_title"];
-                                        }
-                                       
-
-                                        CGSize s = [fooditem.title sizeWithFont:kMainFont constrainedToSize:CGSizeMake(kCellHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
-                                        CGSize x = [fooditem.sub_title sizeWithFont:kSubtitleFont constrainedToSize:CGSizeMake(kCellSubtitleHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
-    
-                                        fooditem.cell_height = [NSNumber numberWithInt:(fooditem.cell_height.intValue + 10)];//padding btw title and subtitle;
-                                        fooditem.cell_height = [NSNumber numberWithInt:(fooditem.cell_height.intValue + MAX(30,s.height))];
-                                        fooditem.cell_height = [NSNumber numberWithInt:(fooditem.cell_height.intValue + 5)];//padding btw title and subtitle;
-                                        fooditem.cell_height = [NSNumber numberWithInt:(fooditem.cell_height.intValue + x.height)];
-                                        fooditem.cell_height = [NSNumber numberWithInt:(fooditem.cell_height.intValue + 5)];//padding btw title and subtitle;
-                                        fooditem.cell_height = [NSNumber numberWithInt:(fooditem.cell_height.intValue + 10)];//padding btw title and subtitle;
-                                        
-                                        [fooditem setValue:[NSNumber numberWithInt:(fooditem.cell_height.intValue + 10)]forKey:@"cell_height"];//padding btw title and subtitle;
-                                        //gsObject.descriptionhtml = [foodItem valueForKey:@"descriptionHTML"];
-                                        
-                                        
-                                        [fooditem setValue:[NSNumber numberWithBool:[[item objectForKey:@"is_post"] boolValue]] forKey:@"is_post"];
-                                        [fooditem setValue:[item objectForKey:@"source"] forKey:@"source"];
-                                        [fooditem setValue:[item objectForKey:@"id"] forKey:@"item_id"];
-                                        [fooditem setValue:[item objectForKey:@"location"] forKey:@"location_string"];
-                                        [fooditem setValue:[item objectForKey:@"link"] forKey:@"link"];
-                                        
-                                        if (![[item objectForKey:@"foursqure_venue"] isEqual:[NSNull null]])
-                                        {
-                                            [fooditem setValue:[item objectForKey:@"foursqure_venue"] forKey:@"foursquare_venue"];
-                                        }
-                                        if (![[item objectForKey:@"place_id"] isEqual:[NSNull null]])
-                                        {
-                                            FoodPlace *foodplace = nil;
-                                            NSFetchRequest *request = [[NSFetchRequest alloc] init];
-                                            request.includesPropertyValues = NO;
-                                            request.entity = [NSEntityDescription entityForName:@"FoodPlace" inManagedObjectContext:context];
-                                            request.predicate = [NSPredicate predicateWithFormat:@"item_id = %d", [[item objectForKey:@"place_id"] intValue]];
-                                            NSError *executeFetchError = nil;
-                                            foodplace = [[context executeFetchRequest:request error:&executeFetchError] lastObject];
-                                            
-                                            if (executeFetchError) {
-                                                NSLog(@"fetch error");
-                                            } else if (!foodplace) {
-                                                
-                                                //if no foodplace found create one
-                                                NSLog(@"creating new food place");
-                                                foodplace = [NSEntityDescription insertNewObjectForEntityForName:@"FoodPlace"
-                                                                                         inManagedObjectContext:context];
-                                                foodplace.item_id = [NSNumber numberWithInt:[[item objectForKey:@"place_id"] intValue]];
-                                                fooditem.place = foodplace;
-                                                if (![[item objectForKey:@"foursqure_venue"] isEqual:[NSNull null]])
-                                                {
-                                                    [foodplace setValue:[item objectForKey:@"foursqure_venue"] forKey:@"foursquare_venue"];
-                                                }else{
-                                                    [foodplace setValue:@"unknown" forKey:@"foursquare_venue"];
-                                                }
-                                                //get most recent
-                                                [foodplace setValue:[item objectForKey:@"title"] forKey:@"title"];
-                                                
-                                                
-                                                
-                                            }else if(foodplace){
-                                                //found a foodplace with the correct id, add fooditem to foodplace and foodplace to fooditem
-                                                 NSLog(@"found food place.. adding item to it");
-                                                [foodplace addItemsObject:fooditem];
-                                                fooditem.place = foodplace;
-                                            }else{
-                                                NSLog(@"unknown error");
-                                            }
-
-                                            
-                                        }
-                                        double lat = [[item objectForKey:@"latitude"] doubleValue];
-                                        double lon = [[item objectForKey:@"longitude"] doubleValue];
-                                        [fooditem setValue:[NSNumber numberWithDouble:lat] forKey:@"latitude"];
-                                        [fooditem setValue:[NSNumber numberWithDouble:lon] forKey:@"longitude"];
-                                        
-                                        if ([[item objectForKey:@"foodtype"] isKindOfClass:[NSArray class]]) {
-                                            
-                                            NSArray* foodtypeArray = [item objectForKey:@"foodtype"];
-                                            if (foodtypeArray.count>0) {
-                                                [fooditem removeFoodtypes:fooditem.foodtypes];
-                                                for (NSString* foodstring in foodtypeArray) {
-                                                    FoodType *foodtype = [NSEntityDescription
-                                                                          insertNewObjectForEntityForName:@"FoodType"
-                                                                          inManagedObjectContext:context];
-                                                    [foodtype setValue:foodstring forKey:@"type"];
-                                                    [fooditem addFoodtypesObject:foodtype];
-                                                }
-                                            }
-                                        }
-                                        if ([[item objectForKey:@"images"] isKindOfClass:[NSArray class]]) {
-                                            
-                                            NSArray* high_res_images_array = [item objectForKey:@"images"];
-                                            NSArray* low_res_images_array = [item objectForKey:@"low_res_images"];
-                                            if (high_res_images_array.count>0) {
-                                                [fooditem removeImages:fooditem.images];
-                                                for (int i=0;i<high_res_images_array.count;i++)
-                                                {
-                                                    FoodImage* image = [NSEntityDescription
-                                                                        insertNewObjectForEntityForName:@"FoodImage"
-                                                                        inManagedObjectContext:context];
-                                                    [image setValue:[high_res_images_array objectAtIndex:i] forKey:@"high_res_image"];
-                                                    [image setValue:[low_res_images_array objectAtIndex:i] forKey:@"low_res_image"];
-                                                    [fooditem addImagesObject:image];
-                                                    
-                                                }
-                                            }
-                                            
-                                        }
-                                        
-                                        FoodDescription *fooddescription = [NSEntityDescription
-                                                                            insertNewObjectForEntityForName:@"FoodDescription"
-                                                                            inManagedObjectContext:context];
-                                        [fooddescription setValue:[item objectForKey:@"descriptionHTML"] forKey:@"descriptionHTML"];
-                                        [fooditem setValue:fooddescription forKey:@"descriptionHTML"];
-                                        
-                                        
-                                    if (![context save:&error]) {
-                                        NSLog(@"Whoops, couldn't save: %@", [error localizedDescription]);
-                                    }else{
-                                        NSLog(@"saved");
-                                    }
+                            
+                        }
+                        double lat = [[item objectForKey:@"latitude"] doubleValue];
+                        double lon = [[item objectForKey:@"longitude"] doubleValue];
+                        [fooditem setValue:[NSNumber numberWithDouble:lat] forKey:@"latitude"];
+                        [fooditem setValue:[NSNumber numberWithDouble:lon] forKey:@"longitude"];
+                        
+                        if ([[item objectForKey:@"foodtype"] isKindOfClass:[NSArray class]]) {
+                            
+                            NSArray* foodtypeArray = [item objectForKey:@"foodtype"];
+                            if (foodtypeArray.count>0) {
+                                [fooditem removeFoodtypes:fooditem.foodtypes];
+                                for (NSString* foodstring in foodtypeArray) {
+                                    FoodType *foodtype = [NSEntityDescription
+                                                          insertNewObjectForEntityForName:@"FoodType"
+                                                          inManagedObjectContext:context];
+                                    [foodtype setValue:foodstring forKey:@"type"];
+                                    [fooditem addFoodtypesObject:foodtype];
+                                }
+                            }
+                        }
+                        if ([[item objectForKey:@"images"] isKindOfClass:[NSArray class]]) {
+                            
+                            NSArray* high_res_images_array = [item objectForKey:@"images"];
+                            NSArray* low_res_images_array = [item objectForKey:@"low_res_images"];
+                            if (high_res_images_array.count>0) {
+                                [fooditem removeImages:fooditem.images];
+                                for (int i=0;i<high_res_images_array.count;i++)
+                                {
+                                    FoodImage* image = [NSEntityDescription
+                                                        insertNewObjectForEntityForName:@"FoodImage"
+                                                        inManagedObjectContext:context];
+                                    [image setValue:[high_res_images_array objectAtIndex:i] forKey:@"high_res_image"];
+                                    [image setValue:[low_res_images_array objectAtIndex:i] forKey:@"low_res_image"];
+                                    [fooditem addImagesObject:image];
                                     
                                 }
-                                
-                                
-                                
-                                NSDateFormatter *format = [[NSDateFormatter alloc] init];
-                                [format setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
-                                NSString *currentDateString = [format stringFromDate:[NSDate date]];
-                                [[NSUserDefaults standardUserDefaults] setObject:currentDateString forKey:[NSString stringWithFormat:@"lastupdated%@",blog]];
-                                [[NSUserDefaults standardUserDefaults]synchronize];
-                                
-                                NSLog(@"done with blog = %@",blog);
-                                
-                                [self.ongoingRequests removeObject:blog];
-                                
-                            });
+                            }
+                            
+                        }
+                        
+                        FoodDescription *fooddescription = [NSEntityDescription
+                                                            insertNewObjectForEntityForName:@"FoodDescription"
+                                                            inManagedObjectContext:context];
+                        [fooddescription setValue:[item objectForKey:@"descriptionHTML"] forKey:@"descriptionHTML"];
+                        [fooditem setValue:fooddescription forKey:@"descriptionHTML"];
+                        
+                        
+
+                    
+                }
+                if (![context save:&error]) {
+                    NSLog(@"Whoops, couldn't save: %@", [error localizedDescription]);
+                }else{
+                    NSLog(@"saved");
+                }
+                
+                
+                [[NSUserDefaults standardUserDefaults] setObject:[self currentDateString] forKey:[NSString stringWithFormat:@"lastupdated%@",blog]];
+                [[NSUserDefaults standardUserDefaults]synchronize];
+                
+                NSLog(@"done with blog = %@",blog);
+                
+                [self.ongoingRequests removeObject:blog];
+                
+            });
          } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON)
          {
              NSLog(@"failed with error = %@",error);
@@ -418,6 +651,7 @@
          }];
         [operation start];
     }
+    
     
 
     
@@ -480,50 +714,24 @@
     
 }
 
--(void)processDataWithCoreDataForSources:(NSMutableArray*)source withCompletionBlock:(void (^)(BOOL finished))completionBlock
+-(void)processDataWithCoreDataForSourcesWithCompletionBlock:(void (^)(BOOL finished))completionBlock
 {
-    
+
     NSError *error;
     NSManagedObjectContext *context = [((AppDelegate*)[UIApplication sharedApplication].delegate) managedObjectContext];
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-    fetchRequest.includesPropertyValues = NO;
+    fetchRequest.includesPropertyValues = YES;
+    fetchRequest.returnsObjectsAsFaults = NO;
     NSEntityDescription *entity = [NSEntityDescription
-                                   entityForName:@"FoodItem" inManagedObjectContext:context];
+                                   entityForName:@"FoodPlace" inManagedObjectContext:context];
     [fetchRequest setEntity:entity];
     
-    
-    switch (source.count) {
-        case 0:
-            return;
-            break;
-        case 1:
-            [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"(source == %@) AND is_post == TRUE",[source objectAtIndex:0],[NSString stringWithFormat:@"%@",[NSNumber numberWithBool:YES]]]];
-            break;
-        case 2:
-            [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"(source == %@ OR source == %@) AND is_post == TRUE",[source objectAtIndex:0],[source objectAtIndex:1],[NSString stringWithFormat:@"%@",[NSNumber numberWithBool:YES]]]];
-            break;
-        case 3:
-            [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"(source == %@ OR source == %@ OR source == %@) AND is_post == TRUE",[source objectAtIndex:0],[source objectAtIndex:1],[source objectAtIndex:2],[NSString stringWithFormat:@"%@",[NSNumber numberWithBool:YES]]]];
-            break;
-        case 4:
-            [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"(source == %@ OR source == %@ OR source == %@ OR source == %@) AND is_post LIKE[c] %@",[source objectAtIndex:0],[source objectAtIndex:1],[source objectAtIndex:2],[source objectAtIndex:3],[NSString stringWithFormat:@"%@",[NSNumber numberWithBool:YES]]]];
-            break;
-        case 5:
-            [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"(source == %@ OR source == %@ OR source == %@ OR source == %@ OR source == %@) AND is_post LIKE[c] %@",[source objectAtIndex:0],[source objectAtIndex:1],[source objectAtIndex:2],[source objectAtIndex:3],[source objectAtIndex:4],[NSString stringWithFormat:@"%@",[NSNumber numberWithBool:YES]]]];
-            break;
-        default:
-            break;
-    }
+
     
     
         NSArray *fetchedObjects = [context executeFetchRequest:fetchRequest error:&error];
-    for (FoodItem* item in fetchedObjects) {
-        if ([item.is_post isEqualToNumber:[NSNumber numberWithBool:NO]]) {
-            NSLog(@"found a false");
-        }
     
-    }
-    
+        [self.loadedGSObjectArray removeAllObjects];
         NSLog(@"fetched = %d objects ",fetchedObjects.count);
         [self.loadedGSObjectArray addObjectsFromArray:fetchedObjects];
         
@@ -538,7 +746,6 @@
 {
     NSLog(@"view willappear");
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(topDidAnchorLeft ) name:ECSlidingViewTopDidAnchorLeft object:nil];
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underRightWillDisappear) name:ECSlidingViewUnderRightWillDisappear object:nil];
     
     
@@ -552,7 +759,7 @@
     if (![self.slidingViewController.underRightViewController isKindOfClass:[UnderMapViewController class]]) {
         self.slidingViewController.underRightViewController  = [self.storyboard instantiateViewControllerWithIdentifier:@"UnderMap"];
     }
-    [self.view addGestureRecognizer:self.slidingViewController.panGesture];
+    //[self.view addGestureRecognizer:self.slidingViewController.panGesture];
     
     UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
     if (orientation == UIInterfaceOrientationLandscapeLeft||orientation == UIInterfaceOrientationLandscapeRight) {
@@ -576,10 +783,7 @@
 //sorts both loaded and display arrays by gsobject variable
 -(NSMutableArray*) sortLoadedArray:(NSMutableArray*)loadedArray ByVariable:(NSString*)variable  ascending:(BOOL)ascending
 {
-    //notsorting
-    
-    
-    
+    //notsorting    
      NSLog(@"sorting by %@",variable);
      if ([variable isEqualToString:@"distanceInMeters"]) {
      currentScopeType = kScopeTypeDistance;
@@ -590,13 +794,13 @@
      }
     
      NSSortDescriptor * frequencyDescriptor =
-     [[NSSortDescriptor alloc] initWithKey:@"distance_in_meters"
-     ascending:ascending] ;
+     [[NSSortDescriptor alloc] initWithKey:@"current_rating"
+     ascending:NO] ;
      NSArray * descriptors = [NSArray arrayWithObjects:frequencyDescriptor, nil];
      NSArray * sortedArray = [loadedArray sortedArrayUsingDescriptors:descriptors];
      [loadedArray removeAllObjects];
      [loadedArray addObjectsFromArray:sortedArray];
-     
+    
     return loadedArray;
 }
 
@@ -636,19 +840,26 @@
                 NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
                 fetchRequest.includesPropertyValues = NO;
                 NSEntityDescription *entity = [NSEntityDescription
-                                               entityForName:@"FoodItem" inManagedObjectContext:context];
+                                               entityForName:@"FoodPlace" inManagedObjectContext:context];
                 [fetchRequest setEntity:entity];
                 [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"title contains %@ OR ANY foodtypes.type = %@", term, term]];
                 NSArray *fetchedObjects = [context executeFetchRequest:fetchRequest error:&error];
                 NSLog(@"fetched %d",fetchedObjects.count);
-                for (FoodItem* item in fetchedObjects) {
+                NSSortDescriptor * frequencyDescriptor =
+                [[NSSortDescriptor alloc] initWithKey:@"current_rating"
+                                            ascending:NO] ;
+                NSArray * descriptors = [NSArray arrayWithObjects:frequencyDescriptor, nil];
+                NSArray * sortedArray = [fetchedObjects sortedArrayUsingDescriptors:descriptors];
+                for (FoodPlace* item in sortedArray) {
                     updateRect = [self updateCrumbsWithFoodItem:item IntoResultArray:resultArray withMap:map andRegion:region andUpdateRect:updateRect];
                 }
             }
         }
     }
-    for (FoodItem* gsObj in loadedArray)
+    for (FoodPlace* gsObj in loadedArray)
     {
+        @autoreleasepool {
+            
         if (search.length > 0)
         {
             //first find out if its a location
@@ -664,19 +875,7 @@
                         continue;
                     }
                 }
-                
-//                //find gsobjects which match searches
-//                if(([term caseInsensitiveCompare:gsObj.title] == NSOrderedSame || [gsObj.title rangeOfString:term options:NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch].location != NSNotFound))
-//                {
-//                    updateRect = [self updateCrumbsWithFoodItem:gsObj IntoResultArray:resultArray withMap:map andRegion:region andUpdateRect:updateRect];
-//                    
-//                }
-//                else
-//                {
-//                    
-//
-//
-//                }
+
             }
         }
         else
@@ -698,38 +897,8 @@
                     NSLog(@"done adding overlay count = %d",map.overlays.count);
                     
                 }
-                
-                //updateRect = [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs addCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) withColor:gsObj.cursorColor];
-                if ([gsObj.source isEqualToString:@"LADY IRON CHEF"])
-                {
-                    updateRect = [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs addCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) withColor:[UIColor blueColor]]; //lady iron chef
-                }
-                else if ([gsObj.source isEqualToString:@"IEATISHOOTIPOST"])
-                {
-                    updateRect = [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs addCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) withColor:[UIColor redColor]];
-                }
-                else if ([gsObj.source isEqualToString:@"DANIEL FOOD DIARY"])
-                {
-                    updateRect = [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs addCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) withColor:[UIColor magentaColor]];
-                }
-                else if ([gsObj.source isEqualToString:@"KEROPOKMAN"])
-                {
-                    updateRect = [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs addCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) withColor:[UIColor greenColor]];
-                }
-                else if ([gsObj.source isEqualToString:@"LOVE SG FOOD"])
-                {
-                    updateRect = [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs addCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) withColor:[UIColor blackColor]];
-                }
-                else if ([gsObj.source isEqualToString:@"SGFOODONFOOT"])
-                {
-                    updateRect = [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs addCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) withColor:[UIColor cyanColor]];
-                }
-                else
-                {
-                    updateRect = [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs addCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) withColor:[UIColor darkTextColor]];
-                }
-                
-                
+
+                updateRect = [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs addCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) withColor:[UIColor blueColor]];
              
             }
             
@@ -737,6 +906,7 @@
             {
                 
                 [resultArray addObject:gsObj];
+            }
             }
             
         }
@@ -761,7 +931,7 @@
     NSLog(@"done recalculating");
     //    self.canSearch = YES;
 }
--(MKMapRect)updateCrumbsWithFoodItem:(FoodItem*)gsObj IntoResultArray:(NSMutableArray*)resultArray withMap:(MKMapView*)map andRegion:(MKCoordinateRegion)region andUpdateRect:(MKMapRect)updateRect
+-(MKMapRect)updateCrumbsWithFoodItem:(FoodPlace*)gsObj IntoResultArray:(NSMutableArray*)resultArray withMap:(MKMapView*)map andRegion:(MKCoordinateRegion)region andUpdateRect:(MKMapRect)updateRect
 {
     if (![resultArray containsObject:gsObj]) {
         if([self coordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) ContainedinRegion:region])
@@ -783,37 +953,12 @@
             NSLog(@"adding overlay in update crumbs");
             [map addOverlay:((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs];
         }
-        if ([gsObj.source isEqualToString:@"LADY IRON CHEF"])
-        {
-            updateRect = [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs addCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) withColor:[UIColor blueColor]]; //lady iron chef
-        }
-        else if ([gsObj.source isEqualToString:@"IEATISHOOTIPOST"])
-        {
-            updateRect = [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs addCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) withColor:[UIColor redColor]];
-        }
-        else if ([gsObj.source isEqualToString:@"DANIEL FOOD DIARY"])
-        {
-            updateRect = [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs addCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) withColor:[UIColor magentaColor]];
-        }
-        else if ([gsObj.source isEqualToString:@"KEROPOKMAN"])
-        {
-            updateRect = [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs addCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) withColor:[UIColor greenColor]];
-        }
-        else if ([gsObj.source isEqualToString:@"LOVE SG FOOD"])
-        {
-            updateRect = [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs addCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) withColor:[UIColor blackColor]];
-        }
-        else if ([gsObj.source isEqualToString:@"SGFOODONFOOT"])
-        {
-            updateRect = [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs addCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) withColor:[UIColor cyanColor]];
-        }
-        else
-        {
-            updateRect = [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs addCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) withColor:[UIColor darkTextColor]];
-        }
 
+            updateRect = [((UnderMapViewController*)self.slidingViewController.underRightViewController).crumbs addCoordinate:CLLocationCoordinate2DMake(gsObj.latitude.doubleValue, gsObj.longitude.doubleValue) withColor:[UIColor blueColor]];
+        
         
     }
+    return updateRect;
 }
 
 -(void)selectedInstructions:(id)sender
@@ -880,7 +1025,7 @@
     dispatch_async(GSserialQueue, ^{
         if (userLocation && self.loadedGSObjectArray.count>0) {
             CLLocation* defensiveUserLocation = [userLocation.location copy];
-            for (FoodItem* item in self.loadedGSObjectArray) {
+            for (FoodPlace* item in self.loadedGSObjectArray) {
                 CLLocation *gsLoc = [[CLLocation alloc] initWithLatitude:item.latitude.doubleValue longitude:item.longitude.doubleValue];
                 CLLocationDistance meters = [gsLoc distanceFromLocation:defensiveUserLocation];
                 [item setDistance_in_meters:[NSNumber numberWithDouble:meters]];
@@ -972,7 +1117,7 @@
                              menuViewController.shopLabel.frame = shopLabelFinalFrame;
                          }
                          completion:^(BOOL finished){
-                             NSLog(@"Done!");
+                             NSLog(@"Done! g");
                          }];
         
         menuViewController.shouldShowPinAnimation = YES;
@@ -1023,7 +1168,7 @@
             menuViewController.locationButton.hidden = YES;
             menuViewController.resetTopViewButton.hidden = YES;
             [menuViewController.resetTopViewButton removeGestureRecognizer:self.slidingViewController.panGesture];
-            [self.view addGestureRecognizer:self.slidingViewController.panGesture];
+            //[self.view addGestureRecognizer:self.slidingViewController.panGesture];
             menuViewController.allButton.hidden = YES;
             menuViewController.categorySelectionButton.hidden = YES;
             MKMapView* underMapView = menuViewController.mapView;
@@ -1098,7 +1243,7 @@
             [underMapView removeAnnotation:annnote];  // remove any annotations that exist
         }
     }
-    FoodItem* gsObj = [self.GSObjectArray objectAtIndex:idx];
+    FoodPlace* gsObj = [self.GSObjectArray objectAtIndex:idx];
     self.selectedGsObject = gsObj;
 
     [underMapView addAnnotation:gsObj];
@@ -1114,12 +1259,12 @@
     
     
     menuViewController.gsObjSelected = gsObj;
-    if (gsObj.images.count>0) {
-        [menuViewController.shopImageView setImageWithURL:[NSURL URLWithString:((FoodImage*)[[gsObj.images allObjects] objectAtIndex:0]).low_res_image]];
-        
-    }else{
-        [menuViewController.shopImageView setImage:nil];
-    }
+//    if (gsObj.images.count>0) {
+//        [menuViewController.shopImageView setImageWithURL:[NSURL URLWithString:((FoodImage*)[[gsObj.images allObjects] objectAtIndex:0]).low_res_image]];
+//        
+//    }else{
+//        [menuViewController.shopImageView setImage:nil];
+//    }
     
     UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
     if (orientation == UIInterfaceOrientationLandscapeLeft||orientation == UIInterfaceOrientationLandscapeRight) {
@@ -1208,7 +1353,6 @@
     self.tableView.hidden = NO;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(topDidAnchorLeft ) name:ECSlidingViewTopDidAnchorLeft object:nil];
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underRightWillDisappear) name:ECSlidingViewUnderRightWillDisappear object:nil];
     
     
@@ -1417,7 +1561,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     if (tableView == self.imageTableView) {
-        return self.selectedGsObject.images.count;
+        return 0; //self.selectedGsObject.images.count;
     }else{
         if ([GSObjectArray count]>0) {
             if (self.random) {
@@ -1472,7 +1616,7 @@
             
             UIButton* resetButton = [UIButton buttonWithType:UIButtonTypeCustom];
             [resetButton setBackgroundColor:[UIColor whiteColor]];
-            [resetButton setBackgroundImage:[UIImage imageNamed:@"cross.png"] forState:UIControlStateNormal];
+            [resetButton setBackgroundImage:[UIImage imageNamed:@"BarMap@2x.png"] forState:UIControlStateNormal];
             [resetButton setFrame:CGRectMake(300-44, 0, 44, 44)];
             [resetButton addTarget:self action:@selector(cancelSearch:) forControlEvents:UIControlEventTouchUpInside];
             [resetButton addTarget:self action:@selector(setBgColorForButton:) forControlEvents:UIControlEventTouchDown];
@@ -1524,12 +1668,12 @@
                 }
             }
         }
-        FoodImage* selectedImage = [[self.selectedGsObject.images allObjects] objectAtIndex:indexPath.row];
-        [cell.imageView setImageWithURL:[NSURL URLWithString:selectedImage.low_res_image] placeholderImage:nil success:^(UIImage *image, BOOL cached) {
-            [cell.imageView setImage:image];
-        } failure:nil];
-        
-        [cell.activityIndicator startAnimating];
+//        FoodImage* selectedImage = [[self.selectedGsObject.images allObjects] objectAtIndex:indexPath.row];
+//        [cell.imageView setImageWithURL:[NSURL URLWithString:selectedImage.low_res_image] placeholderImage:nil success:^(UIImage *image, BOOL cached) {
+//            [cell.imageView setImage:image];
+//        } failure:nil];
+//        
+//        [cell.activityIndicator startAnimating];
         return cell;
     }else{
         if(indexPath.row == 0){
@@ -1589,66 +1733,69 @@
             }
             return endcell;
         }
-        FoodItem* gsObj;
+        FoodPlace* gsObj;
         if (self.random) {
             gsObj = [self.GSObjectArray objectAtIndex:self.randomIndex];
         }else{
             gsObj = [self.GSObjectArray objectAtIndex:indexPath.row-1];
         }
-        CGSize s = [gsObj.title sizeWithFont:kMainFont constrainedToSize:CGSizeMake(kCellHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
-        CGSize subTitleSize = [gsObj.sub_title sizeWithFont:kSubtitleFont constrainedToSize:CGSizeMake(kCellSubtitleHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
-        NSString *FromCellIdentifier = [NSString stringWithFormat:@"%@,%d,%d",gsObj.source,(int)s.height,(int)subTitleSize.height];
-        
+
+          NSString *FromCellIdentifier = [NSString stringWithFormat:@"%f",gsObj.cell_height.doubleValue];
         RotatingTableCell *cell = [tableView dequeueReusableCellWithIdentifier:FromCellIdentifier];
         
         if (cell == nil)
         {
             CGSize s = [gsObj.title sizeWithFont:kMainFont constrainedToSize:CGSizeMake(kCellHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
-            CGSize subTitleSize = [gsObj.sub_title sizeWithFont:kSubtitleFont constrainedToSize:CGSizeMake(kCellSubtitleHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
             //        CGSize sourceSize = [gsObj.source sizeWithFont:kSourceFont constrainedToSize:CGSizeMake(kCellSubtitleHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
             cell = [[RotatingTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:FromCellIdentifier];
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            cell.mainContainer = [[touchScrollView alloc]initWithFrame:CGRectMake(0, 0, cell.bounds.size.width, gsObj.cell_height.intValue)];
+           
+            [cell.mainContainer setScrollsToTop:NO];
+            [cell.mainContainer setContentSize:CGSizeMake(960, gsObj.cell_height.intValue)];
+            [cell.mainContainer setContentOffset:CGPointMake(320, 0)];
+            [cell.mainContainer setPagingEnabled:YES];
+            [cell.mainContainer setBackgroundColor:[UIColor clearColor]];
+            [cell.mainContainer setShowsHorizontalScrollIndicator:NO];
+            
+            cell.imagesView = [[UIView alloc]initWithFrame:CGRectMake(640, 0, cell.bounds.size.width, gsObj.cell_height.intValue)];
+            [cell.imagesView setBackgroundColor:[UIColor clearColor]];
+            cell.mainImagesBackgroundCellView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, cell.bounds.size.width, gsObj.cell_height.intValue)];
+            cell.mainImagesCellView = [[UIView alloc]initWithFrame:CGRectMake(kCellPaddingLeft, kCellPaddingTop, cell.bounds.size.width-2*kCellPaddingLeft, gsObj.cell_height.intValue-kCellPaddingTop*2)];
+            
+            int imagecount = ((cell.bounds.size.width-2*kCellPaddingLeft) / (gsObj.cell_height.intValue-kCellPaddingTop*2));
+            float imagewh = (gsObj.cell_height.intValue-kCellPaddingTop*2);
+            for (int i= 0 ; i< imagecount; i++) {
+                UIImageView* buttonImage = [[UIImageView alloc]initWithFrame:CGRectMake((i*imagewh)+kCellPaddingLeft, kCellPaddingTop, imagewh, imagewh)];
+                [buttonImage setContentMode:UIViewContentModeScaleAspectFill];
+                [buttonImage setClipsToBounds:YES];
+                [cell.mainImagesBackgroundCellView addSubview:buttonImage];
+                [cell.buttonImagesArray addObject:buttonImage];
+            }
+            cell.currentImageIndex =0 ;
+            
+            
+            cell.ratingView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, cell.bounds.size.width, gsObj.cell_height.intValue)];
+            [cell.ratingView setBackgroundColor:[UIColor clearColor]];
+            
+            cell.mainRatingBackgroundCellView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, cell.bounds.size.width, gsObj.cell_height.intValue)];
+            cell.mainRatingCellView = [[UIView alloc]initWithFrame:CGRectMake(kCellPaddingLeft, kCellPaddingTop, cell.bounds.size.width-2*kCellPaddingLeft, gsObj.cell_height.intValue-kCellPaddingTop*2)];
+            
+           
+            
+            cell.ratingStarView = [[HHStarView alloc]initWithFrame:CGRectMake(kStarLeftPadding,10 + s.height + 5,80+45,14.75f) andRating:00 withLabel:YES animated:NO];
+            cell.ratingStarView.context = [((AppDelegate*)[UIApplication sharedApplication].delegate) dataManagedObjectContext];
+            cell.ratingStarView.GSdataSerialQueue = GSdataSerialQueue;
+            [cell.ratingStarView setUserInteractionEnabled:NO];
+            
+            [cell.mainTitleView setBackgroundColor:[UIColor clearColor]];
             
             cell.mainCellView = [[UIView alloc]initWithFrame:CGRectMake(kCellPaddingLeft, kCellPaddingTop, cell.bounds.size.width-2*kCellPaddingLeft, gsObj.cell_height.intValue-kCellPaddingTop*2)];
             
             cell.colorBarView = [[UIView alloc]initWithFrame:CGRectMake(kCellPaddingLeft, kCellPaddingTop, kCellColorBarWidth, gsObj.cell_height.intValue-kCellPaddingTop*2)];
+            [cell.colorBarView setBackgroundColor:[UIColor blueColor]];
             
-            if ([gsObj.source isEqualToString:@"LADY IRON CHEF"])
-            {
-                [cell.colorBarView setBackgroundColor:[UIColor blueColor]];
 
-            }
-            else if ([gsObj.source isEqualToString:@"IEATISHOOTIPOST"])
-            {
-                [cell.colorBarView setBackgroundColor:[UIColor redColor]];
-            }
-            else if ([gsObj.source isEqualToString:@"DANIEL FOOD DIARY"])
-            {
-                [cell.colorBarView setBackgroundColor:[UIColor magentaColor]];
-
-            }
-            else if ([gsObj.source isEqualToString:@"KEROPOKMAN"])
-            {
-                [cell.colorBarView setBackgroundColor:[UIColor greenColor]];
-
-            }
-            else if ([gsObj.source isEqualToString:@"LOVE SG FOOD"])
-            {
-                [cell.colorBarView setBackgroundColor:[UIColor blackColor]];
-            }
-            else if ([gsObj.source isEqualToString:@"SGFOODONFOOT"])
-            {
-                [cell.colorBarView setBackgroundColor:[UIColor cyanColor]];
-            }
-            else
-            {
-                [cell.colorBarView setBackgroundColor:[UIColor darkTextColor]];
-            }
-
-            
-            
-            
-            
             
             cell.titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(kStarLeftPadding,10,kCellHeightConstraint,s.height)];
             cell.titleLabel.backgroundColor = [UIColor clearColor];
@@ -1659,14 +1806,12 @@
             cell.titleLabel.shadowOffset = CGSizeMake(1, 1);
             
             
-            
-            cell.subTitleLabel = [[UILabel alloc]initWithFrame:CGRectMake(kStarLeftPadding,10 + s.height + 5 ,kCellSubtitleHeightConstraint,subTitleSize.height)];
-            cell.subTitleLabel.backgroundColor = [UIColor clearColor];
-            cell.subTitleLabel.textColor = [UIColor whiteColor];
-            [cell.subTitleLabel setFont:kSubtitleFont];
-            [cell.subTitleLabel setNumberOfLines:0];
-            cell.subTitleLabel.shadowColor = [UIColor blackColor];
-            cell.subTitleLabel.shadowOffset = CGSizeMake(0.2, 0.2);
+            cell.starview = [[HHStarView alloc]initWithFrame:CGRectMake(kStarLeftPadding,20,300-(kStarLeftPadding*2),41.66f) andRating:00 withLabel:NO animated:NO];
+            [cell.starview setCenter:CGPointMake(160, gsObj.cell_height.intValue/2)];
+            cell.starview.context = [((AppDelegate*)[UIApplication sharedApplication].delegate) dataManagedObjectContext];
+            cell.starview.GSdataSerialQueue = GSdataSerialQueue;
+            [cell.starview addObserver:cell.ratingStarView forKeyPath:@"userRating" options:0 context:nil];
+            cell.mainTitleView = [[UIView alloc]initWithFrame:CGRectMake(320, 0, cell.bounds.size.width, gsObj.cell_height.intValue)];
             
             
             
@@ -1689,22 +1834,63 @@
             [cell.distanceColorBarView setBackgroundColor:BLUE_COLOR];
             [cell.distanceColorBarView setAlpha:0.5];
             
-            [cell.contentView addSubview:cell.mainCellView];
-            [cell.contentView addSubview:cell.distanceColorBarView];
-            [cell.contentView addSubview:cell.colorBarView];
-            [cell.contentView addSubview:cell.starview];
-            [cell.contentView addSubview:cell.titleLabel];
-            [cell.contentView addSubview:cell.subTitleLabel];
-            [cell.contentView addSubview:cell.sourceLabel];
-            [cell.contentView addSubview:cell.distanceIcon];
-            [cell.contentView addSubview:cell.distanceLabel];
+            [cell.contentView addSubview:cell.mainContainer];
             
+            [cell.mainContainer addSubview:cell.imagesView];
+            [cell.imagesView addSubview:cell.mainImagesBackgroundCellView];
+            [cell.mainImagesBackgroundCellView addSubview:cell.mainImagesCellView];
+            [cell.mainImagesBackgroundCellView sendSubviewToBack:cell.mainImagesCellView];
+            
+            [cell.mainContainer addSubview:cell.ratingView];
+            [cell.ratingView addSubview:cell.mainRatingBackgroundCellView];
+            [cell.mainRatingBackgroundCellView addSubview:cell.mainRatingCellView];
+            [cell.mainRatingBackgroundCellView addSubview:cell.starview];            
+            
+            [cell.mainContainer addSubview:cell.mainTitleView];
+            [cell.mainTitleView addSubview:cell.mainCellView];
+            [cell.mainTitleView addSubview:cell.distanceColorBarView];
+            [cell.mainTitleView addSubview:cell.colorBarView];
+            [cell.mainTitleView addSubview:cell.ratingStarView];
+            [cell.mainTitleView addSubview:cell.titleLabel];
+            [cell.mainTitleView addSubview:cell.distanceIcon];
+            [cell.mainTitleView addSubview:cell.distanceLabel];
+            [cell.mainTitleView addSubview:cell.subTitleLabel];
         }
         
         
         cell.titleLabel.text = gsObj.title;
-        cell.subTitleLabel.text = [[gsObj.sub_title stringByReplacingOccurrencesOfString:@": " withString:@""]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        cell.sourceLabel.text = [NSString stringWithFormat:@"source: %@",gsObj.source];
+        cell.starview.foodplace = gsObj;
+        cell.ratingStarView.foodplace = gsObj;
+        if (gsObj.images.count >= cell.buttonImagesArray.count) {
+            for (int i=0; i<cell.buttonImagesArray.count; i++) {
+                [((UIImageView*)[cell.buttonImagesArray objectAtIndex:i]) setImageWithURL:[NSURL URLWithString:((FoodImage*)[[gsObj.images allObjects] objectAtIndex:i]).high_res_image]];
+            }
+        }
+        
+        if (gsObj.current_user_rated.boolValue) {
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"user_id == %d", [[[NSUserDefaults standardUserDefaults] objectForKey:@"user_id"] intValue]];
+            NSSet* filteredSet = [gsObj.ratings filteredSetUsingPredicate:predicate];
+            FoodRating* foundRating = nil;
+            if ([filteredSet count] > 0) {
+                foundRating = [[filteredSet allObjects] objectAtIndex:0];
+                [cell.ratingStarView starViewSetRating:foundRating.score.intValue isUser:NO];
+                [cell.starview removeObserver:cell.ratingStarView forKeyPath:@"userRating"];
+                [cell.starview starViewSetRating:foundRating.score.intValue isUser:YES];
+                [cell.starview addObserver:cell.ratingStarView forKeyPath:@"userRating" options:0 context:nil];
+            }else{
+                [cell.starview removeObserver:cell.ratingStarView forKeyPath:@"userRating"];
+                [cell.starview starViewSetRating:0 isUser:YES];
+                [cell.starview addObserver:cell.ratingStarView forKeyPath:@"userRating" options:0 context:nil];
+                [cell.ratingStarView starViewSetRating:gsObj.current_rating.intValue isUser:NO];
+            }
+        }else{
+            [cell.starview removeObserver:cell.ratingStarView forKeyPath:@"userRating"];
+            [cell.starview starViewSetRating:0 isUser:YES];
+            [cell.starview addObserver:cell.ratingStarView forKeyPath:@"userRating" options:0 context:nil];
+            [cell.ratingStarView starViewSetRating:gsObj.current_rating.intValue isUser:NO];
+            
+        }
+        
         if (gsObj.distance_in_meters.intValue<1000) {
             cell.distanceLabel.text = [NSString stringWithFormat:@"%d m",gsObj.distance_in_meters.intValue];
         }else if (gsObj.distance_in_meters.intValue>1000) {
@@ -1712,10 +1898,41 @@
         }else if (gsObj.distance_in_meters.intValue>100000) {
             cell.distanceLabel.text = [NSString stringWithFormat:@""];
         }
+        HHStarView* leftStarView = cell.starview;
+        [((touchScrollView*)cell.mainContainer)setLeftRefresh:^
+        {
+            [leftStarView deleteUserRatingsForStall];
+        }];
+        NSMutableArray* buttonArray = cell.buttonImagesArray;
+        RotatingTableCell * __weak weakSelf = cell;
+        [((touchScrollView*)cell.mainContainer)setRightRefresh:^
+         {
+             NSLog(@"right refreshing , %@",gsObj.title);
+             
+             if (gsObj.images.count >= weakSelf.currentImageIndex + buttonArray.count) {
+                 for (int i=0; i<buttonArray.count; i++) {
+                     [((UIImageView*)[buttonArray objectAtIndex:i]) setImageWithURL:[NSURL URLWithString:((FoodImage*)[[gsObj.images allObjects] objectAtIndex:((weakSelf.currentImageIndex+i+buttonArray.count)%[gsObj.images allObjects].count)]).high_res_image]];
+                 }
+
+             }
+             weakSelf.currentImageIndex += buttonArray.count;
+             if (weakSelf.currentImageIndex > gsObj.images.count) {
+                 weakSelf.currentImageIndex=0;
+             }
+         }];
+        cell.mainImagesCellView.alpha = self.alphaValue;
+        cell.mainImagesCellView.backgroundColor = [UIColor blackColor];
+        
+        cell.mainRatingCellView.alpha = self.alphaValue;
+        cell.mainRatingCellView.backgroundColor = [UIColor blackColor];
         
         cell.mainCellView.alpha = self.alphaValue;
         cell.mainCellView.backgroundColor = [UIColor blackColor];
+        
         cell.mainCellView.layer.cornerRadius = 0;
+        
+        
+        
         return cell;
     }
     
@@ -1723,40 +1940,48 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    NSLog(@"didselect");
+ 
     if (tableView == self.imageTableView) {
-        if ([self.imageTableView cellForRowAtIndexPath:indexPath].imageView.image != nil) {
-            fullscreenButton = [UIButton buttonWithType:UIButtonTypeCustom];
-            [fullscreenButton setBackgroundColor:[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.9]];
-            
-            [fullscreenButton setFrame:self.view.bounds];
-            [fullscreenButton addTarget:self action:@selector(dismissSelf:) forControlEvents:UIControlEventTouchUpInside];
-            UIImageView* newImageView = [[UIImageView alloc]initWithFrame:self.view.bounds];
-            FoodImage* selectedImage = [[self.selectedGsObject.images allObjects] objectAtIndex:indexPath.row];
-            [newImageView setImageWithURL:[NSURL URLWithString:selectedImage.high_res_image] placeholderImage:[self.imageTableView cellForRowAtIndexPath:indexPath].imageView.image];
-            
-            [newImageView setContentMode:UIViewContentModeScaleAspectFit];
-            [newImageView setUserInteractionEnabled:NO];
-            [fullscreenButton addSubview:newImageView];
-            [self.view addSubview:fullscreenButton];
-        }
+//        if ([self.imageTableView cellForRowAtIndexPath:indexPath].imageView.image != nil) {
+//            fullscreenButton = [UIButton buttonWithType:UIButtonTypeCustom];
+//            [fullscreenButton setBackgroundColor:[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.9]];
+//            
+//            [fullscreenButton setFrame:self.view.bounds];
+//            [fullscreenButton addTarget:self action:@selector(dismissSelf:) forControlEvents:UIControlEventTouchUpInside];
+//            UIImageView* newImageView = [[UIImageView alloc]initWithFrame:self.view.bounds];
+//            FoodImage* selectedImage = [[self.selectedGsObject.images allObjects] objectAtIndex:indexPath.row];
+//            [newImageView setImageWithURL:[NSURL URLWithString:selectedImage.high_res_image] placeholderImage:[self.imageTableView cellForRowAtIndexPath:indexPath].imageView.image];
+//            
+//            [newImageView setContentMode:UIViewContentModeScaleAspectFit];
+//            [newImageView setUserInteractionEnabled:NO];
+//            [fullscreenButton addSubview:newImageView];
+//            [self.view addSubview:fullscreenButton];
+//        }
     }else{
         if (indexPath.row == 0 || indexPath.row == [self.GSObjectArray count]+1)
         {
             return;
         }
-        FoodItem* selectedGSObj;
+        FoodPlace* selectedGSObj;
         
         if (self.random) {
             selectedGSObj   = [self.GSObjectArray objectAtIndex:self.randomIndex];
         }else{
             selectedGSObj   = [self.GSObjectArray objectAtIndex:indexPath.row-1];
         }
+
         
-        NSURL *URL = [NSURL URLWithString:[NSString stringWithFormat:@"%@",selectedGSObj.link]];
-        SVWebViewController *webViewController = [[SVWebViewController alloc] initWithURL:URL];
-        webViewController.gsobj = selectedGSObj;
-        webViewController.currentLocation = self.userLocation;
-        [self.navigationController pushViewController:webViewController animated:YES];
+
+            FoodPlaceViewController* foodplaceViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"FoodPlace"];
+            foodplaceViewController.foodplace = selectedGSObj;
+            [self.navigationController pushViewController:foodplaceViewController animated:YES];
+
+//        RotatingTableCell* thatCell = ((RotatingTableCell*)[tableView cellForRowAtIndexPath:indexPath]);
+//        if (thatCell.state != MCSwipeTableViewCellState2) {
+//            [thatCell bounceToOrigin];
+//        }else{
+//        }
         
     }
 }
@@ -1882,7 +2107,6 @@
 }
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
-#warning crashes here if empty
     
     
     if (fullscreenButton) {
@@ -2014,6 +2238,7 @@
 }
 -(void)cancelSearch:(UIButton*)sender
 {
+    [self.slidingViewController anchorTopViewTo:ECLeft];
     dispatch_async(dispatch_get_main_queue(), ^{
             [SVProgressHUD showWithStatus:@"Loading" maskType:SVProgressHUDMaskTypeGradient];
     });
@@ -2085,26 +2310,8 @@
     [self setImageTableView:nil];
     [super viewDidUnload];
 }
-- (NSManagedObjectContext *)dataManagedObjectContext {
-    NSManagedObjectContext *managedObjectContext = nil;
-    
-    NSPersistentStoreCoordinator *coordinator = [((AppDelegate*)[UIApplication sharedApplication].delegate) persistentStoreCoordinator];
-    if (coordinator != nil) {
-        managedObjectContext = [[NSManagedObjectContext alloc] init];
-        [managedObjectContext setPersistentStoreCoordinator:coordinator];
-        [managedObjectContext setUndoManager:nil];
-    }
-    return managedObjectContext;
-}
-- (NSManagedObjectModel *)managedObjectModel
-{
-    if (_dataManagedObjectModel != nil) {
-        return _dataManagedObjectModel;
-    }
-    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"FoodItem" withExtension:@"momd"];
-    _dataManagedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
-    return _dataManagedObjectModel;
-}
+
+
 - (void)didReceiveMemoryWarning
 {
     NSLog(@"did recieve memory warning");
@@ -2123,11 +2330,22 @@
                          self.tableView.alpha=1;
                      } 
                      completion:^(BOOL finished){
-                         NSLog(@"Done!");
+
                      }];
     }else{
         [self.tableView reloadData];
     }
+}
+-(NSString*)currentDateString
+{
+    NSDateFormatter *format = [[NSDateFormatter alloc] init];
+    [format setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
+    
+    NSDate *localDate = [NSDate date];
+    NSTimeInterval timeZoneOffset = [[NSTimeZone defaultTimeZone] secondsFromGMT]; // You could also use the systemTimeZone method
+    NSTimeInterval gmtTimeInterval = [localDate timeIntervalSinceReferenceDate] - timeZoneOffset;
+    NSDate *gmtDate = [NSDate dateWithTimeIntervalSinceReferenceDate:gmtTimeInterval];
+    return [format stringFromDate:gmtDate];
 }
 
 @end

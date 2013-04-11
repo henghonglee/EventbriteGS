@@ -10,6 +10,7 @@
 
 #import "SVModalWebViewController.h"
 #import "GSObject.h"
+#import "FoodItem.h"
 #import "MobclixAds.h"
 @interface SVWebViewController : UIViewController <UIActionSheetDelegate,UIScrollViewDelegate,MFMessageComposeViewControllerDelegate,MobclixAdViewDelegate>
 {
@@ -19,7 +20,7 @@
 - (id)initWithAddress:(NSString*)urlString;
 - (id)initWithURL:(NSURL*)URL;
 @property (nonatomic,strong) MobclixAdView* adView;
-@property (nonatomic, strong) GSObject* gsobj;
+@property (nonatomic, strong) FoodItem* gsobj;
 @property (nonatomic) BOOL isLoading;
 @property (nonatomic, strong) CLLocation* currentLocation;
 @property (nonatomic)float lastContentOffset;

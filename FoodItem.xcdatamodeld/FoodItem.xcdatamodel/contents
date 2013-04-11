@@ -31,21 +31,41 @@
         <relationship name="place" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="FoodPlace" inverseName="items" inverseEntity="FoodPlace" syncable="YES"/>
     </entity>
     <entity name="FoodPlace" representedClassName="FoodPlace" syncable="YES">
+        <attribute name="cell_height" optional="YES" attributeType="Integer 64" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="created_at" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="current_rating" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="current_user_rated" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="distance_in_meters" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
         <attribute name="foursquare_venue" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="item_id" attributeType="Integer 64" defaultValueString="0" indexed="YES" syncable="YES"/>
+        <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="rate_count" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="updated_at" optional="YES" attributeType="Date" syncable="YES"/>
+        <relationship name="foodtypes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FoodType" syncable="YES"/>
+        <relationship name="images" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FoodImage" syncable="YES"/>
         <relationship name="items" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FoodItem" inverseName="place" inverseEntity="FoodItem" syncable="YES"/>
+        <relationship name="ratings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FoodRating" syncable="YES"/>
+    </entity>
+    <entity name="FoodRating" representedClassName="FoodRating" syncable="YES">
+        <attribute name="item_id" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="place_id" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="score" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="updated_at" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="uploaded_at" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="user_id" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
     </entity>
     <entity name="FoodType" representedClassName="FoodType" syncable="YES">
         <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="info" optional="YES" minCount="1" maxCount="1" deletionRule="Cascade" destinationEntity="FoodItem" inverseName="foodtypes" inverseEntity="FoodItem" syncable="YES"/>
     </entity>
     <elements>
-        <element name="FoodDescription" positionX="-5375" positionY="855" width="128" height="73"/>
+        <element name="FoodDescription" positionX="-5420" positionY="783" width="128" height="73"/>
         <element name="FoodImage" positionX="-5420" positionY="1040" width="128" height="103"/>
-        <element name="FoodItem" positionX="-5645" positionY="695" width="128" height="313"/>
-        <element name="FoodType" positionX="-5391" positionY="692" width="128" height="73"/>
-        <element name="FoodPlace" positionX="-5825" positionY="839" width="128" height="118"/>
+        <element name="FoodItem" positionX="-5670" positionY="650" width="128" height="313"/>
+        <element name="FoodPlace" positionX="-5886" positionY="810" width="128" height="285"/>
+        <element name="FoodRating" positionX="-5643" positionY="1071" width="128" height="135"/>
+        <element name="FoodType" positionX="-5420" positionY="908" width="128" height="73"/>
     </elements>
 </model>

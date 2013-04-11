@@ -306,7 +306,7 @@ static dispatch_once_t onceToken;
 
     
 }
-
+/*
 -(void)clearFaces
 {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -351,6 +351,7 @@ static dispatch_once_t onceToken;
     }
 
 }
+*/
 -(void)getDirections
 {
     NSString* saddr = @"Current+Locaton";
@@ -358,7 +359,7 @@ static dispatch_once_t onceToken;
         [NSURL URLWithString:@"comgooglemaps://"]]){
         saddr = [NSString stringWithFormat:@"%f,%f", self.currentLocation.coordinate.latitude,self.currentLocation.coordinate.longitude];
         NSLog(@"");
-        [[UIApplication sharedApplication]openURL:[NSURL URLWithString:[NSString stringWithFormat:@"comgooglemaps://?saddr=%@&daddr=%@&zoom=14&directionsmode=driving",saddr,[gsobj.locationString stringByReplacingOccurrencesOfString:@" " withString:@"+"]]]];
+        [[UIApplication sharedApplication]openURL:[NSURL URLWithString:[NSString stringWithFormat:@"comgooglemaps://?saddr=%@&daddr=%@&zoom=14&directionsmode=driving",saddr,[gsobj.location_string stringByReplacingOccurrencesOfString:@" " withString:@"+"]]]];
     }else{
         
         NSString* urlStr;
@@ -368,14 +369,14 @@ static dispatch_once_t onceToken;
             if ((self.currentLocation.coordinate.latitude != kCLLocationCoordinate2DInvalid.latitude) && (self.currentLocation.coordinate.longitude != kCLLocationCoordinate2DInvalid.longitude)) {
                 //Valid location.
                 saddr = [NSString stringWithFormat:@"%f,%f", self.currentLocation.coordinate.latitude,self.currentLocation.coordinate.longitude];
-                urlStr = [NSString stringWithFormat:@"http://maps.apple.com/maps?saddr=%@&daddr=%@", saddr, [gsobj.locationString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+                urlStr = [NSString stringWithFormat:@"http://maps.apple.com/maps?saddr=%@&daddr=%@", saddr, [gsobj.location_string stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
             } else {
                 //Invalid location. Location Service disabled.
-                urlStr = [NSString stringWithFormat:@"http://maps.apple.com/maps?daddr=%@", [gsobj.locationString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+                urlStr = [NSString stringWithFormat:@"http://maps.apple.com/maps?daddr=%@", [gsobj.location_string stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
             }
         } else {
             // < iOS 6. Use maps.google.com
-            urlStr = [NSString stringWithFormat:@"http://maps.google.com/maps?saddr=%@&daddr=%@", saddr, [gsobj.locationString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+            urlStr = [NSString stringWithFormat:@"http://maps.google.com/maps?saddr=%@&daddr=%@", saddr, [gsobj.location_string stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
         }
         
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlStr]];
@@ -403,7 +404,7 @@ static dispatch_once_t onceToken;
     if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:@"Stall Closed"]) {
         NSURL *tokenurl = [NSURL URLWithString:@"http://tastebudsapp.herokuapp.com"];
         AFHTTPClient* afclient = [[AFHTTPClient alloc]initWithBaseURL:tokenurl];
-        [afclient putPath:[NSString stringWithFormat:@"/items/%d",self.gsobj.itemId.intValue] parameters:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO],@"item[is_post]", nil] success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        [afclient putPath:[NSString stringWithFormat:@"/items/%d",self.gsobj.item_id.intValue] parameters:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO],@"item[is_post]", nil] success:^(AFHTTPRequestOperation *operation, id responseObject) {
             UIAlertView* alert = [[UIAlertView alloc]initWithTitle:@"Success" message:@"" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
             [alert show];
         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
@@ -517,7 +518,7 @@ static dispatch_once_t onceToken;
             [SVProgressHUD showWithStatus:@"Loading"];
         });
     }
-    [[self navigationController] setNavigationBarHidden:NO animated:YES];
+    [[self navigationController] setNavigationBarHidden:NO animated:NO];
     NSAssert(self.navigationController, @"SVWebViewController needs to be contained in a UINavigationController. If you are presenting SVWebViewController modally, use SVModalWebViewController instead.");
 //    UIButton* barbutton = [UIButton buttonWithType:UIButtonTypeCustom];
 
@@ -535,7 +536,7 @@ static dispatch_once_t onceToken;
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-        [[self navigationController] setNavigationBarHidden:YES animated:YES];
+        [[self navigationController] setNavigationBarHidden:NO animated:YES];
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
         [self.navigationController setToolbarHidden:YES animated:animated];
     }

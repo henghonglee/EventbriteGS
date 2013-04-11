@@ -15,12 +15,14 @@
 #import "MTStatusBarOverlay.h"
 #import "SearchViewController.h"
 #import <CoreImage/CoreImage.h>
+
+
 typedef enum {
     kScopeTypeLikes,
     kScopeTypeDeals,
     kScopeTypeDistance
 } ScopeType;
-@interface GeoScrollViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,MKMapViewDelegate,UIScrollViewDelegate,UISearchBarDelegate,UITextFieldDelegate,SearchViewControllerDelegate>
+@interface GeoScrollViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,MKMapViewDelegate,UIScrollViewDelegate,UISearchBarDelegate,UITextFieldDelegate,SearchViewControllerDelegate,UIGestureRecognizerDelegate>
 {
         MKMapRect oldRegion;
         NSMutableArray *mapAnnotations;
@@ -31,9 +33,12 @@ typedef enum {
         dispatch_queue_t GSserialQueue;
         dispatch_queue_t GSdataSerialQueue;
 }
-@property (readonly, strong, nonatomic) NSManagedObjectContext *dataManagedObjectContext;
-@property (readonly, strong, nonatomic) NSManagedObjectModel *dataManagedObjectModel;
-@property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *dataPersistentStoreCoordinator;
+
+
+
+@property (strong, nonatomic) NSManagedObjectContext *dataManagedObjectContext;
+@property ( strong, nonatomic) NSManagedObjectModel *dataManagedObjectModel;
+@property ( strong, nonatomic) NSPersistentStoreCoordinator *dataPersistentStoreCoordinator;
 
 
 @property (weak, nonatomic) IBOutlet UIButton *resetTopViewButton;
@@ -42,7 +47,7 @@ typedef enum {
 @property (nonatomic) int randomIndex;
 @property (nonatomic) float alphaValue;
 @property (nonatomic,strong)UIButton*fullscreenButton;
-@property (nonatomic,strong)FoodItem* selectedGsObject;
+@property (nonatomic,strong)FoodPlace* selectedGsObject;
 @property (nonatomic,strong)UITextField* searchTextField;
 @property (nonatomic, strong) CLLocation *shouldZoomToLocation;
 @property (weak, nonatomic) IBOutlet UITableView *imageTableView;
@@ -65,5 +70,5 @@ typedef enum {
 -(void)hintLeft;
 -(void)hintRight;
 -(void)getDirectionsToSelectedGSObj;
-
+-(void)didRefreshTable:(id)sender;
 @end

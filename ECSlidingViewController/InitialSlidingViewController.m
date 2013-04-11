@@ -24,17 +24,17 @@
   self.topViewController = [MapNavViewController sharedInstance];
 
 
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveEvent:) name:@"SHOWMENU" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveHideMenuEvent:) name:@"HIDEMENU" object:nil];
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveEvent:) name:@"SHOWMENU" object:nil];
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveHideMenuEvent:) name:@"HIDEMENU" object:nil];
     
 }
 - (void)receiveEvent:(NSNotification *)notification {
     
-    [super anchorTopViewTo:ECRight];
-    if([[NSUserDefaults standardUserDefaults]objectForKey:@"LeftReveal"]==nil)
-    {
-        [[NSUserDefaults standardUserDefaults] setObject:@"Enabled" forKey:@"LeftReveal"];
-    }
+//    [super anchorTopViewTo:ECRight];
+//    if([[NSUserDefaults standardUserDefaults]objectForKey:@"LeftReveal"]==nil)
+//    {
+//        [[NSUserDefaults standardUserDefaults] setObject:@"Enabled" forKey:@"LeftReveal"];
+//    }
 }
 - (void)receiveHideMenuEvent:(NSNotification *)notification {
     NSLog(@"hiding menu");
@@ -66,7 +66,7 @@
     }
     else
     {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveEvent:) name:@"SHOWMENU" object:nil];
+        //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveEvent:) name:@"SHOWMENU" object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveHideMenuEvent:) name:@"HIDEMENU" object:nil];
     }
 }

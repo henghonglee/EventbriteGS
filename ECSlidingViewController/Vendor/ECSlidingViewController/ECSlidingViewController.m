@@ -23,7 +23,7 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
 @property (nonatomic, unsafe_unretained) CGFloat initialTouchPositionX;
 @property (nonatomic, unsafe_unretained) CGFloat initialHoizontalCenter;
 @property (nonatomic, strong) UIPanGestureRecognizer *panGesture;
-@property (nonatomic, strong) UISwipeGestureRecognizer *resetTapGesture;
+@property (nonatomic, strong) UITapGestureRecognizer *resetTapGesture;
 @property (nonatomic, strong) UIPanGestureRecognizer *topViewSnapshotPanGesture;
 @property (nonatomic, unsafe_unretained) BOOL underLeftShowing;
 @property (nonatomic, unsafe_unretained) BOOL underRightShowing;
@@ -181,14 +181,14 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     [super viewDidLoad];
     self.shouldAllowUserInteractionsWhenAnchored = NO;
     self.shouldAddPanGestureRecognizerToTopViewSnapshot = NO;
-    self.resetTapGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(resetTopView)];
-    [self.resetTapGesture setDirection:UISwipeGestureRecognizerDirectionLeft];
+    self.resetTapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(resetTopView)];
+//    [self.resetTapGesture setDirection:UISwipeGestureRecognizerDirectionLeft];
     _panGesture          = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(updateTopViewHorizontalCenterWithRecognizer:)];
     self.resetTapGesture.enabled = NO;
     self.resetStrategy = ECTapping | ECPanning;
     
     self.topViewSnapshot = [[UIView alloc] initWithFrame:self.topView.bounds];
-//    [self.topViewSnapshot setAutoresizingMask:self.autoResizeToFillScreen];
+    [self.topViewSnapshot setAutoresizingMask:self.autoResizeToFillScreen];
     [self.topViewSnapshot addGestureRecognizer:self.resetTapGesture];
 }
 
@@ -261,10 +261,7 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     } else if (recognizer.state == UIGestureRecognizerStateChanged) {
         
         CGPoint translation = [recognizer translationInView:self.view];
-        if (translation.x >0 && !self.underRightShowing) {
-           // NSLog(@"showing menu");
-            [[NSNotificationCenter defaultCenter]postNotificationName:@"SHOWMENU" object:nil];
-        }else {
+
             if(fabs(translation.x) > fabs(translation.y))
             {
                 CGFloat panAmount = self.initialTouchPositionX - currentTouchPositionX;
@@ -278,12 +275,13 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
                 [self topViewHorizontalCenterDidChange:newCenterPosition];
                 
             }
-        }
+        
     } else if (recognizer.state == UIGestureRecognizerStateEnded || recognizer.state == UIGestureRecognizerStateCancelled) {
         CGPoint currentVelocityPoint = [recognizer velocityInView:self.view];
         CGFloat currentVelocityX     = currentVelocityPoint.x;
         
         if ([self underLeftShowing] && currentVelocityX > 100) {
+            NSLog(@"anchor right now");
             [self anchorTopViewTo:ECRight];
         } else if ([self underRightShowing] && currentVelocityX < 100) {
             [self anchorTopViewTo:ECLeft];
@@ -305,6 +303,7 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
 
 - (void)anchorTopViewTo:(ECSide)side animations:(void (^)())animations onComplete:(void (^)())complete
 {
+
     CGFloat newCenter = self.topView.center.x;
     
     if (side == ECLeft) {

@@ -24,6 +24,9 @@
 		27FC94E014D0C14E0000B18C /* InitialSlidingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 27FC94DF14D0C14E0000B18C /* InitialSlidingViewController.m */; };
 		27FC94E314D105C60000B18C /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27FC94E214D105C60000B18C /* QuartzCore.framework */; };
 		349BC2EA16DBBE9600A45706 /* libFlurry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 349BC2E916DBBE9600A45706 /* libFlurry.a */; };
+		EF09AA5B1713E80200DF34F1 /* touchScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = EF09AA5A1713E80200DF34F1 /* touchScrollView.m */; };
+		EF09AA631714116100DF34F1 /* SimpleKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = EF09AA621714116100DF34F1 /* SimpleKeychain.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		EF09AA651714122800DF34F1 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF09AA641714122700DF34F1 /* Security.framework */; };
 		EF0C5E2B16B27C7100288EB3 /* navigation.png in Resources */ = {isa = PBXBuildFile; fileRef = EF0C5E2A16B27C7100288EB3 /* navigation.png */; };
 		EF0C5E5316B28C5500288EB3 /* MTStatusBarOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = EF0C5E5216B28C5500288EB3 /* MTStatusBarOverlay.m */; };
 		EF0C5E5516B2957C00288EB3 /* buttonBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = EF0C5E5416B2957C00288EB3 /* buttonBlue.png */; };
@@ -41,10 +44,12 @@
 		EF18F5B61705BA710077972A /* ProximaNova-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = EF18F5B51705BA710077972A /* ProximaNova-Light.otf */; };
 		EF18F5B81705BC480077972A /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EF18F5B71705BC480077972A /* Lato-Regular.ttf */; };
 		EF2BCCBD16BD822100C1192E /* foodtypes.txt in Resources */ = {isa = PBXBuildFile; fileRef = EF2BCCBC16BD822100C1192E /* foodtypes.txt */; };
+		EF2E3B43170DBC4300F8A4E8 /* BarMap@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EF2E3B42170DBC4300F8A4E8 /* BarMap@2x.png */; };
 		EF3A33FB16CBF5AF000E10C5 /* distanceWhite@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EF3A33FA16CBF5AE000E10C5 /* distanceWhite@2x.png */; };
 		EF3A33FF16CBFC5B000E10C5 /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = EF3A33FE16CBFC5A000E10C5 /* icon.png */; };
 		EF3E6C1E16EDDB6800ED2448 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF3E6C1D16EDDB6800ED2448 /* CoreImage.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		EF44BD46168B3ADB00F7BCB5 /* ShopDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF44BD42168B3AD800F7BCB5 /* ShopDetailViewController.m */; };
+		EF4E8FF31716AAF10052D019 /* FoodItem.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = EF4E8FF21716AAF10052D019 /* FoodItem.sqlite */; };
 		EF59502116E9893D00C4CC31 /* randomize.png in Resources */ = {isa = PBXBuildFile; fileRef = EF59502016E9893C00C4CC31 /* randomize.png */; };
 		EF5FDC0716D8CEF30019E3BA /* MapSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF5FDC0616D8CEF30019E3BA /* MapSearchViewController.m */; };
 		EF5FDC0916D92C360019E3BA /* locationBlue@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EF5FDC0816D92C360019E3BA /* locationBlue@2x.png */; };
@@ -59,6 +64,10 @@
 		EF9A294416FC74C300FF89DD /* bakuteh.jpg in Resources */ = {isa = PBXBuildFile; fileRef = EF9A294216FC74C200FF89DD /* bakuteh.jpg */; };
 		EF9A294516FC74C300FF89DD /* chillycrab.jpg in Resources */ = {isa = PBXBuildFile; fileRef = EF9A294316FC74C300FF89DD /* chillycrab.jpg */; };
 		EF9A294D16FC847F00FF89DD /* howtonavigatecopy.png in Resources */ = {isa = PBXBuildFile; fileRef = EF9A294C16FC847F00FF89DD /* howtonavigatecopy.png */; };
+		EF9B0F3F171276B1008B3C5A /* NewRelicAgent.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF9B0F3E171276B1008B3C5A /* NewRelicAgent.framework */; };
+		EF9B0F41171276CA008B3C5A /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF9B0F40171276CA008B3C5A /* CoreTelephony.framework */; };
+		EF9B0F441712AECA008B3C5A /* SlidingCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = EF9B0F431712AECA008B3C5A /* SlidingCellView.m */; };
+		EF9B0F4D17132741008B3C5A /* FoodPlace.m in Sources */ = {isa = PBXBuildFile; fileRef = EF9B0F4C17132740008B3C5A /* FoodPlace.m */; };
 		EF9D891D167A44A8002B352D /* CrumbPath.m in Sources */ = {isa = PBXBuildFile; fileRef = EF9D891A167A44A8002B352D /* CrumbPath.m */; };
 		EF9D891E167A44A8002B352D /* CrumbPathView.m in Sources */ = {isa = PBXBuildFile; fileRef = EF9D891C167A44A8002B352D /* CrumbPathView.m */; };
 		EFA2915816E78CDB004EDE3F /* racing_speed_avatar_100x100_64393.jpg in Resources */ = {isa = PBXBuildFile; fileRef = EFA2915716E78CDB004EDE3F /* racing_speed_avatar_100x100_64393.jpg */; };
@@ -78,7 +87,6 @@
 		EFA83A7C16B1142100BD8057 /* SearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA83A7A16B1142100BD8057 /* SearchViewController.m */; };
 		EFA83A8416B1197800BD8057 /* TrieNode.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA83A8116B1197800BD8057 /* TrieNode.m */; };
 		EFA83A8516B1197800BD8057 /* Trie.m in Sources */ = {isa = PBXBuildFile; fileRef = EFA83A8316B1197800BD8057 /* Trie.m */; };
-		EFA913641706FBB500A9C932 /* FoodItem.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = EFA913631706FBB500A9C932 /* FoodItem.sqlite */; };
 		EFBFAF7116DFB523007C6874 /* slide@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EFBFAF7016DFB523007C6874 /* slide@2x.png */; };
 		EFC1903C16FF56800014243E /* icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EFC1903B16FF567F0014243E /* icon@2x.png */; };
 		EFC1903E16FF58220014243E /* myloc.gpx in Resources */ = {isa = PBXBuildFile; fileRef = EFC1903D16FF58220014243E /* myloc.gpx */; };
@@ -91,6 +99,7 @@
 		EFC3BD9216CFB651005D133F /* pinLoad-3 (dragged).tiff in Resources */ = {isa = PBXBuildFile; fileRef = EFC3BD8A16CFB651005D133F /* pinLoad-3 (dragged).tiff */; };
 		EFC3BD9316CFB651005D133F /* pinLoad-4 (dragged).tiff in Resources */ = {isa = PBXBuildFile; fileRef = EFC3BD8B16CFB651005D133F /* pinLoad-4 (dragged).tiff */; };
 		EFC526DE169A9D5B00D9DFBF /* CrumbObj.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC526DD169A9D5B00D9DFBF /* CrumbObj.m */; };
+		EFC565AF17072EAF0089C8CF /* FoodPlaceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC565AE17072EAF0089C8CF /* FoodPlaceViewController.m */; };
 		EFCC16CE16D3E2D000A369B7 /* MenuInstructions.png in Resources */ = {isa = PBXBuildFile; fileRef = EFCC16CD16D3E2D000A369B7 /* MenuInstructions.png */; };
 		EFCC16D016D3E60000A369B7 /* MapInstructions.png in Resources */ = {isa = PBXBuildFile; fileRef = EFCC16CF16D3E60000A369B7 /* MapInstructions.png */; };
 		EFCC16D216D3E6AE00A369B7 /* GeoscrollInstructions.png in Resources */ = {isa = PBXBuildFile; fileRef = EFCC16D116D3E6AE00A369B7 /* GeoscrollInstructions.png */; };
@@ -106,6 +115,9 @@
 		EFDBC97A16C89EEE0015A96A /* splash1.png in Resources */ = {isa = PBXBuildFile; fileRef = EFDBC97916C89EEE0015A96A /* splash1.png */; };
 		EFDE5DF116F4A6250014C0AF /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFDE5DF016F4A6250014C0AF /* CoreData.framework */; };
 		EFDE5DF416F4A6B40014C0AF /* FoodItem.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = EFDE5DF216F4A6B40014C0AF /* FoodItem.xcdatamodeld */; };
+		EFE1A4D01715DEFB008C393D /* RefreshView.m in Sources */ = {isa = PBXBuildFile; fileRef = EFE1A4CF1715DEFB008C393D /* RefreshView.m */; };
+		EFE1A4D21715DF7C008C393D /* arrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EFE1A4D11715DF7C008C393D /* arrow@2x.png */; };
+		EFE1A4D71715EF19008C393D /* arrowleft@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EFE1A4D61715EF19008C393D /* arrowleft@2x.png */; };
 		EFE28F401677060B00095554 /* UIImage+Resize.m in Sources */ = {isa = PBXBuildFile; fileRef = EFE28F3B1677060B00095554 /* UIImage+Resize.m */; };
 		EFE28F411677060B00095554 /* UIImage+Alpha.m in Sources */ = {isa = PBXBuildFile; fileRef = EFE28F3D1677060B00095554 /* UIImage+Alpha.m */; };
 		EFE28F421677060B00095554 /* UIImage+RoundedCorner.m in Sources */ = {isa = PBXBuildFile; fileRef = EFE28F3F1677060B00095554 /* UIImage+RoundedCorner.m */; };
@@ -170,7 +182,6 @@
 		EFE5B33216EB9159009F9EDD /* back_button_landscape@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EFE5B33116EB9159009F9EDD /* back_button_landscape@2x.png */; };
 		EFE5B33416EC31E9009F9EDD /* action@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EFE5B33316EC31E9009F9EDD /* action@2x.png */; };
 		EFE7A67916BCB11A0008E4FF /* suggestedLocations.txt in Resources */ = {isa = PBXBuildFile; fileRef = EFE7A67816BCB11A0008E4FF /* suggestedLocations.txt */; };
-		EFE83D3F16C73248005C45A5 /* sandwiches_pepper_food_1600x1200_wallpaper_High Quality Wallpaper_640x960_www.wallpaperhi.com.jpg in Resources */ = {isa = PBXBuildFile; fileRef = EFE83D3E16C73248005C45A5 /* sandwiches_pepper_food_1600x1200_wallpaper_High Quality Wallpaper_640x960_www.wallpaperhi.com.jpg */; };
 		EFE83D4516C73B84005C45A5 /* distance.png in Resources */ = {isa = PBXBuildFile; fileRef = EFE83D4116C73B84005C45A5 /* distance.png */; };
 		EFE83D4616C73B84005C45A5 /* map.png in Resources */ = {isa = PBXBuildFile; fileRef = EFE83D4216C73B84005C45A5 /* map.png */; };
 		EFE83D4716C73B84005C45A5 /* random.png in Resources */ = {isa = PBXBuildFile; fileRef = EFE83D4316C73B84005C45A5 /* random.png */; };
@@ -190,11 +201,11 @@
 		EFF236C416B7655200DA9D0B /* loading-1 (dragged).tiff in Resources */ = {isa = PBXBuildFile; fileRef = EFF236BA16B7655200DA9D0B /* loading-1 (dragged).tiff */; };
 		EFF236C516B7655200DA9D0B /* loading-2 (dragged).tiff in Resources */ = {isa = PBXBuildFile; fileRef = EFF236BB16B7655200DA9D0B /* loading-2 (dragged).tiff */; };
 		EFF236C616B7655200DA9D0B /* loading-3 (dragged).tiff in Resources */ = {isa = PBXBuildFile; fileRef = EFF236BC16B7655200DA9D0B /* loading-3 (dragged).tiff */; };
+		EFF26E80170C29540000D0C5 /* FoodRating.m in Sources */ = {isa = PBXBuildFile; fileRef = EFF26E7F170C29540000D0C5 /* FoodRating.m */; };
 		EFF733FF1706E8DA0072EAA3 /* FoodItem.m in Sources */ = {isa = PBXBuildFile; fileRef = EFF733FE1706E8DA0072EAA3 /* FoodItem.m */; };
 		EFF734021706E8DB0072EAA3 /* FoodDescription.m in Sources */ = {isa = PBXBuildFile; fileRef = EFF734011706E8DB0072EAA3 /* FoodDescription.m */; };
 		EFF734051706E8DB0072EAA3 /* FoodType.m in Sources */ = {isa = PBXBuildFile; fileRef = EFF734041706E8DB0072EAA3 /* FoodType.m */; };
 		EFF7340B1706E8DC0072EAA3 /* FoodImage.m in Sources */ = {isa = PBXBuildFile; fileRef = EFF7340A1706E8DC0072EAA3 /* FoodImage.m */; };
-		EFF734111706EAEE0072EAA3 /* FoodPlace.m in Sources */ = {isa = PBXBuildFile; fileRef = EFF734101706EAEE0072EAA3 /* FoodPlace.m */; };
 		EFFBEC5516E8954400868B45 /* searchWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = EFFBEC5416E8954400868B45 /* searchWhite.png */; };
 		EFFD8D1416B68C4C001DF353 /* back_button@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EFFD8D1316B68C4C001DF353 /* back_button@2x.png */; };
 		EFFD8D1716B693A4001DF353 /* directions@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EFFD8D1616B693A4001DF353 /* directions@2x.png */; };
@@ -232,6 +243,11 @@
 		27FC94DF14D0C14E0000B18C /* InitialSlidingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InitialSlidingViewController.m; sourceTree = "<group>"; };
 		27FC94E214D105C60000B18C /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		349BC2E916DBBE9600A45706 /* libFlurry.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libFlurry.a; sourceTree = "<group>"; };
+		EF09AA591713E80200DF34F1 /* touchScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = touchScrollView.h; sourceTree = "<group>"; };
+		EF09AA5A1713E80200DF34F1 /* touchScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = touchScrollView.m; sourceTree = "<group>"; };
+		EF09AA611714116100DF34F1 /* SimpleKeychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleKeychain.h; sourceTree = "<group>"; };
+		EF09AA621714116100DF34F1 /* SimpleKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimpleKeychain.m; sourceTree = "<group>"; };
+		EF09AA641714122700DF34F1 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		EF0C5E2A16B27C7100288EB3 /* navigation.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = navigation.png; sourceTree = "<group>"; };
 		EF0C5E5116B28C5500288EB3 /* MTStatusBarOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTStatusBarOverlay.h; sourceTree = "<group>"; };
 		EF0C5E5216B28C5500288EB3 /* MTStatusBarOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTStatusBarOverlay.m; sourceTree = "<group>"; };
@@ -250,12 +266,14 @@
 		EF18F5B51705BA710077972A /* ProximaNova-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ProximaNova-Light.otf"; sourceTree = "<group>"; };
 		EF18F5B71705BC480077972A /* Lato-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Regular.ttf"; sourceTree = "<group>"; };
 		EF2BCCBC16BD822100C1192E /* foodtypes.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = foodtypes.txt; sourceTree = "<group>"; };
+		EF2E3B42170DBC4300F8A4E8 /* BarMap@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "BarMap@2x.png"; sourceTree = "<group>"; };
 		EF3A33FA16CBF5AE000E10C5 /* distanceWhite@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "distanceWhite@2x.png"; sourceTree = "<group>"; };
 		EF3A33FE16CBFC5A000E10C5 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = ../icon.png; sourceTree = "<group>"; };
 		EF3D430916AAB79F0064618E /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		EF3E6C1D16EDDB6800ED2448 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 		EF44BD41168B3AD800F7BCB5 /* ShopDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShopDetailViewController.h; sourceTree = "<group>"; };
 		EF44BD42168B3AD800F7BCB5 /* ShopDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShopDetailViewController.m; sourceTree = "<group>"; };
+		EF4E8FF21716AAF10052D019 /* FoodItem.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = FoodItem.sqlite; sourceTree = "<group>"; };
 		EF59502016E9893C00C4CC31 /* randomize.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = randomize.png; sourceTree = "<group>"; };
 		EF5FDC0516D8CEF30019E3BA /* MapSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapSearchViewController.h; sourceTree = "<group>"; };
 		EF5FDC0616D8CEF30019E3BA /* MapSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapSearchViewController.m; sourceTree = "<group>"; };
@@ -275,6 +293,12 @@
 		EF9A294216FC74C200FF89DD /* bakuteh.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = bakuteh.jpg; sourceTree = "<group>"; };
 		EF9A294316FC74C300FF89DD /* chillycrab.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = chillycrab.jpg; sourceTree = "<group>"; };
 		EF9A294C16FC847F00FF89DD /* howtonavigatecopy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = howtonavigatecopy.png; sourceTree = "<group>"; };
+		EF9B0F3E171276B1008B3C5A /* NewRelicAgent.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NewRelicAgent.framework; path = ../../../Downloads/NewRelic_iOS_Agent_1.309/NewRelicAgent.framework; sourceTree = "<group>"; };
+		EF9B0F40171276CA008B3C5A /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
+		EF9B0F421712AECA008B3C5A /* SlidingCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SlidingCellView.h; sourceTree = "<group>"; };
+		EF9B0F431712AECA008B3C5A /* SlidingCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SlidingCellView.m; sourceTree = "<group>"; };
+		EF9B0F4B17132740008B3C5A /* FoodPlace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FoodPlace.h; sourceTree = "<group>"; };
+		EF9B0F4C17132740008B3C5A /* FoodPlace.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FoodPlace.m; sourceTree = "<group>"; };
 		EF9D8919167A44A8002B352D /* CrumbPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CrumbPath.h; sourceTree = "<group>"; };
 		EF9D891A167A44A8002B352D /* CrumbPath.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CrumbPath.m; sourceTree = "<group>"; };
 		EF9D891B167A44A8002B352D /* CrumbPathView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CrumbPathView.h; sourceTree = "<group>"; };
@@ -308,7 +332,6 @@
 		EFA83A8116B1197800BD8057 /* TrieNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrieNode.m; sourceTree = "<group>"; };
 		EFA83A8216B1197800BD8057 /* Trie.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Trie.h; sourceTree = "<group>"; };
 		EFA83A8316B1197800BD8057 /* Trie.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Trie.m; sourceTree = "<group>"; };
-		EFA913631706FBB500A9C932 /* FoodItem.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = FoodItem.sqlite; sourceTree = "<group>"; };
 		EFB7CF55169EBE4600E1AED6 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		EFB7CF56169EBE4600E1AED6 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		EFB7CF57169EBE4600E1AED6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -325,6 +348,8 @@
 		EFC3BD8B16CFB651005D133F /* pinLoad-4 (dragged).tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "pinLoad-4 (dragged).tiff"; sourceTree = "<group>"; };
 		EFC526DC169A9D5B00D9DFBF /* CrumbObj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CrumbObj.h; sourceTree = "<group>"; };
 		EFC526DD169A9D5B00D9DFBF /* CrumbObj.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CrumbObj.m; sourceTree = "<group>"; };
+		EFC565AD17072EAF0089C8CF /* FoodPlaceViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FoodPlaceViewController.h; sourceTree = "<group>"; };
+		EFC565AE17072EAF0089C8CF /* FoodPlaceViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FoodPlaceViewController.m; sourceTree = "<group>"; };
 		EFCC16CD16D3E2D000A369B7 /* MenuInstructions.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MenuInstructions.png; sourceTree = "<group>"; };
 		EFCC16CF16D3E60000A369B7 /* MapInstructions.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MapInstructions.png; sourceTree = "<group>"; };
 		EFCC16D116D3E6AE00A369B7 /* GeoscrollInstructions.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GeoscrollInstructions.png; sourceTree = "<group>"; };
@@ -342,6 +367,10 @@
 		EFDBC97916C89EEE0015A96A /* splash1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = splash1.png; sourceTree = "<group>"; };
 		EFDE5DF016F4A6250014C0AF /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		EFDE5DF316F4A6B40014C0AF /* FoodItem.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FoodItem.xcdatamodel; sourceTree = "<group>"; };
+		EFE1A4CE1715DEFB008C393D /* RefreshView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RefreshView.h; sourceTree = "<group>"; };
+		EFE1A4CF1715DEFB008C393D /* RefreshView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RefreshView.m; sourceTree = "<group>"; };
+		EFE1A4D11715DF7C008C393D /* arrow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "arrow@2x.png"; sourceTree = "<group>"; };
+		EFE1A4D61715EF19008C393D /* arrowleft@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "arrowleft@2x.png"; sourceTree = "<group>"; };
 		EFE28F3A1677060B00095554 /* UIImage+Resize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Resize.h"; sourceTree = "<group>"; };
 		EFE28F3B1677060B00095554 /* UIImage+Resize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Resize.m"; sourceTree = "<group>"; };
 		EFE28F3C1677060B00095554 /* UIImage+Alpha.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Alpha.h"; sourceTree = "<group>"; };
@@ -437,7 +466,6 @@
 		EFE5B33116EB9159009F9EDD /* back_button_landscape@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "back_button_landscape@2x.png"; path = "../back_button_landscape@2x.png"; sourceTree = "<group>"; };
 		EFE5B33316EC31E9009F9EDD /* action@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "action@2x.png"; path = "../action@2x.png"; sourceTree = "<group>"; };
 		EFE7A67816BCB11A0008E4FF /* suggestedLocations.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = suggestedLocations.txt; path = ../suggestedLocations.txt; sourceTree = "<group>"; };
-		EFE83D3E16C73248005C45A5 /* sandwiches_pepper_food_1600x1200_wallpaper_High Quality Wallpaper_640x960_www.wallpaperhi.com.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "sandwiches_pepper_food_1600x1200_wallpaper_High Quality Wallpaper_640x960_www.wallpaperhi.com.jpg"; sourceTree = "<group>"; };
 		EFE83D4116C73B84005C45A5 /* distance.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = distance.png; sourceTree = "<group>"; };
 		EFE83D4216C73B84005C45A5 /* map.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = map.png; sourceTree = "<group>"; };
 		EFE83D4316C73B84005C45A5 /* random.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = random.png; sourceTree = "<group>"; };
@@ -458,6 +486,8 @@
 		EFF236BA16B7655200DA9D0B /* loading-1 (dragged).tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "loading-1 (dragged).tiff"; sourceTree = "<group>"; };
 		EFF236BB16B7655200DA9D0B /* loading-2 (dragged).tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "loading-2 (dragged).tiff"; sourceTree = "<group>"; };
 		EFF236BC16B7655200DA9D0B /* loading-3 (dragged).tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "loading-3 (dragged).tiff"; sourceTree = "<group>"; };
+		EFF26E7E170C29540000D0C5 /* FoodRating.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FoodRating.h; sourceTree = "<group>"; };
+		EFF26E7F170C29540000D0C5 /* FoodRating.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FoodRating.m; sourceTree = "<group>"; };
 		EFF733FD1706E8DA0072EAA3 /* FoodItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FoodItem.h; sourceTree = "<group>"; };
 		EFF733FE1706E8DA0072EAA3 /* FoodItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FoodItem.m; sourceTree = "<group>"; };
 		EFF734001706E8DB0072EAA3 /* FoodDescription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FoodDescription.h; sourceTree = "<group>"; };
@@ -466,8 +496,6 @@
 		EFF734041706E8DB0072EAA3 /* FoodType.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FoodType.m; sourceTree = "<group>"; };
 		EFF734091706E8DC0072EAA3 /* FoodImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FoodImage.h; sourceTree = "<group>"; };
 		EFF7340A1706E8DC0072EAA3 /* FoodImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FoodImage.m; sourceTree = "<group>"; };
-		EFF7340F1706EAEE0072EAA3 /* FoodPlace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FoodPlace.h; sourceTree = "<group>"; };
-		EFF734101706EAEE0072EAA3 /* FoodPlace.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FoodPlace.m; sourceTree = "<group>"; };
 		EFFBEC5416E8954400868B45 /* searchWhite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = searchWhite.png; sourceTree = "<group>"; };
 		EFFD8D1316B68C4C001DF353 /* back_button@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "back_button@2x.png"; sourceTree = "<group>"; };
 		EFFD8D1616B693A4001DF353 /* directions@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "directions@2x.png"; sourceTree = "<group>"; };
@@ -481,6 +509,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EF09AA651714122800DF34F1 /* Security.framework in Frameworks */,
+				EF9B0F41171276CA008B3C5A /* CoreTelephony.framework in Frameworks */,
+				EF9B0F3F171276B1008B3C5A /* NewRelicAgent.framework in Frameworks */,
 				EFDE5DF116F4A6250014C0AF /* CoreData.framework in Frameworks */,
 				EFEE06FA16F2E6FE00710EA3 /* Social.framework in Frameworks */,
 				EFA44FD816B2737F004D40E7 /* AdSupport.framework in Frameworks */,
@@ -520,13 +551,15 @@
 			isa = PBXGroup;
 			children = (
 				EFC1903D16FF58220014243E /* myloc.gpx */,
-				EFDE5DF016F4A6250014C0AF /* CoreData.framework */,
-				EFEE06F916F2E6FE00710EA3 /* Social.framework */,
 				EF68E9F416DD13CA006A6D84 /* libFlurry.a */,
 				EFC1903B16FF567F0014243E /* icon@2x.png */,
 				EF18F5B71705BC480077972A /* Lato-Regular.ttf */,
 				EF18F5B51705BA710077972A /* ProximaNova-Light.otf */,
 				349BC2E916DBBE9600A45706 /* libFlurry.a */,
+				EFE1A4CE1715DEFB008C393D /* RefreshView.h */,
+				EFE1A4CF1715DEFB008C393D /* RefreshView.m */,
+				EFE1A4D11715DF7C008C393D /* arrow@2x.png */,
+				EFE1A4D61715EF19008C393D /* arrowleft@2x.png */,
 				EFDE5E4516F4B0F20014C0AF /* CoreData */,
 				2750E77614CDB0DF007727A0 /* ECSlidingViewController */,
 				2750E76F14CDB0DF007727A0 /* Frameworks */,
@@ -545,6 +578,11 @@
 		2750E76F14CDB0DF007727A0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EF09AA641714122700DF34F1 /* Security.framework */,
+				EF9B0F40171276CA008B3C5A /* CoreTelephony.framework */,
+				EF9B0F3E171276B1008B3C5A /* NewRelicAgent.framework */,
+				EFDE5DF016F4A6250014C0AF /* CoreData.framework */,
+				EFEE06F916F2E6FE00710EA3 /* Social.framework */,
 				EF3E6C1D16EDDB6800ED2448 /* CoreImage.framework */,
 				EFEE06F716F2E51000710EA3 /* Accounts.framework */,
 				EFEE06F516F2D8D300710EA3 /* FacebookSDK.framework */,
@@ -584,6 +622,8 @@
 				2750E78914CDB1C7007727A0 /* Vendor */,
 				2750E77F14CDB0DF007727A0 /* AppDelegate.h */,
 				2750E78014CDB0DF007727A0 /* AppDelegate.m */,
+				EF09AA611714116100DF34F1 /* SimpleKeychain.h */,
+				EF09AA621714116100DF34F1 /* SimpleKeychain.m */,
 				2750E77714CDB0DF007727A0 /* Supporting Files */,
 				2750E78714CDB114007727A0 /* iPhone.storyboard */,
 				27407EEB14D8787E0035FD7F /* iPad.storyboard */,
@@ -736,18 +776,20 @@
 		EFDE5E4516F4B0F20014C0AF /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
-				EFA913631706FBB500A9C932 /* FoodItem.sqlite */,
-				EFF7340F1706EAEE0072EAA3 /* FoodPlace.h */,
-				EFF734101706EAEE0072EAA3 /* FoodPlace.m */,
+				EF4E8FF21716AAF10052D019 /* FoodItem.sqlite */,
+				EF9B0F4B17132740008B3C5A /* FoodPlace.h */,
+				EF9B0F4C17132740008B3C5A /* FoodPlace.m */,
 				EFDE5DF216F4A6B40014C0AF /* FoodItem.xcdatamodeld */,
+				EFF26E7E170C29540000D0C5 /* FoodRating.h */,
+				EFF26E7F170C29540000D0C5 /* FoodRating.m */,
 				EFF733FD1706E8DA0072EAA3 /* FoodItem.h */,
+				EFF733FE1706E8DA0072EAA3 /* FoodItem.m */,
 				EFF734091706E8DC0072EAA3 /* FoodImage.h */,
 				EFF7340A1706E8DC0072EAA3 /* FoodImage.m */,
 				EFF734031706E8DB0072EAA3 /* FoodType.h */,
 				EFF734041706E8DB0072EAA3 /* FoodType.m */,
 				EFF734001706E8DB0072EAA3 /* FoodDescription.h */,
 				EFF734011706E8DB0072EAA3 /* FoodDescription.m */,
-				EFF733FE1706E8DA0072EAA3 /* FoodItem.m */,
 			);
 			name = CoreData;
 			sourceTree = "<group>";
@@ -784,6 +826,8 @@
 				EF9016F316AC172B0089C57D /* MenuCell.xib */,
 				EFE28F4B1677065200095554 /* RotatingTableCell.h */,
 				EFE28F4C1677065200095554 /* RotatingTableCell.m */,
+				EF9B0F421712AECA008B3C5A /* SlidingCellView.h */,
+				EF9B0F431712AECA008B3C5A /* SlidingCellView.m */,
 				EFE28F4D1677065200095554 /* SorterCell.h */,
 				EFE28F4E1677065200095554 /* SorterCell.m */,
 				EFE28F4F1677065200095554 /* SorterCell.xib */,
@@ -827,6 +871,8 @@
 			children = (
 				EF44BD41168B3AD800F7BCB5 /* ShopDetailViewController.h */,
 				EF44BD42168B3AD800F7BCB5 /* ShopDetailViewController.m */,
+				EFC565AD17072EAF0089C8CF /* FoodPlaceViewController.h */,
+				EFC565AE17072EAF0089C8CF /* FoodPlaceViewController.m */,
 				EF90D2EF16F81F6A00767290 /* EditTagsViewController.m */,
 				EF90D2F016F81F6B00767290 /* EditTagsViewController.h */,
 				EFE28F7A1677078F00095554 /* MapNavViewController.h */,
@@ -837,6 +883,8 @@
 				EFE28F7F1677078F00095554 /* GeoScrollViewController.m */,
 				EF9A293B16FC46EA00FF89DD /* LoadingViewController.h */,
 				EF9A293C16FC46EA00FF89DD /* LoadingViewController.m */,
+				EF09AA591713E80200DF34F1 /* touchScrollView.h */,
+				EF09AA5A1713E80200DF34F1 /* touchScrollView.m */,
 				EFA83A8616B1198100BD8057 /* Search */,
 				EFE28F801677078F00095554 /* UnderMapViewController.h */,
 				EFE28F811677078F00095554 /* UnderMapViewController.m */,
@@ -877,6 +925,7 @@
 		EFE28FA0167707E700095554 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				EF2E3B42170DBC4300F8A4E8 /* BarMap@2x.png */,
 				EF9A294C16FC847F00FF89DD /* howtonavigatecopy.png */,
 				EFD30AF016ECC5C100B2751A /* locationBlue.png */,
 				EFE5B33116EB9159009F9EDD /* back_button_landscape@2x.png */,
@@ -904,7 +953,6 @@
 				EF0C5E5A16B2C9C700288EB3 /* toolnav.png */,
 				EFDBC97916C89EEE0015A96A /* splash1.png */,
 				EFE83D4016C73B70005C45A5 /* icons */,
-				EFE83D3E16C73248005C45A5 /* sandwiches_pepper_food_1600x1200_wallpaper_High Quality Wallpaper_640x960_www.wallpaperhi.com.jpg */,
 				EFE28FC41677081400095554 /* flag@2x.png */,
 				EFE28FC51677081400095554 /* flag.png */,
 				EFE28FC61677081400095554 /* statusBarBackgroundGrey.png */,
@@ -1076,7 +1124,6 @@
 				EFF236C616B7655200DA9D0B /* loading-3 (dragged).tiff in Resources */,
 				EFE7A67916BCB11A0008E4FF /* suggestedLocations.txt in Resources */,
 				EF2BCCBD16BD822100C1192E /* foodtypes.txt in Resources */,
-				EFE83D3F16C73248005C45A5 /* sandwiches_pepper_food_1600x1200_wallpaper_High Quality Wallpaper_640x960_www.wallpaperhi.com.jpg in Resources */,
 				EFE83D4516C73B84005C45A5 /* distance.png in Resources */,
 				EFE83D4616C73B84005C45A5 /* map.png in Resources */,
 				EFE83D4716C73B84005C45A5 /* random.png in Resources */,
@@ -1121,7 +1168,10 @@
 				EFC1903E16FF58220014243E /* myloc.gpx in Resources */,
 				EF18F5B61705BA710077972A /* ProximaNova-Light.otf in Resources */,
 				EF18F5B81705BC480077972A /* Lato-Regular.ttf in Resources */,
-				EFA913641706FBB500A9C932 /* FoodItem.sqlite in Resources */,
+				EF2E3B43170DBC4300F8A4E8 /* BarMap@2x.png in Resources */,
+				EFE1A4D21715DF7C008C393D /* arrow@2x.png in Resources */,
+				EFE1A4D71715EF19008C393D /* arrowleft@2x.png in Resources */,
+				EF4E8FF31716AAF10052D019 /* FoodItem.sqlite in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1193,7 +1243,13 @@
 				EFF734021706E8DB0072EAA3 /* FoodDescription.m in Sources */,
 				EFF734051706E8DB0072EAA3 /* FoodType.m in Sources */,
 				EFF7340B1706E8DC0072EAA3 /* FoodImage.m in Sources */,
-				EFF734111706EAEE0072EAA3 /* FoodPlace.m in Sources */,
+				EFC565AF17072EAF0089C8CF /* FoodPlaceViewController.m in Sources */,
+				EFF26E80170C29540000D0C5 /* FoodRating.m in Sources */,
+				EF9B0F441712AECA008B3C5A /* SlidingCellView.m in Sources */,
+				EF9B0F4D17132741008B3C5A /* FoodPlace.m in Sources */,
+				EF09AA5B1713E80200DF34F1 /* touchScrollView.m in Sources */,
+				EF09AA631714116100DF34F1 /* SimpleKeychain.m in Sources */,
+				EFE1A4D01715DEFB008C393D /* RefreshView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1277,6 +1333,7 @@
 					"\"$(SRCROOT)\"",
 					"\"$(SRCROOT)/../../../Downloads\"",
 					"\"$(SRCROOT)/../../../Documents/FacebookSDK\"",
+					"\"$(SRCROOT)/../../../Downloads/NewRelic_iOS_Agent_1.309\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ECSlidingViewController/ECSlidingViewController-Prefix.pch";
@@ -1295,8 +1352,8 @@
 					"-all_load",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "8A1CA49A-1F4D-435C-A7B8-A695095FCB5B";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "8A1CA49A-1F4D-435C-A7B8-A695095FCB5B";
+				PROVISIONING_PROFILE = "265F9983-406B-4B28-8289-B0E0F5A0BE48";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "265F9983-406B-4B28-8289-B0E0F5A0BE48";
 				STRIP_INSTALLED_PRODUCT = NO;
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
@@ -1314,6 +1371,7 @@
 					"\"$(SRCROOT)\"",
 					"\"$(SRCROOT)/../../../Downloads\"",
 					"\"$(SRCROOT)/../../../Documents/FacebookSDK\"",
+					"\"$(SRCROOT)/../../../Downloads/NewRelic_iOS_Agent_1.309\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ECSlidingViewController/ECSlidingViewController-Prefix.pch";
@@ -1332,8 +1390,8 @@
 					"-all_load",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "8A1CA49A-1F4D-435C-A7B8-A695095FCB5B";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "8A1CA49A-1F4D-435C-A7B8-A695095FCB5B";
+				PROVISIONING_PROFILE = "265F9983-406B-4B28-8289-B0E0F5A0BE48";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "265F9983-406B-4B28-8289-B0E0F5A0BE48";
 				STRIP_INSTALLED_PRODUCT = NO;
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;

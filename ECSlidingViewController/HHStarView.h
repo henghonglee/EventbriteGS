@@ -7,12 +7,24 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "FoodPlace.h"
 @interface HHStarView : UIView
-@property (nonatomic) float maxrating;
-@property (nonatomic) float rating;
+{
+    dispatch_queue_t GSdataSerialQueue;
+}
+@property dispatch_queue_t GSdataSerialQueue;
+@property (nonatomic) int userRating;
+@property (nonatomic) BOOL isSending;
+@property (nonatomic) int maxrating;
+@property (nonatomic) int rating;
+@property (nonatomic,strong) NSManagedObjectContext* context;
+@property (nonatomic) float kLabelAllowance;
 @property (nonatomic,strong) NSTimer* timer;
 @property (nonatomic,strong) UILabel* label;
-- (id)initWithFrame:(CGRect)frame andRating:(float)rating animated:(BOOL)animated;
--(void)rating:(float)rating withAnimation:(BOOL)animated;
+@property (nonatomic,strong) UILabel* sublabel;
+@property (nonatomic,strong) FoodPlace* foodplace;
+
+- (id)initWithFrame:(CGRect)frame andRating:(int)rating withLabel:(BOOL)label animated:(BOOL)animated;
+-(void)starViewSetRating:(int)Rating isUser:(BOOL)isUser;
+-(void)deleteUserRatingsForStall;
 @end
