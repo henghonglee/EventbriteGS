@@ -2,14 +2,14 @@
 //  FoodItem.h
 //  ECSlidingViewController
 //
-//  Created by HengHong on 30/3/13.
+//  Created by HengHong on 19/4/13.
 //
 //
 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 
-@class FoodDescription, FoodImage, FoodType;
+@class FoodDescription, FoodImage, FoodPlace, FoodType;
 
 @interface FoodItem : NSManagedObject
 
@@ -30,7 +30,7 @@
 @property (nonatomic, retain) FoodDescription *descriptionHTML;
 @property (nonatomic, retain) NSSet *foodtypes;
 @property (nonatomic, retain) NSSet *images;
-@property (nonatomic, retain) NSManagedObject *place;
+@property (nonatomic, retain) FoodPlace *place;
 @end
 
 @interface FoodItem (CoreDataGeneratedAccessors)

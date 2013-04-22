@@ -8,6 +8,9 @@
 
 #import "MapSearchViewController.h"
 #import "AFHTTPClient.h"
+#import "TBAPIClient.h"
+#import <MapKit/MapKit.h>
+#import <AddressBook/AddressBook.h>
 @interface MapSearchViewController () <UISearchDisplayDelegate, UISearchBarDelegate>
 
 @end
@@ -115,12 +118,25 @@
             addressString = [addressString stringByAppendingFormat:@" , %@",formattedAddress];
         }
     }
+    NSString *street = [item.placemark.addressDictionary valueForKey:(NSString *)kABPersonAddressStreetKey];
 
+    NSString *zip = [item.placemark.addressDictionary valueForKey:(NSString *)kABPersonAddressZIPKey];
+    NSString *country = [item.placemark.addressDictionary valueForKey:(NSString *)kABPersonAddressCountryKey];
+    NSLog(@"%@",[NSString stringWithFormat:@"%f,%f,%@,%@,%@",item.placemark.location.coordinate.latitude,item.placemark.location.coordinate.longitude,street,country,zip]);
+  
+    AFHTTPClient* afclient = [TBAPIClient sharedClient];
+    for (FoodItem* fooditem in self.gsobj.items) {
+        [afclient putPath:[NSString stringWithFormat:@"/items/%d",fooditem.item_id.intValue] parameters:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"%f",item.placemark.location.coordinate.latitude],@"item[latitude]",[NSString stringWithFormat:@"%f",item.placemark.location.coordinate.longitude],@"item[longitude]",[NSString stringWithFormat:@"%@, %@ %@",street,country,zip],@"item[location]", nil] success:^(AFHTTPRequestOperation *operation, id responseObject) {
+            
+            
+        } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+            UIAlertView* alert = [[UIAlertView alloc]initWithTitle:@"Error!" message:[NSString stringWithFormat:@"%@",error] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [alert show];
+        }];
+    }
     
     
-    NSURL *tokenurl = [NSURL URLWithString:@"http://tastebudsapp.herokuapp.com"];
-    AFHTTPClient* afclient = [[AFHTTPClient alloc]initWithBaseURL:tokenurl];
-    [afclient putPath:[NSString stringWithFormat:@"/items/%d",self.gsobj.item_id.intValue] parameters:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"%f",item.placemark.location.coordinate.latitude],@"item[latitude]",[NSString stringWithFormat:@"%f",item.placemark.location.coordinate.longitude],@"item[longitude]",[NSString stringWithFormat:@"%@",addressString],@"item[location]", nil] success:^(AFHTTPRequestOperation *operation, id responseObject) {
+    [afclient putPath:[NSString stringWithFormat:@"/places/%d",self.gsobj.item_id.intValue] parameters:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"%f",item.placemark.location.coordinate.latitude],@"place[latitude]",[NSString stringWithFormat:@"%f",item.placemark.location.coordinate.longitude],@"place[longitude]", nil] success:^(AFHTTPRequestOperation *operation, id responseObject) {
         UIAlertView* alert = [[UIAlertView alloc]initWithTitle:@"Success!" message:[NSString stringWithFormat:@"%f,%f,%@",item.placemark.location.coordinate.latitude,item.placemark.location.coordinate.longitude,[NSString stringWithFormat:@"%@",addressString]] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
         
@@ -128,7 +144,6 @@
         UIAlertView* alert = [[UIAlertView alloc]initWithTitle:@"Error!" message:[NSString stringWithFormat:@"%@",error] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
     }];
-    
 
 }
 

@@ -22,7 +22,8 @@
         [self setDelegate:self];
         [pullBottomToRefreshView setRefreshDelegate:self];
         [self addSubview:pullBottomToRefreshView];
-		
+        
+    
     }
     return self;
 }
@@ -51,7 +52,10 @@
         self.rightRefresh();
     }
 }
-
+-(BOOL)dataIsLoading:(RefreshView *)view
+{
+    return NO;
+}
 
 - (void)doneLoadingData:(RefreshView*)refreshView{
     
@@ -61,13 +65,16 @@
 }
 
 
-- (void) touchesEnded: (NSSet *) touches withEvent: (UIEvent *) event
-{
-    NSLog(@"touch scroll");
-    [[self nextResponder] touchesEnded:touches withEvent:event];
-}
-- (void) touchesBegan: (NSSet*) touches withEvent: (UIEvent*) event
-{
-    [[self nextResponder] touchesBegan:touches withEvent:event];
-}
+//- (void) touchesEnded: (NSSet *) touches withEvent: (UIEvent *) event
+//{
+//   
+//    NSLog(@"nextResponder = %@,%@,%@", self.nextResponder,touches,event);
+//    
+//    [[self nextResponder] touchesEnded:touches withEvent:event];
+//}
+//- (void) touchesBegan: (NSSet*) touches withEvent: (UIEvent*) event
+//{
+//     NSLog(@"nextResponder = %@", self.nextResponder);
+//    [[self nextResponder] touchesBegan:touches withEvent:event];
+//}
 @end

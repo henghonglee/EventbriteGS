@@ -20,11 +20,12 @@
     if (self) {
         self.opaque = NO;
         self.backgroundColor = [UIColor clearColor];
+        self.animated = animated;
         _maxrating = rating;
         //*(self.bounds.size.width-frame.size.height-kLabelAllowance);
-        if (animated) {
-            _rating = 0;
-            timer = [NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector:@selector(increaseRating) userInfo:nil repeats:YES];
+        if (self.animated) {
+            //_rating = 0;
+           // timer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(increaseRating) userInfo:nil repeats:YES];
         }else{
             _rating = _maxrating;
          
@@ -40,7 +41,11 @@
             [self addSubview:self.label];
             self.sublabel = [[UILabel alloc]initWithFrame:CGRectMake(self.bounds.size.width-kLabelAllowance , self.bounds.size.height-15,kLabelAllowance, 15)];
             self.sublabel.font = [UIFont systemFontOfSize:11.0f];
-            self.sublabel.text = [NSString stringWithFormat:@"%d votes",self.foodplace.rate_count.intValue];
+            if (self.foodplace.rate_count.intValue == 1) {
+                self.sublabel.text = [NSString stringWithFormat:@"%d vote",self.foodplace.rate_count.intValue];
+            }else{
+                self.sublabel.text = [NSString stringWithFormat:@"%d votes",self.foodplace.rate_count.intValue];
+            }
             self.sublabel.textAlignment = NSTextAlignmentRight;
             self.sublabel.textColor = [UIColor whiteColor];
             self.sublabel.backgroundColor = [UIColor clearColor];
@@ -61,12 +66,40 @@
     
     if (_rating<_maxrating) {
         _rating = _rating + 1;
+        if (self.label) 
+            self.label.text = [NSString stringWithFormat:@"%d%%",self.rating];
         [self setNeedsDisplay];
     }else{
         [timer invalidate];
     }
 }
-
+-(void)starViewSetRating:(int)Rating isUser:(BOOL)isUser isAnimated:(BOOL)isanimated
+{
+    if (isUser) {
+        self.userRating= Rating;
+        self.rating = self.userRating;
+    }else{
+        self.maxrating = Rating;
+        self.rating=Rating;
+        self.userRating = 0.0f;
+        if (isanimated) {
+            _rating = 0;
+            timer = [NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector:@selector(increaseRating) userInfo:nil repeats:YES];
+        }else{
+            _rating = _maxrating;
+            
+        }
+    }
+    if (self.label) {
+        self.label.text = [NSString stringWithFormat:@"%d%%",self.maxrating];
+        if (self.foodplace.rate_count.intValue == 1) {
+            self.sublabel.text = [NSString stringWithFormat:@"%d vote",self.foodplace.rate_count.intValue];
+        }else{
+            self.sublabel.text = [NSString stringWithFormat:@"%d votes",self.foodplace.rate_count.intValue];
+        }
+    }
+    [self setNeedsDisplay];
+}
 
 -(void)starViewSetRating:(int)Rating isUser:(BOOL)isUser
 {
@@ -80,17 +113,21 @@
     }
     if (self.label) {
         self.label.text = [NSString stringWithFormat:@"%d%%",self.rating];
-        self.sublabel.text = [NSString stringWithFormat:@"%d votes",self.foodplace.rate_count.intValue];
+        if (self.foodplace.rate_count.intValue == 1) {
+            self.sublabel.text = [NSString stringWithFormat:@"%d vote",self.foodplace.rate_count.intValue];
+        }else{
+            self.sublabel.text = [NSString stringWithFormat:@"%d votes",self.foodplace.rate_count.intValue];
+        }
     }
     [self setNeedsDisplay];
 }
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
+
 - (void)drawRect:(CGRect)rect
 {
-    UIImage* image = [UIImage imageNamed:@"5starsgray.png"];
+    
+//    UIImage* image = [UIImage imageNamed:@"5starsgray.png"];
     CGRect newrect = CGRectMake(0, 0, self.bounds.size.width-kLabelAllowance, self.bounds.size.height);
-    [image drawInRect:newrect];
+//    [image drawInRect:newrect];
     
     CGContextRef drawcontext = UIGraphicsGetCurrentContext();
     CGContextClipToMask(drawcontext, newrect, [UIImage imageNamed:@"5starflip.png"].CGImage);
@@ -150,7 +187,11 @@
         
         if (self.label) {
             self.label.text = [NSString stringWithFormat:@"%d%%",self.rating];
-            self.sublabel.text = [NSString stringWithFormat:@"%d votes",self.foodplace.rate_count.intValue];
+            if (self.foodplace.rate_count.intValue == 1) {
+                self.sublabel.text = [NSString stringWithFormat:@"%d vote",self.foodplace.rate_count.intValue];
+            }else{
+                self.sublabel.text = [NSString stringWithFormat:@"%d votes",self.foodplace.rate_count.intValue];
+            }
         }
         [self setNeedsDisplay];
         NSDictionary* ratingDict = [NSDictionary dictionaryWithObjectsAndKeys:self.foodplace.item_id,@"place_id",[NSNumber numberWithInt:[[[NSUserDefaults standardUserDefaults] objectForKey:@"user_id"] intValue]],@"user_id",[NSNumber numberWithInt:self.userRating],@"score",nil];
@@ -181,7 +222,11 @@
         self.rating = self.userRating;
         if (self.label) {
             self.label.text = [NSString stringWithFormat:@"%d%%",self.rating];
-            self.sublabel.text = [NSString stringWithFormat:@"%d votes",self.foodplace.rate_count.intValue];
+            if (self.foodplace.rate_count.intValue == 1) {
+                self.sublabel.text = [NSString stringWithFormat:@"%d vote",self.foodplace.rate_count.intValue];
+            }else{
+                self.sublabel.text = [NSString stringWithFormat:@"%d votes",self.foodplace.rate_count.intValue];
+            }
         }
         [self setNeedsDisplay];
         NSDictionary* ratingDict = [NSDictionary dictionaryWithObjectsAndKeys:self.foodplace.item_id,@"place_id",[NSNumber numberWithInt:[[[NSUserDefaults standardUserDefaults] objectForKey:@"user_id"] intValue]],@"user_id",[NSNumber numberWithInt:self.userRating],@"score",nil];
@@ -200,7 +245,7 @@
         request.entity = [NSEntityDescription entityForName:@"FoodRating" inManagedObjectContext:context];
         
         request.predicate = [NSPredicate predicateWithFormat:@"place_id = %d AND user_id = %d", [[ratingDictionary objectForKey:@"place_id"] intValue],[[ratingDictionary objectForKey:@"user_id"] intValue]];
-        
+        request.fetchLimit = 1;
         NSError *executeFetchError = nil;
         foodrating = [[context executeFetchRequest:request error:&executeFetchError] lastObject];
         if (executeFetchError) {
@@ -229,24 +274,24 @@
 
 -(void)refreshFoodPlaceRatingWithFoodRating:(FoodRating*)foodrating andContext:(NSManagedObjectContext*)context withPrevRating:(NSNumber*)prevRating
 {
-    NSError* executeFetchError = nil;
-    FoodPlace *place = nil;
-    NSFetchRequest *placeRequest = [[NSFetchRequest alloc] init];
-    placeRequest.includesPropertyValues = YES;
-    placeRequest.returnsObjectsAsFaults = NO;
-    placeRequest.entity = [NSEntityDescription entityForName:@"FoodPlace" inManagedObjectContext:context];
-    placeRequest.predicate = [NSPredicate predicateWithFormat:@"item_id = %d", foodrating.place_id.intValue];
-    
-    place = [[context executeFetchRequest:placeRequest error:&executeFetchError] lastObject];
-    if (executeFetchError) {
-        
-    } else if (!place) {
-        NSLog(@"got rating without place");
-        NSAssert(false, @"We've got a rating without a food place ... shouldnt happen");
-    }
+//    NSError* executeFetchError = nil;
+//    FoodPlace *place = nil;
+//    NSFetchRequest *placeRequest = [[NSFetchRequest alloc] init];
+//    placeRequest.includesPropertyValues = YES;
+//    placeRequest.returnsObjectsAsFaults = NO;
+//    placeRequest.entity = [NSEntityDescription entityForName:@"FoodPlace" inManagedObjectContext:context];
+//    placeRequest.predicate = [NSPredicate predicateWithFormat:@"item_id = %d", foodrating.place_id.intValue];
+//    
+//    place = [[context executeFetchRequest:placeRequest error:&executeFetchError] lastObject];
+//    if (executeFetchError) {
+//        
+//    } else if (!place) {
+//        NSLog(@"got rating without place");
+//        NSAssert(false, @"We've got a rating without a food place ... shouldnt happen");
+//    }
     
     BOOL placeIsRated = NO;
-    for (FoodRating *placeRating in place.ratings) {
+    for (FoodRating *placeRating in self.foodplace.ratings) {
         if ([placeRating.item_id isEqualToNumber:foodrating.item_id]) {
             NSLog(@"rating already has foodplace");
             placeIsRated = YES;
@@ -255,7 +300,7 @@
     if (!placeIsRated) {
         NSLog(@"adding rating to foodplace");
         float currentTotal = self.foodplace.current_rating.floatValue * self.foodplace.rate_count.intValue;
-        currentTotal = currentTotal - prevRating.intValue + foodrating.score.intValue;
+        currentTotal = currentTotal + foodrating.score.intValue;
         
         [self.foodplace addRatingsObject:foodrating];
         
@@ -264,7 +309,11 @@
         NSLog(@"setting food place current rating to %d", self.foodplace.current_rating.intValue);
         [self.foodplace setCurrent_user_rated:[NSNumber numberWithBool:YES]];
         if (self.label) {
-            self.sublabel.text = [NSString stringWithFormat:@"%d votes",self.foodplace.rate_count.intValue];
+            if (self.foodplace.rate_count.intValue == 1) {
+                self.sublabel.text = [NSString stringWithFormat:@"%d vote",self.foodplace.rate_count.intValue];
+            }else{
+                self.sublabel.text = [NSString stringWithFormat:@"%d votes",self.foodplace.rate_count.intValue];
+            }
         }
         [self setNeedsDisplay];
         return;
@@ -282,7 +331,11 @@
     self.foodplace.current_rating = [NSNumber numberWithInt:(currentTotal/self.foodplace.rate_count.intValue)];
     NSLog(@"current rating to %d",self.foodplace.current_rating.intValue );
     if (self.label) {
-        self.sublabel.text = [NSString stringWithFormat:@"%d votes",self.foodplace.rate_count.intValue];
+        if (self.foodplace.rate_count.intValue == 1) {
+            self.sublabel.text = [NSString stringWithFormat:@"%d vote",self.foodplace.rate_count.intValue];
+        }else{
+            self.sublabel.text = [NSString stringWithFormat:@"%d votes",self.foodplace.rate_count.intValue];
+        }
     }
     [self setNeedsDisplay];
 }
@@ -296,7 +349,11 @@
         NSLog(@"observer change rating to %d",((HHStarView*)object).foodplace.current_rating.intValue );
         [self starViewSetRating:((HHStarView*)object).foodplace.current_rating.intValue isUser:NO];
         if (self.label) {
-            self.sublabel.text = [NSString stringWithFormat:@"%d votes",((HHStarView*)object).foodplace.rate_count.intValue];
+            if (self.foodplace.rate_count.intValue == 1) {
+                self.sublabel.text = [NSString stringWithFormat:@"%d vote",self.foodplace.rate_count.intValue];
+            }else{
+                self.sublabel.text = [NSString stringWithFormat:@"%d votes",self.foodplace.rate_count.intValue];
+            }
         }
         [self setNeedsDisplay];
         

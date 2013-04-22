@@ -161,7 +161,7 @@
             
             [UIView animateWithDuration:0.2
                           delay:0.0
-                        options: UIViewAnimationCurveEaseOut
+                        options: UIViewAnimationOptionCurveEaseOut
                      animations:^{
                          self.profileImage.alpha = 0;
                          self.titleLabel.alpha= 0;
@@ -176,7 +176,7 @@
     }else{
             [UIView animateWithDuration:0.2
                                   delay:0.0
-                                options: UIViewAnimationCurveEaseOut
+                                options: UIViewAnimationOptionCurveEaseOut
                              animations:^{
                                  self.profileImage.alpha = 1;
                                  self.titleLabel.alpha= 1;

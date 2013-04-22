@@ -19,6 +19,7 @@
 #import "GeoScrollViewController.h"
 #import "MapSlidingViewController.h"
 #import "MapNavViewController.h"
+#import "TBAPIClient.h"
 #import <NewRelicAgent/NewRelicAgent.h>
 
 #define VERSION 1.0
@@ -36,9 +37,7 @@
     [[NSUserDefaults standardUserDefaults] setObject:@"Enabled" forKey:@"LeftReveal"];
     
     if ([[NSUserDefaults standardUserDefaults]objectForKey:@"auth_token"]==NULL) {
-            NSLog(@"didnt find auth token in keychain");
-            NSURL *tokenurl = [NSURL URLWithString:@"http://tastebudsapp.herokuapp.com"];
-            AFHTTPClient* afclient = [[AFHTTPClient alloc]initWithBaseURL:tokenurl];
+            AFHTTPClient* afclient = [TBAPIClient sharedClient];
             [afclient getPath:@"/newGuestUser" parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
                 NSError* error = nil;
                 NSDictionary* jsonResponse = [NSJSONSerialization JSONObjectWithData:responseObject options:NSJSONReadingAllowFragments error:&error];
@@ -66,30 +65,17 @@
     [NewRelicAgent startWithApplicationToken:@"AA6d3b18f7d946f4fd29b49f53d8d598b9ff835a19"];
     [Flurry startSession:@"GS58TP8CPRJC55Z7PGV2"];
     [BugSenseController sharedControllerWithBugSenseAPIKey:@"e10888bc"];
-
+    [Mobclix startWithApplicationId:@"DD9EE023-DB44-43A2-BE49-8E8EA51459F5"];
 
     
     
     self.window.rootViewController.modalPresentationStyle = UIModalPresentationCurrentContext;
-    application.applicationSupportsShakeToEdit = YES;
-    if ([[[NSUserDefaults standardUserDefaults]objectForKey:[NSString stringWithFormat:@"%0.2f",VERSION]] isEqualToString:@"Enabled"]) {
-        
-    }else{
-        NSLog(@"not enabled");
-        [[NSUserDefaults standardUserDefaults] setObject:@"Enabled" forKey:[NSString stringWithFormat:@"%0.2f",VERSION]];
-        NSArray* menuItems = [NSArray arrayWithObjects:@"IEATISHOOTIPOST",@"LADY IRON CHEF",@"LOVE SG FOOD",@"SGFOODONFOOT",@"DANIEL FOOD DIARY", nil];
-        for (NSString* blog in menuItems)
-        {
-            [[NSUserDefaults standardUserDefaults] setObject:@"Enabled" forKey:blog];
-        }
-    }
-  [self.window makeKeyAndVisible];
-    [Mobclix startWithApplicationId:@"DD9EE023-DB44-43A2-BE49-8E8EA51459F5"];
+    
+    [self.window makeKeyAndVisible];
+    
     
     
     [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
-    //    [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"navigation.png"] forBarMetrics:UIBarMetricsDefault];
-    
     UIImage *backButton = [[UIImage imageNamed:@"back_button.png"]  resizableImageWithCapInsets:UIEdgeInsetsMake(0, 17, 0, 10)];
     [[UIBarButtonItem appearance] setBackButtonBackgroundImage:backButton forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
     UIImage *backButtonLandscape = [[UIImage imageNamed:@"back_button_landscape.png"]  resizableImageWithCapInsets:UIEdgeInsetsMake(0, 17, 0, 10)];
@@ -159,14 +145,14 @@
     
     [self beginBackgroundUpdateTask];
     
-    GSdataSerialQueue = dispatch_queue_create("com.example.GSDataSerialQueue", NULL);
+    GSBackgroundSerialQueue = dispatch_queue_create("com.example.GSDataSerialQueue", NULL);
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
     request.includesPropertyValues = NO;
-    request.entity = [NSEntityDescription entityForName:@"FoodRating" inManagedObjectContext:[self dataManagedObjectContext]];
+    request.entity = [NSEntityDescription entityForName:@"FoodRating" inManagedObjectContext:[self uploadManagedObjectContext]];
     
     request.predicate = [NSPredicate predicateWithFormat:@"(uploaded_at >= %@)", [self getGMTDate]];
     NSError *executeFetchError = nil;
-    NSArray* foodratings = [[self dataManagedObjectContext] executeFetchRequest:request error:&executeFetchError];
+    NSArray* foodratings = [[self uploadManagedObjectContext] executeFetchRequest:request error:&executeFetchError];
     __block int ratingcount = foodratings.count;
     __block int currentcount = 0;
     if (executeFetchError) {
@@ -176,19 +162,19 @@
         for (FoodRating* rating in foodratings) {
             NSLog(@"sending ratings");
             if (rating.score.intValue <= 0) {
-                NSURL *tokenurl = [NSURL URLWithString:@"http://tastebudsapp.herokuapp.com/"];
-                AFHTTPClient* afclient = [[AFHTTPClient alloc]initWithBaseURL:tokenurl];
+
+                AFHTTPClient* afclient = [TBAPIClient sharedClient];
                 [afclient deletePath:[NSString stringWithFormat:@"/ratings/1"] parameters:[NSDictionary dictionaryWithObjectsAndKeys:rating.place_id,@"rating[place_id]",[[NSUserDefaults standardUserDefaults]objectForKey:@"auth_token"],@"auth_token",nil] success:^(AFHTTPRequestOperation *operation, id responseObject) {
-                    dispatch_async(GSdataSerialQueue, ^{
+                    dispatch_async(GSBackgroundSerialQueue, ^{
                         NSError* error =nil;
                         NSDictionary* jsonResp = [NSJSONSerialization JSONObjectWithData:responseObject options:NSJSONReadingAllowFragments error:&error];
                         FoodPlace *foodplace = nil;
-                        NSManagedObjectContext* context = [self dataManagedObjectContext];
+                        NSManagedObjectContext* context = [self uploadManagedObjectContext];
                         NSFetchRequest *request = [[NSFetchRequest alloc] init];
                         request.includesPropertyValues = NO;
                         request.entity = [NSEntityDescription entityForName:@"FoodPlace" inManagedObjectContext:context];
                         request.predicate = [NSPredicate predicateWithFormat:@"item_id = %d", rating.place_id.intValue];
-                        
+                        request.fetchLimit = 1;
                         NSError *executeFetchError = nil;
                         NSArray* foodratings = [context executeFetchRequest:request error:&executeFetchError];
                         if (foodratings.count>0) {
@@ -230,11 +216,10 @@
                 }];
 
             }else{
-                NSURL *tokenurl = [NSURL URLWithString:@"http://tastebudsapp.herokuapp.com/"];
-                AFHTTPClient* afclient = [[AFHTTPClient alloc]initWithBaseURL:tokenurl];
+                AFHTTPClient* afclient = [TBAPIClient sharedClient];
                 [afclient postPath:@"/ratings" parameters:[NSDictionary dictionaryWithObjectsAndKeys:rating.score,@"rating[score]",rating.place_id,@"rating[place_id]",rating.user_id,@"rating[user_id]",[[NSUserDefaults standardUserDefaults]objectForKey:@"auth_token"],@"auth_token",nil] success:^(AFHTTPRequestOperation *operation, id responseObject) {
                     
-                    dispatch_async(GSdataSerialQueue, ^{
+                    dispatch_async(GSBackgroundSerialQueue, ^{
                         
                         NSError* error =nil;
                         NSDictionary* jsonResp = [NSJSONSerialization JSONObjectWithData:responseObject options:NSJSONReadingAllowFragments error:&error];
@@ -407,13 +392,13 @@
 {
     NSError* error =nil;
     FoodRating *foodrating = nil;
-    NSManagedObjectContext* context = [self dataManagedObjectContext];
+    NSManagedObjectContext* context = [self uploadManagedObjectContext];
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
     request.includesPropertyValues = NO;
     request.entity = [NSEntityDescription entityForName:@"FoodRating" inManagedObjectContext:context];
     
     request.predicate = [NSPredicate predicateWithFormat:@"place_id = %d AND user_id = %d", [[ratingDictionary objectForKey:@"place_id"] intValue],[[ratingDictionary objectForKey:@"user_id"] intValue]];
-    
+    request.fetchLimit = 1;
     NSError *executeFetchError = nil;
     NSArray* foodratings = [context executeFetchRequest:request error:&executeFetchError];
     if (foodratings.count>0) {
@@ -470,6 +455,40 @@
     }
     
     return _dataManagedObjectContext;
+}
+- (NSManagedObjectContext *)uploadManagedObjectContext
+{
+    
+    if (_uploadManagedObjectContext != nil) {
+        return _uploadManagedObjectContext;
+    }
+    
+    NSPersistentStoreCoordinator *coordinator = [((AppDelegate*)[UIApplication sharedApplication].delegate) persistentStoreCoordinator];
+    if (coordinator != nil) {
+        _uploadManagedObjectContext = [[NSManagedObjectContext alloc] init];
+        [_uploadManagedObjectContext setPersistentStoreCoordinator:coordinator];
+        [_uploadManagedObjectContext setUndoManager:nil];
+        
+    }
+    
+    return _uploadManagedObjectContext;
+}
+- (NSManagedObjectContext *)placeManagedObjectContext
+{
+    
+    if (_placeManagedObjectContext != nil) {
+        return _placeManagedObjectContext;
+    }
+    
+    NSPersistentStoreCoordinator *coordinator = [((AppDelegate*)[UIApplication sharedApplication].delegate) persistentStoreCoordinator];
+    if (coordinator != nil) {
+        _placeManagedObjectContext = [[NSManagedObjectContext alloc] init];
+        [_placeManagedObjectContext setPersistentStoreCoordinator:coordinator];
+        [_placeManagedObjectContext setUndoManager:nil];
+        
+    }
+    
+    return _placeManagedObjectContext;
 }
 
 

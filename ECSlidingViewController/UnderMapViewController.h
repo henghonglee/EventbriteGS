@@ -34,6 +34,7 @@
 @property (weak, nonatomic) IBOutlet UIImageView *shopImageView;
 @property (weak, nonatomic) IBOutlet UIView *locationButtonView;
 @property (weak, nonatomic) IBOutlet UILabel *shopLabel;
+
 @property (weak, nonatomic) IBOutlet UIButton *ShopButton;
 
 @property (weak, nonatomic) IBOutlet UIButton *allButton;
@@ -47,7 +48,7 @@
 @property (weak, nonatomic) IBOutlet UIImageView *shop2;
 @property (nonatomic,strong) FoodPlace* gsObjSelected;
 - (IBAction)selectCategory:(id)sender;
--(void)dismissCallout;
+
 -(void)hideCategoryButtons;
 - (IBAction)showGeoscroll:(id)sender;
 

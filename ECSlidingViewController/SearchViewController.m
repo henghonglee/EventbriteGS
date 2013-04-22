@@ -39,7 +39,6 @@
     self.resultList = [[NSMutableArray alloc]init];
     self.shopResultList = [[NSMutableArray alloc]init];
     self.suggestedFood = [NSMutableDictionary dictionary];
-    
     if (!serialQueue)
         serialQueue = dispatch_queue_create("com.example.MyQueue", NULL);
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -79,6 +78,8 @@
             [self.suggestedFood setObject:[NSString stringWithFormat:@"%.01f km",(gsobj.distance_in_meters.doubleValue)/1000.0f] forKey:gsobj.title];
         }
         [self.resultList sortUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+        
+        
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.rsTableView reloadData];
             [SVProgressHUD dismiss];

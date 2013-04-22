@@ -11,12 +11,14 @@
 #import <CoreData/CoreData.h>
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 {
-    dispatch_queue_t GSdataSerialQueue;
+    dispatch_queue_t GSBackgroundSerialQueue;
     
 }
 @property (nonatomic) UIBackgroundTaskIdentifier backgroundUpdateTask;
 @property (strong, nonatomic) UIWindow *window;
 @property (strong, nonatomic) NSManagedObjectContext *dataManagedObjectContext;
+@property (strong, nonatomic) NSManagedObjectContext *uploadManagedObjectContext;
+@property (strong, nonatomic) NSManagedObjectContext *placeManagedObjectContext;
 @property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;
 @property (readonly, strong, nonatomic) NSManagedObjectModel *managedObjectModel;
 @property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;

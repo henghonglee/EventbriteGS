@@ -15,6 +15,7 @@
 @property dispatch_queue_t GSdataSerialQueue;
 @property (nonatomic) int userRating;
 @property (nonatomic) BOOL isSending;
+@property (nonatomic) BOOL animated;
 @property (nonatomic) int maxrating;
 @property (nonatomic) int rating;
 @property (nonatomic,strong) NSManagedObjectContext* context;
@@ -25,6 +26,7 @@
 @property (nonatomic,strong) FoodPlace* foodplace;
 
 - (id)initWithFrame:(CGRect)frame andRating:(int)rating withLabel:(BOOL)label animated:(BOOL)animated;
+-(void)starViewSetRating:(int)Rating isUser:(BOOL)isUser isAnimated:(BOOL)isanimated;
 -(void)starViewSetRating:(int)Rating isUser:(BOOL)isUser;
 -(void)deleteUserRatingsForStall;
 @end

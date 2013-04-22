@@ -31,10 +31,11 @@
         {
 //            UIImage* circleImage = [UIImage imageNamed:@"buttonOrange@2x.png"];
 //            CGContextDrawImage(context, (CGRectMake (lastCGPoint.x-lineWidth/2, lastCGPoint.y-lineWidth/2, lineWidth, lineWidth )), circleImage.CGImage);
-            CGContextSetFillColorWithColor(context, ((CrumbObj*)[crumbs.pointsArray objectAtIndex:i]).pointColor.CGColor); // Or any other color.
-            CGContextFillEllipseInRect(context, (CGRectMake (lastCGPoint.x-lineWidth/2, lastCGPoint.y-lineWidth/2, lineWidth, lineWidth )));
+//            CGContextSetFillColorWithColor(context, ((CrumbObj*)[crumbs.pointsArray objectAtIndex:i]).pointColor.CGColor); // Or any other color.
+            CGContextSetFillColorWithColor(context, [UIColor redColor].CGColor);
+            CGContextFillEllipseInRect(context, (CGRectMake (lastCGPoint.x-lineWidth/4, lastCGPoint.y-lineWidth/4, lineWidth/2, lineWidth/2 )));
             
-            CGContextAddEllipseInRect(context, (CGRectMake (lastCGPoint.x-lineWidth/2, lastCGPoint.y-lineWidth/2, lineWidth, lineWidth )));
+            CGContextAddEllipseInRect(context, (CGRectMake (lastCGPoint.x-lineWidth/4, lastCGPoint.y-lineWidth/4, lineWidth/2, lineWidth/2 )));
             CGContextSetStrokeColorWithColor(context, [UIColor blackColor].CGColor);
             CGContextSetLineWidth(context, 2);
             CGContextStrokePath(context);

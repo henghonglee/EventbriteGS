@@ -20,7 +20,7 @@ static NSTimeInterval const kMCDurationHightLimit = 0.1; // Highest duration whe
 #import "GeoScrollViewController.h"
 @implementation RotatingTableCell
 
-@synthesize mainCellView,colorBarView,rankLabel,starview,distanceLabel,distanceIcon ,sourceLabel;
+@synthesize mainCellView,colorBarView,rateLabel,starview,distanceLabel,distanceIcon ,sourceLabel;
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
@@ -28,10 +28,7 @@ static NSTimeInterval const kMCDurationHightLimit = 0.1; // Highest duration whe
     if (self) {
         self.buttonImagesArray = [[NSMutableArray alloc]init];
         [self setAutoresizingMask:UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleTopMargin ];
-//        _panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGestureRecognizer:)];
-//        [self addGestureRecognizer:_panGestureRecognizer];
-//        [_panGestureRecognizer setDelegate:self];
-//        self.state = MCSwipeTableViewCellState2;
+
     }
     return self;
 }
@@ -58,25 +55,21 @@ static NSTimeInterval const kMCDurationHightLimit = 0.1; // Highest duration whe
         if ((convertedPoint.x+(self.bounds.size.height/2)) >=(230) && (convertedPoint.x+(self.bounds.size.height/2)) <=(280)) {
             if (self.colorBarView.alpha != 0.7) {
                 self.colorBarView.alpha = 0.7;
-//                self.mainCellView.alpha = 0.3;
                 [master didScrollToEntryAtIndex:((NSIndexPath*)[((UITableView*)self.superview) indexPathForCell:self]).row-1];
             }
             
         }else{
             self.colorBarView.alpha = 0.0;
-//            self.mainCellView.alpha = 0.3;
         }
     }else{    
         if ((convertedPoint.y+(self.bounds.size.height/2)) >=230 && (convertedPoint.y+(self.bounds.size.height/2)) <=310) {
             if (self.colorBarView.alpha != 0.7) {
                 self.colorBarView.alpha = 0.7;
-//                self.mainCellView.alpha = 0.3;
                 [master didScrollToEntryAtIndex:((NSIndexPath*)[((UITableView*)self.superview) indexPathForCell:self]).row-1];
             }
             
         }else{
             self.colorBarView.alpha = 0.0;
-//            self.mainCellView.alpha = 0.3;
         }
     }
 }
@@ -94,136 +87,6 @@ static NSTimeInterval const kMCDurationHightLimit = 0.1; // Highest duration whe
 }
 
 
-#pragma mark - Handle Gestures
-
-- (void)handlePanGestureRecognizer:(UIPanGestureRecognizer *)gesture {
-    UIGestureRecognizerState state = [gesture state];
-    CGPoint translation = [gesture translationInView:self.contentView];
-    CGPoint velocity = [gesture velocityInView:self.contentView];
-    CGFloat percentage = [self percentageWithOffset:CGRectGetMinX(self.mainContainer.frame) relativeToWidth:CGRectGetWidth(self.bounds)];
-    NSTimeInterval animationDuration = [self animationDurationWithVelocity:velocity];
-    _direction = [self directionWithPercentage:percentage];
-    
-    if (state == UIGestureRecognizerStateBegan) {
-    }
-    else if (state == UIGestureRecognizerStateBegan || state == UIGestureRecognizerStateChanged) {
-        CGPoint center = {self.mainContainer.center.x + translation.x, self.mainContainer.center.y};
-        [self.mainContainer setCenter:center];
-        [gesture setTranslation:CGPointZero inView:self];
-    }
-    else if (state == UIGestureRecognizerStateEnded || state == UIGestureRecognizerStateCancelled) {
-      
-        _currentPercentage = percentage;
-
-        
-        if (_direction != MCSwipeTableViewCellDirectionCenter ){
-            [self moveWithDuration:animationDuration andDirection:_direction];
-            if (_direction == MCSwipeTableViewCellDirectionCenter) {
-                self.state = MCSwipeTableViewCellState2;
-            }else if (_direction == MCSwipeTableViewCellDirectionRight)
-            {
-                self.state = MCSwipeTableViewCellState3;
-            }else if (_direction == MCSwipeTableViewCellDirectionLeft)
-            {
-                self.state = MCSwipeTableViewCellState1;
-            }
-        }
-        else{
-            self.state = MCSwipeTableViewCellState2;
-            [self bounceToOrigin];
-        }
-    }
-}
-
-#pragma mark - UIGestureRecognizerDelegate
-
-- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
-    if (gestureRecognizer == _panGestureRecognizer) {
-        UIScrollView *superview = (UIScrollView *) self.superview;
-        CGPoint translation = [(UIPanGestureRecognizer *) gestureRecognizer translationInView:superview];
-        
-        // Make sure it is scrolling horizontally
-        return ((fabs(translation.x) / fabs(translation.y) > 1) ? YES : NO && (superview.contentOffset.y == 0.0 && superview.contentOffset.x == 0.0));
-    }
-    return NO;
-}
-
-#pragma mark - Utils
-
-- (CGFloat)offsetWithPercentage:(CGFloat)percentage relativeToWidth:(CGFloat)width {
-    CGFloat offset = percentage * width;
-    
-    if (offset < -width) offset = -width;
-    else if (offset > width) offset = 1.0;
-    
-    return offset;
-}
-
-- (CGFloat)percentageWithOffset:(CGFloat)offset relativeToWidth:(CGFloat)width {
-    CGFloat percentage = offset / width;
-    
-    if (percentage < -1.0) percentage = -1.0;
-    else if (percentage > 1.0) percentage = 1.0;
-    
-    return percentage;
-}
-- (MCSwipeTableViewCellDirection)directionWithPercentage:(CGFloat)percentage {
-    
-    if (self.state == MCSwipeTableViewCellState1){
-            return MCSwipeTableViewCellDirectionCenter;
-    }
-    if (self.state == MCSwipeTableViewCellState3){
-            return MCSwipeTableViewCellDirectionCenter;
-    }
-    
-    if (percentage < -kMCStop1){
-
-        return MCSwipeTableViewCellDirectionLeft;
-    }
-    else if (percentage > kMCStop1){
-
-        return MCSwipeTableViewCellDirectionRight;
-    }
-    else{
-
-        return MCSwipeTableViewCellDirectionCenter;
-    }
-}
-- (NSTimeInterval)animationDurationWithVelocity:(CGPoint)velocity {
-    CGFloat width = CGRectGetWidth(self.bounds);
-    NSTimeInterval animationDurationDiff = kMCDurationHightLimit - kMCDurationLowLimit;
-    CGFloat horizontalVelocity = velocity.x;
-    
-    if (horizontalVelocity < -width) horizontalVelocity = -width;
-    else if (horizontalVelocity > width) horizontalVelocity = width;
-    
-    return (kMCDurationHightLimit + kMCDurationLowLimit) - fabs(((horizontalVelocity / width) * animationDurationDiff));
-}
-#pragma mark - Movement
-
-
-- (void)moveWithDuration:(NSTimeInterval)duration andDirection:(MCSwipeTableViewCellDirection)direction {
-    CGFloat origin;
-    
-    if (direction == MCSwipeTableViewCellDirectionLeft)
-        origin = -270;
-    else
-        origin = 270;
-    
-    CGRect rect = self.mainContainer.frame;
-    rect.origin.x = origin;
-    
-    
-    
-    [UIView animateWithDuration:duration
-                          delay:0.0
-                        options:(UIViewAnimationOptionCurveEaseOut | UIViewAnimationOptionAllowUserInteraction)
-                     animations:^{
-                         [self.mainContainer setFrame:rect];
-                     }
-                     completion:^(BOOL finished) {
-                     }];
-}
 
 
 @end

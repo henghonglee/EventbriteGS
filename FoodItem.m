@@ -2,15 +2,16 @@
 //  FoodItem.m
 //  ECSlidingViewController
 //
-//  Created by HengHong on 30/3/13.
+//  Created by HengHong on 19/4/13.
 //
 //
 
 #import "FoodItem.h"
 #import "FoodDescription.h"
 #import "FoodImage.h"
+#import "FoodPlace.h"
 #import "FoodType.h"
-#import <CoreLocation/CoreLocation.h>
+
 
 @implementation FoodItem
 
@@ -33,12 +34,4 @@
 @dynamic images;
 @dynamic place;
 
-- (CLLocationCoordinate2D)coordinate;
-{
-    CLLocationCoordinate2D theCoordinate;
-    
-    theCoordinate.latitude =   self.latitude.doubleValue;
-    theCoordinate.longitude = self.longitude.doubleValue;
-    return theCoordinate;
-}
 @end

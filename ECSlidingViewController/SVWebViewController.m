@@ -10,6 +10,7 @@
 #import "MapSearchViewController.h"
 #import "ShopDetailViewController.h"
 //#import "CorrectionViewController.h"
+#import "TBAPIClient.h"
 #import "SVWebViewController.h"
 #import "GeoScrollViewController.h"
 #import "MapNavViewController.h"
@@ -402,8 +403,7 @@ static dispatch_once_t onceToken;
         [self.navigationController pushViewController:viewController animated:YES];
     }
     if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:@"Stall Closed"]) {
-        NSURL *tokenurl = [NSURL URLWithString:@"http://tastebudsapp.herokuapp.com"];
-        AFHTTPClient* afclient = [[AFHTTPClient alloc]initWithBaseURL:tokenurl];
+        AFHTTPClient* afclient = [TBAPIClient sharedClient];
         [afclient putPath:[NSString stringWithFormat:@"/items/%d",self.gsobj.item_id.intValue] parameters:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO],@"item[is_post]", nil] success:^(AFHTTPRequestOperation *operation, id responseObject) {
             UIAlertView* alert = [[UIAlertView alloc]initWithTitle:@"Success" message:@"" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
             [alert show];

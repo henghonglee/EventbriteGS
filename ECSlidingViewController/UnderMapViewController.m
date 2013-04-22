@@ -11,6 +11,8 @@
 #import <SDWebImage/UIImageView+WebCache.h>
 #import "SVWebViewController.h"
 
+#import "FoodPlaceViewController.h"
+
 #define kCalloutShadowRadius 10.0f
 #define kCalloutShadowOpacity 0.9f
 #define kShadowInset 0.05f
@@ -37,10 +39,7 @@ static dispatch_once_t onceToken;
     self.shop2.clipsToBounds =YES;
     
 
-//    UISwipeGestureRecognizer* swipe = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(showGeoscroll:)];
-//    swipe.direction = UISwipeGestureRecognizerDirectionRight;
-//    [self.resetTopViewButton addGestureRecognizer:swipe];
-//    
+
     self.locationButtonView.layer.cornerRadius = 5.0f;
     self.locationButtonView.layer.shadowColor = [UIColor blackColor].CGColor;
     self.locationButtonView.layer.shadowOpacity = 0.3;
@@ -73,7 +72,7 @@ static dispatch_once_t onceToken;
 
 -(void)viewWillAppear:(BOOL)animated
 {
-//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dismissCallout) name:@"SHOWMENU" object:nil];
+
 
 }
 
@@ -101,15 +100,7 @@ static dispatch_once_t onceToken;
     [self setDistanceLabel:nil];
     [super viewDidUnload];
 }
--(IBAction)showWebView:(id)sender {
-#warning commented
-//        NSURL *URL = [NSURL URLWithString:[NSString stringWithFormat:@"%@",self.gsObjSelected.link]];
-//    	SVWebViewController *webViewController = [[SVWebViewController alloc] initWithURL:URL];
-//        webViewController.gsobj = self.gsObjSelected;
-//        webViewController.currentLocation = ((GeoScrollViewController*)self.slidingViewController.topViewController).userLocation;
-//    	[self.navigationController pushViewController:webViewController animated:YES];
-    
- }
+
 - (IBAction)showGeoscroll:(id)sender {
     NSLog(@"show geoscroll");
     CGRect slideViewFinalFrame = CGRectMake(self.view.bounds.size.width-320, self.view.bounds.size.height, 320, 75);
@@ -139,10 +130,6 @@ static dispatch_once_t onceToken;
     [mapView convertPoint:touchPoint toCoordinateFromView:mapView];
     GeoScrollViewController* topVC = ((GeoScrollViewController*)self.slidingViewController.topViewController);
     [topVC didTouchMapAtCoordinate:touchMapCoordinate];
-//    MKPointAnnotation *pa = [[MKPointAnnotation alloc] init];
-//    pa.coordinate = touchMapCoordinate;
-//    pa.title = @"Hello";
-//    [mapView addAnnotation:pa];
 
 }
 
@@ -171,7 +158,6 @@ static dispatch_once_t onceToken;
 
 - (MKAnnotationView *)mapView:(MKMapView *)theMapView viewForAnnotation:(id <MKAnnotation>)annotation
 {
-    // if it's the user location, just return nil.
     if ([annotation isKindOfClass:[MKUserLocation class]])
         return nil;
 
@@ -193,7 +179,6 @@ static dispatch_once_t onceToken;
             customPinView.clipsToBounds = NO;
             return customPinView;
             
-           // return nil;
         }
         else
         {
@@ -240,55 +225,7 @@ static dispatch_once_t onceToken;
 
 -(void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view
 {
-//    if ([view.annotation isKindOfClass:[GScursor class]]||[view isKindOfClass:[MKUserLocation class]] ) {
-//        
-//        return;
-//    }else if([view.annotation isKindOfClass:[GSObject class]]){
-//        if (!callout) {
-//            callout = [[CustomCalloutView alloc]initWithFrame:CGRectMake(-121, -60, 240, 63)];
-//            
-//            GSObject* selectedGSObj = view.annotation;
-//            
-//            callout.alpha = 0;
-//            callout.detailTitleLabel.text = selectedGSObj.title;
-//            callout.detailSubtitleLabel.text = selectedGSObj.subTitle;
-//            callout.gsObject = selectedGSObj;
-//            callout.containerView.backgroundColor = selectedGSObj.cursorColor;
-//            //adding shadows
-//            callout.layer.shadowColor = [UIColor blackColor].CGColor;
-//            callout.layer.shadowOpacity = kCalloutShadowOpacity;
-//            callout.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
-//            callout.layer.shadowRadius = kCalloutShadowRadius;
-//            UIBezierPath *path = [UIBezierPath bezierPathWithRect:CGRectInset(callout.bounds, callout.bounds.size.width*kShadowInset, callout.bounds.size.height*kShadowInset)];
-//            callout.layer.shadowPath = path.CGPath;
-//        
-//            UIButton* newButton = [UIButton buttonWithType:UIButtonTypeCustom];
-//            newButton.frame = CGRectMake(0, 0, 240, 73);
-//           // [newButton setBackgroundColor:[UIColor greenColor]];
-//            UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]
-//                                           initWithTarget:self action:@selector(showGeoscroll:)];
-//            tap.numberOfTapsRequired = 1;
-//            [newButton addGestureRecognizer:tap];
-//          //  [newButton addTarget:self action:@selector(showGeoscroll:) forControlEvents:UIControlEventTouchUpInside];
-//            [callout addSubview:newButton];
-//            if(selectedGSObj.imageArray.count>0){
-//                [callout.detailImageView setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@",[selectedGSObj.imageArray objectAtIndex:0]]]];
-//            }
-//            [view addSubview:callout];
-//            
-//            [UIView animateWithDuration:0.1
-//                                  delay:0.0
-//                                options: UIViewAnimationOptionCurveEaseOut
-//                             animations:^{
-//                                 callout.alpha = 1;
-//                             } 
-//                             completion:^(BOOL finished){
-//                                 
-//                             }];
-//        
-//        }
-//    }
-//    
+
     
 }
 
@@ -306,11 +243,7 @@ didAddAnnotationViews:(NSArray *)annotationViews
         if ([annView.annotation isKindOfClass:[GScursor class]])
             return;
         [self.mapView bringSubviewToFront:annView];
-        
-//        annView.layer.anchorPoint = CGPointMake(0.5, 1.0);
-//        annView.backgroundColor = [UIColor greenColor];
-//        annView.frame = CGRectMake(annView.frame.origin.x, annView.frame.origin.y-annView.frame.size.height,annView.frame.size.width,annView.frame.size.height);
-        
+
 
         }
     }
@@ -321,13 +254,7 @@ didAddAnnotationViews:(NSArray *)annotationViews
 {
     if (self.slidingViewController.underRightShowing) {
         self.locationButton.hidden = NO;
-//        
-//        if (_isCalloutHidden) {
-//            NSLog(@"callout was hidden");
-//        }else{
-//            [self showCallout];
-//        }
-//        
+
     }
 
     if(animated){
@@ -346,14 +273,14 @@ didAddAnnotationViews:(NSArray *)annotationViews
 - (IBAction)zoomToLoc:(id)sender
 {
 //    [self.mapView setUserTrackingMode:MKUserTrackingModeFollowWithHeading];
-    MKCoordinateRegion region;
-    region.center.latitude = [self.mapView userLocation].coordinate.latitude;
-    region.center.longitude = [self.mapView userLocation].coordinate.longitude;
-    region.span.latitudeDelta = 0.01;
-    region.span.longitudeDelta = 0.01;
-    [mapView setRegion:region animated:YES];
-    
-    
+    if (self.mapView.userLocation) {
+        MKCoordinateRegion region;
+        region.center.latitude = [self.mapView userLocation].coordinate.latitude;
+        region.center.longitude = [self.mapView userLocation].coordinate.longitude;
+        region.span.latitudeDelta = 0.01;
+        region.span.longitudeDelta = 0.01;
+        [mapView setRegion:region animated:YES];
+    }
     
 }
 
@@ -370,11 +297,13 @@ didAddAnnotationViews:(NSArray *)annotationViews
     [self.navigationController popViewControllerAnimated:YES];
 }
 
-- (IBAction)showDetail:(id)sender
+- (IBAction)showWebView:(id)sender
 {
-    ShopDetailViewController* viewController = [self.storyboard instantiateViewControllerWithIdentifier:@"ShopDetail"];
-    
-    [self.navigationController pushViewController:viewController animated:YES];
+    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"iPhone"
+                                                             bundle: nil];
+    FoodPlaceViewController* foodplaceViewController = [mainStoryboard instantiateViewControllerWithIdentifier:@"FoodPlace"];
+    foodplaceViewController.foodplace = self.gsObjSelected;
+    [self.navigationController pushViewController:foodplaceViewController animated:YES];
 }
 - (IBAction)selectCategory:(UIButton*)sender
 {
@@ -431,7 +360,18 @@ didAddAnnotationViews:(NSArray *)annotationViews
 {
     
 }
-
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
+{
+    return YES;
+}
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    return YES;
+}
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+    return YES;
+}
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
     

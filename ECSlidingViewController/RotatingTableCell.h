@@ -5,7 +5,7 @@
 //  Created by HengHong on 8/11/12.
 //  Copyright (c) 2012 Dailymotion. All rights reserved.
 //
-
+#import "RateLabel.h"
 #import <UIKit/UIKit.h>
 #import "HHStarView.h"
 
@@ -28,7 +28,7 @@ typedef NS_ENUM(NSUInteger, MCSwipeTableViewCellMode){
 };
 
 
-@interface RotatingTableCell : UITableViewCell <UIGestureRecognizerDelegate>
+@interface RotatingTableCell : UITableViewCell 
 {
     
     
@@ -55,7 +55,7 @@ typedef NS_ENUM(NSUInteger, MCSwipeTableViewCellMode){
 
 @property (strong, nonatomic) UIView *mainCellView;
 @property (strong, nonatomic) UIView *mainTitleView;
-@property (strong, nonatomic) UILabel *rankLabel;
+@property (strong, nonatomic) RateLabel *rateLabel;
 @property (strong, nonatomic) UILabel *titleLabel;
 @property (strong, nonatomic) UILabel *subTitleLabel;
 @property (strong, nonatomic) UILabel *sourceLabel;

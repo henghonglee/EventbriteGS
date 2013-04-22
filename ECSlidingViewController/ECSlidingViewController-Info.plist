@@ -60,6 +60,11 @@
 		<string>miss-claude.ttf</string>
 		<string>ProximaNova-Light.ttf</string>
 		<string>Lato-Regular.ttf</string>
+		<string>NotoSerif-Regular.ttf</string>
+		<string>Raleway-Bold.ttf</string>
+		<string>Raleway-Light.ttf</string>
+		<string>Raleway-Regular.ttf</string>
+		<string>Raleway-Medium.ttf</string>
 	</array>
 	<key>UIMainStoryboardFile</key>
 	<string>iPhone</string>
@@ -78,9 +83,6 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 </dict>
 </plist>

@@ -22,7 +22,7 @@ typedef enum {
     kScopeTypeDeals,
     kScopeTypeDistance
 } ScopeType;
-@interface GeoScrollViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,MKMapViewDelegate,UIScrollViewDelegate,UISearchBarDelegate,UITextFieldDelegate,SearchViewControllerDelegate,UIGestureRecognizerDelegate>
+@interface GeoScrollViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,MKMapViewDelegate,UIScrollViewDelegate,UISearchBarDelegate,UITextFieldDelegate,SearchViewControllerDelegate,UIGestureRecognizerDelegate,UIAlertViewDelegate>
 {
         MKMapRect oldRegion;
         NSMutableArray *mapAnnotations;
@@ -37,6 +37,7 @@ typedef enum {
 
 
 @property (strong, nonatomic) NSManagedObjectContext *dataManagedObjectContext;
+
 @property ( strong, nonatomic) NSManagedObjectModel *dataManagedObjectModel;
 @property ( strong, nonatomic) NSPersistentStoreCoordinator *dataPersistentStoreCoordinator;
 
@@ -46,6 +47,8 @@ typedef enum {
 @property (nonatomic) BOOL canSearch;
 @property (nonatomic) int randomIndex;
 @property (nonatomic) float alphaValue;
+@property (nonatomic,strong)UIImageView* instructionBack;
+@property (nonatomic,strong)UIScrollView* instructionScroll;
 @property (nonatomic,strong)UIButton*fullscreenButton;
 @property (nonatomic,strong)FoodPlace* selectedGsObject;
 @property (nonatomic,strong)UITextField* searchTextField;

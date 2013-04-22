@@ -2,7 +2,7 @@
 //  FoodPlace.m
 //  ECSlidingViewController
 //
-//  Created by HengHong on 9/4/13.
+//  Created by HengHong on 19/4/13.
 //
 //
 
@@ -28,9 +28,9 @@
 @dynamic title;
 @dynamic updated_at;
 @dynamic foodtypes;
+@dynamic images;
 @dynamic items;
 @dynamic ratings;
-@dynamic images;
 - (CLLocationCoordinate2D)coordinate;
 {
     CLLocationCoordinate2D theCoordinate;

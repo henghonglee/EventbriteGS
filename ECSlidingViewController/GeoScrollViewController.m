@@ -1,3 +1,4 @@
+#import "RateLabel.h"
 #import "touchScrollView.h"
 #import "FoodPlaceViewController.h"
 #import "LoadingViewController.h"
@@ -31,8 +32,8 @@
 #import "FoodDescription.h"
 
 
-#define sqlUpdateDate @"2013-04-11T08:24:30Z"
-#define kMainFont [UIFont systemFontOfSize:27.0]
+#define sqlUpdateDate @"2013-04-19T04:57:32Z"
+#define kMainFont     [UIFont systemFontOfSize:27.0f]
 #define kSubtitleFont [UIFont systemFontOfSize:11.0f]
 #define kSourceFont [UIFont systemFontOfSize:12.0f]
 #define kDistanceFont [UIFont systemFontOfSize:12.0f]
@@ -54,7 +55,7 @@
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
-    
+
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self)
     {
@@ -65,22 +66,10 @@
 -(void)viewDidLoad
 {
     NSLog(@"view didload");
-//    NSManagedObjectContext* myContext = [self dataManagedObjectContext];
-//    NSFetchRequest * allCars = [[NSFetchRequest alloc] init];
-//    [allCars setEntity:[NSEntityDescription entityForName:@"FoodPlace" inManagedObjectContext:myContext]];
-//    [allCars setIncludesPropertyValues:NO]; //only fetch the managedObjectID
-//    
-//    NSError * error = nil;
-//    NSArray * cars = [myContext executeFetchRequest:allCars error:&error];
-//    
-//    //error handling goes here
-//    for (NSManagedObject * car in cars) {
-//        [car setValue:[NSNumber numberWithInt:0] forKey:@"current_rating"];
-//         [car setValue:[NSNumber numberWithInt:0] forKey:@"rate_count"];
-//        [car setValue:[NSNumber numberWithBool:NO] forKey:@"current_user_rated"];
-//    }
-//    NSError *saveError = nil;
-//    [myContext save:&saveError];
+
+    
+    
+    
 
 
     self.alphaValue = 0.3f;
@@ -96,24 +85,43 @@
     self.tableView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
-    self.tableView.scrollsToTop = YES;
+    [self.tableView setScrollsToTop:YES];
     self.tableView.separatorStyle=UITableViewCellSeparatorStyleNone;
     self.tableView.backgroundColor=[UIColor clearColor];
     self.tableView.alpha=0;
     [self.tableView setDecelerationRate:UIScrollViewDecelerationRateNormal];
     [self.view addSubview:self.tableView];
-    
+    [self.imageTableView setScrollsToTop:NO];
     GSserialQueue = dispatch_queue_create("com.example.GSSerialQueue", NULL);
     GSdataSerialQueue = dispatch_queue_create("com.example.GSDataSerialQueue", NULL);
     
+    self.instructionScroll = [[UIScrollView alloc]initWithFrame:self.view.bounds];
+    [self.instructionScroll setContentSize:CGSizeMake(1280, self.view.bounds.size.height)];
+    [self.instructionScroll setPagingEnabled:YES];
+    [self.instructionScroll setScrollsToTop:NO];
+    [self.instructionScroll setDelegate:self];
+    [self.instructionScroll setBackgroundColor:[UIColor clearColor]];
+    self.instructionBack = [[UIImageView alloc]initWithFrame:self.view.bounds];
     
-    //    dispatch_async(dispatch_get_main_queue(), ^
-    //   {
-    //       LoadingViewController* loadingViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"LoadingView"];
-    //       [self.navigationController.topViewController presentViewController:loadingViewController animated:YES completion:^{
-    //
-    //       }];
-    //   });
+    UIImageView* instruction1 = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
+    UIImageView* instruction2 = [[UIImageView alloc]initWithFrame:CGRectMake(self.view.bounds.size.width, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
+    UIImageView* instruction3 = [[UIImageView alloc]initWithFrame:CGRectMake(self.view.bounds.size.width*2, 0, self.view.bounds.size.width*2, self.view.bounds.size.height)];
+//    UIImageView* instruction4 = [[UIImageView alloc]initWithFrame:CGRectMake(self.view.bounds.size.width*3, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
+    [self.instructionBack setImage:[UIImage imageNamed:@"InstructionBack"]];
+    [instruction1 setImage:[UIImage imageNamed:@"instruction2"]];
+    [instruction2 setImage:[UIImage imageNamed:@"instruction3"]];
+    [instruction3 setImage:[UIImage imageNamed:@"instruction4"]];
+//    [instruction4 setImage:[UIImage imageNamed:@"FoodApp_Instruction2"]];
+    
+    [self.instructionScroll addSubview:instruction1];
+    [self.instructionScroll addSubview:instruction2];
+    [self.instructionScroll addSubview:instruction3];
+
+    [self.view addSubview:self.instructionBack];
+    [self.view addSubview:self.instructionScroll];
+    
+    
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         
 
@@ -150,10 +158,6 @@
 -(void)didRefreshTable:(id)sender
 {
     //retrieve food places and rating
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.tableView setAlpha:0.0f];
-    });
-    
     
     dispatch_async(GSdataSerialQueue, ^{
         [self retrieveAndProcessDataFromFoodPlace];
@@ -161,11 +165,11 @@
     
 
     NSLog(@"ADDING to serial queue");
-    dispatch_async(GSserialQueue, ^{
+    dispatch_async(GSdataSerialQueue, ^{
         [self processDataWithCoreDataForSourcesWithCompletionBlock:nil];
     });
     NSLog(@"ADDING to serial queue");
-    dispatch_async(GSserialQueue, ^{
+    dispatch_async(GSdataSerialQueue, ^{
         [self prepareDataForDisplay];
         self.canSearch = YES;
     });
@@ -302,9 +306,9 @@
                                                                                                   NULL,
                                                                                                   CFSTR("!*'();:@&=+$,/?%#[]"),
                                                                                                   kCFStringEncodingUTF8));
-//   NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://tastebudsapp.herokuapp.com/allplaces"]];
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://tastebudsapp.herokuapp.com/allplaces/%@.json",dateEscaped]];
-    
+   NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://tastebudsapp.herokuapp.com/allplaces"]];
+//    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://tastebudsapp.herokuapp.com/allplaces/%@.json",dateEscaped]];
+
     
     if ([self.ongoingRequests containsObject:@"placeupdate"]) {
         NSLog(@"skipping");
@@ -322,23 +326,62 @@
              dispatch_async(GSdataSerialQueue, ^
             {
                 NSError *error;
-                NSManagedObjectContext* context = [((AppDelegate*)[UIApplication sharedApplication].delegate) dataManagedObjectContext];
+                NSManagedObjectContext* context = [((AppDelegate*)[UIApplication sharedApplication].delegate) placeManagedObjectContext];
                 
                 NSMutableArray* jsonArray = [[NSMutableArray alloc]initWithArray:JSON];
-                
-                for (NSDictionary* item in jsonArray) {
-
-                    FoodPlace *foodplace = nil;
-                    NSFetchRequest *request = [[NSFetchRequest alloc] init];
-                    request.includesPropertyValues = NO;
-                    request.entity = [NSEntityDescription entityForName:@"FoodPlace" inManagedObjectContext:context];
-                    request.predicate = [NSPredicate predicateWithFormat:@"item_id = %d", [[item objectForKey:@"id"] intValue]];
-                    
-                    NSError *executeFetchError = nil;
-                    foodplace = [[context executeFetchRequest:request error:&executeFetchError] lastObject];
-                    if (executeFetchError) {
+                NSLog(@"updated object count = %d",jsonArray.count);
+                NSString* pred;
+                NSMutableArray* foodplacearray = [[NSMutableArray alloc]init];
+                NSError *executeFetchError = nil;
+                NSFetchRequest *request = [[NSFetchRequest alloc] init];
+                if (jsonArray.count<1000) {
+                    for (NSDictionary* item in jsonArray) {
+                        if (pred.length==0) {
+                            pred = [NSString stringWithFormat:@"item_id == %d", [[item objectForKey:@"id"] intValue]];
+                        }else{
+                            pred = [pred stringByAppendingFormat:@" OR item_id == %d", [[item objectForKey:@"id"] intValue]];
+                        }
                         
-                    } else if (!foodplace) {
+                    }
+                    request.includesPropertyValues = YES;
+                    request.entity = [NSEntityDescription entityForName:@"FoodPlace" inManagedObjectContext:context];
+                    request.predicate = [NSPredicate predicateWithFormat:pred];
+                    [foodplacearray addObjectsFromArray:[context executeFetchRequest:request error:&executeFetchError]];
+    
+                }else{
+                    [foodplacearray  removeAllObjects];
+                   
+                    for (int j=0; j<(int)ceilf(jsonArray.count/900.0f); j++) {
+                        for (int i=0; (i<900 && (i+j*900)<jsonArray.count); i++) {
+                      //      NSLog(@"i = %d, j = %d",i,j);
+                            if (pred.length==0) {
+                                pred = [NSString stringWithFormat:@"item_id == %d", [[[jsonArray objectAtIndex:(i+j*900)] objectForKey:@"id"] intValue]];
+                            }else{
+                                pred = [pred stringByAppendingFormat:@" OR item_id == %d", [[[jsonArray objectAtIndex:(i+j*900)] objectForKey:@"id"] intValue]];
+                            }
+                            }
+                            request.includesPropertyValues = YES;
+                            request.entity = [NSEntityDescription entityForName:@"FoodPlace" inManagedObjectContext:context];
+                            request.predicate = [NSPredicate predicateWithFormat:pred];
+                            [foodplacearray addObjectsFromArray:[context executeFetchRequest:request error:&executeFetchError]];
+                            pred = @"";
+                        }
+                    }
+                NSLog(@"foodplacearray count = %d",foodplacearray.count);                
+                
+                
+
+                
+//                int counter = 0;
+                for (NSDictionary* item in jsonArray) {
+                    
+                    FoodPlace *foodplace = nil;
+                    NSArray* filteredArray = [foodplacearray filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"item_id == %d", [[item objectForKey:@"id"] intValue]]];
+
+                    if (filteredArray.count > 0) {
+                        foodplace = [filteredArray lastObject];
+                
+                    }else {
                         foodplace = [NSEntityDescription insertNewObjectForEntityForName:@"FoodPlace"
                                                                  inManagedObjectContext:context];
                     }
@@ -348,17 +391,18 @@
                     NSDate *createdDate = [format dateFromString:[item objectForKey:@"created_at"]];
                     
                     NSDate *updatedDate = [format dateFromString:[item objectForKey:@"updated_at"]];
-                    NSDate* lastUpdated = [foodplace valueForKey:@"updated_at"];
+//                    NSDate* lastUpdated = [foodplace valueForKey:@"updated_at"];
                     
-                    if (([updatedDate compare:lastUpdated] == NSOrderedAscending)||[updatedDate isEqualToDate:lastUpdated])  {
-                        continue;
-                    }
+//                    if (([updatedDate compare:lastUpdated] == NSOrderedAscending)||[updatedDate isEqualToDate:lastUpdated])  {
+//                        continue;
+//                    }
                     [foodplace setValue:updatedDate forKey:@"updated_at"];
                     [foodplace setValue:createdDate forKey:@"created_at"];
                     [foodplace setValue:[item objectForKey:@"current_rating"] forKey:@"current_rating"];
                     [foodplace setValue:[item objectForKey:@"rate_count"] forKey:@"rate_count"];                    
                     [foodplace setValue:[item objectForKey:@"title"] forKey:@"title"];
-                    foodplace.item_id = [NSNumber numberWithInt:[[item objectForKey:@"id"] intValue]];
+                    [foodplace setValue:[item objectForKey:@"id"] forKey:@"item_id"];
+                       
                     if (![[item objectForKey:@"foursquare_venue"] isEqual:[NSNull null]])
                     {
                         [foodplace setValue:[item objectForKey:@"foursquare_venue"] forKey:@"foursquare_venue"];
@@ -379,41 +423,50 @@
                     
                     [foodplace setValue:[NSNumber numberWithInt:(foodplace.cell_height.intValue + 10)]forKey:@"cell_height"];
                    
-                    
-                    
                     if ([[item objectForKey:@"foodtype"] isKindOfClass:[NSArray class]]) {
-                        
+                      
                         NSArray* foodtypeArray = [item objectForKey:@"foodtype"];
                         if (foodtypeArray.count>0) {
-                            [foodplace removeFoodtypes:foodplace.foodtypes];
-                            for (NSString* foodstring in foodtypeArray) {
-                                FoodType *foodtype = [NSEntityDescription
-                                                      insertNewObjectForEntityForName:@"FoodType"
-                                                      inManagedObjectContext:context];
-                                [foodtype setValue:foodstring forKey:@"type"];
-                                [foodplace addFoodtypesObject:foodtype];
+                            if (foodtypeArray.count > foodplace.foodtypes.count) {
+                                for (int j=0; j<(foodtypeArray.count-foodplace.foodtypes.count); j++) {
+                                    FoodType *foodtype = [NSEntityDescription
+                                                          insertNewObjectForEntityForName:@"FoodType"
+                                                          inManagedObjectContext:context];
+                                    [foodplace addFoodtypesObject:foodtype];
+                                }
+                            }
+                            //refreshing food types
+                            for (int f = 0 ; f < foodplace.foodtypes.count; f++) {
+                                FoodType* type = [foodplace.foodtypes.allObjects objectAtIndex:f];
+                                [type setValue:[foodtypeArray objectAtIndex:f] forKey:@"type"];
                             }
                         }
                     }
                     if ([[item objectForKey:@"images"] isKindOfClass:[NSArray class]]) {
-                        
-                        NSArray* imagesArray = [item objectForKey:@"images"];
-                        if (imagesArray.count>0) {
-                            [foodplace removeImages:foodplace.images];
-                            for (NSString* foodstring in imagesArray) {
-                                FoodImage* image = [NSEntityDescription
-                                                    insertNewObjectForEntityForName:@"FoodImage"
-                                                    inManagedObjectContext:context];
-                                [image setValue:foodstring forKey:@"high_res_image"];
-                                [foodplace addImagesObject:image];
+                       
+                        NSArray* high_res_images_array = [item objectForKey:@"images"];
+                        NSArray* low_res_images_array = [item objectForKey:@"low_res_images"];
+                        if (high_res_images_array.count>0) {
+                            if (high_res_images_array.count > foodplace.images.count) {
+                                for (int j=0; j<(high_res_images_array.count-foodplace.images.count); j++) {
+                                    FoodImage *foodimage = [NSEntityDescription
+                                                          insertNewObjectForEntityForName:@"FoodImage"
+                                                          inManagedObjectContext:context];
+                                    [foodplace addImagesObject:foodimage];
+                                }
                             }
+                            for (int f = 0 ; f < foodplace.images.count; f++) {
+                                FoodImage* image = [foodplace.images.allObjects objectAtIndex:f];
+                                [image setValue:[high_res_images_array objectAtIndex:f] forKey:@"high_res_image"];
+                                [image setValue:[low_res_images_array objectAtIndex:f] forKey:@"low_res_image"];
+                            }
+
                         }
+                        
                     }
-                    
-                    
-                    
-                 
+
                 }
+                NSLog(@"saving");
                 if (![context save:&error]) {
                     NSLog(@"Whoops, couldn't save: %@", [error localizedDescription]);
                 }else{
@@ -429,9 +482,6 @@
                 NSLog(@"done with blog = %@",@"placeupdate");
                 
                 [self.ongoingRequests removeObject:@"placeupdate"];
-//                dispatch_async(GSdataSerialQueue, ^{
-//                    [self retrieveAndProcessDataFromFoodRating];
-//                });
                 NSArray* menuItems = [NSArray arrayWithObjects:@"IEATISHOOTIPOST",@"LADY IRON CHEF",@"LOVE SG FOOD",@"SGFOODONFOOT",@"DANIEL FOOD DIARY", nil];
                 for (NSString* blog in menuItems)
                 {
@@ -472,7 +522,9 @@
                                                                                                   CFSTR("!*'();:@&=+$,/?%#[]"),
                                                                                                   kCFStringEncodingUTF8));
     
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://tastebudsapp.herokuapp.com/%@/%@.json",[blog stringByReplacingOccurrencesOfString:@" " withString:@"%20"],dateEscaped]];
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://tastebudsapp.herokuapp.com/%@.json",[blog stringByReplacingOccurrencesOfString:@" " withString:@"%20"],dateEscaped]];
+    
+//    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://tastebudsapp.herokuapp.com/%@/%@.json",[blog stringByReplacingOccurrencesOfString:@" " withString:@"%20"],dateEscaped]];
     
         if ([self.ongoingRequests containsObject:blog]) {
         NSLog(@"skipping");
@@ -490,20 +542,18 @@
              dispatch_async(GSdataSerialQueue, ^
             {
                 NSError *error;
-                //            NSManagedObjectContext *context = ((AppDelegate*)[UIApplication sharedApplication].delegate).managedObjectContext;
-                NSManagedObjectContext* context = [((AppDelegate*)[UIApplication sharedApplication].delegate) dataManagedObjectContext];
+                NSManagedObjectContext* context = [((AppDelegate*)[UIApplication sharedApplication].delegate) placeManagedObjectContext];
                 
                 
                 NSMutableArray* jsonArray = [[NSMutableArray alloc]initWithArray:JSON];
                 
                 for (NSDictionary* item in jsonArray) {
-//                    NSLog(@"items = %@",item);
                         FoodItem *fooditem = nil;
                         NSFetchRequest *request = [[NSFetchRequest alloc] init];
                         request.includesPropertyValues = NO;
                         request.entity = [NSEntityDescription entityForName:@"FoodItem" inManagedObjectContext:context];
                         request.predicate = [NSPredicate predicateWithFormat:@"item_id = %d", [[item objectForKey:@"id"] intValue]];
-                        
+                        request.fetchLimit = 1;
                         NSError *executeFetchError = nil;
                         fooditem = [[context executeFetchRequest:request error:&executeFetchError] lastObject];
                         if (executeFetchError) {
@@ -526,7 +576,10 @@
                         [fooditem setValue:updatedDate forKey:@"updated_at"];
                         [fooditem setValue:createdDate forKey:@"created_at"];
                         [fooditem setValue:[item objectForKey:@"title"] forKey:@"title"];
-                    
+                        if (![[item objectForKey:@"subtitle"] isEqual:[NSNull null]])
+                        {
+                            [fooditem setValue:[item objectForKey:@"subtitle"] forKey:@"sub_title"];
+                        }
 
                         CGSize s = [fooditem.title sizeWithFont:kMainFont constrainedToSize:CGSizeMake(kCellHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
                         CGSize x = [fooditem.sub_title sizeWithFont:kSubtitleFont constrainedToSize:CGSizeMake(kCellSubtitleHeightConstraint, 999) lineBreakMode:NSLineBreakByWordWrapping];
@@ -559,6 +612,7 @@
                             request.includesPropertyValues = NO;
                             request.entity = [NSEntityDescription entityForName:@"FoodPlace" inManagedObjectContext:context];
                             request.predicate = [NSPredicate predicateWithFormat:@"item_id = %d", [[item objectForKey:@"place_id"] intValue]];
+                            request.fetchLimit=1;
                             NSError *executeFetchError = nil;
                             foodplace = [[context executeFetchRequest:request error:&executeFetchError] lastObject];
                             
@@ -796,7 +850,12 @@
      NSSortDescriptor * frequencyDescriptor =
      [[NSSortDescriptor alloc] initWithKey:@"current_rating"
      ascending:NO] ;
-     NSArray * descriptors = [NSArray arrayWithObjects:frequencyDescriptor, nil];
+     NSSortDescriptor * rateCountDescriptor =
+     [[NSSortDescriptor alloc] initWithKey:@"rate_count"
+                                ascending:NO] ;
+    
+    
+     NSArray * descriptors = [NSArray arrayWithObjects:frequencyDescriptor,rateCountDescriptor, nil];
      NSArray * sortedArray = [loadedArray sortedArrayUsingDescriptors:descriptors];
      [loadedArray removeAllObjects];
      [loadedArray addObjectsFromArray:sortedArray];
@@ -1160,7 +1219,7 @@
             
             UnderMapViewController* menuViewController = ((UnderMapViewController*)self.slidingViewController.underRightViewController);
             NSLog(@"underright will disappear");
-            [menuViewController dismissCallout];
+
             menuViewController.InfoPanelView.hidden = YES;
             menuViewController.shopLabel.hidden = YES;
             menuViewController.locationButtonView.hidden = YES;
@@ -1259,12 +1318,11 @@
     
     
     menuViewController.gsObjSelected = gsObj;
-//    if (gsObj.images.count>0) {
-//        [menuViewController.shopImageView setImageWithURL:[NSURL URLWithString:((FoodImage*)[[gsObj.images allObjects] objectAtIndex:0]).low_res_image]];
-//        
-//    }else{
-//        [menuViewController.shopImageView setImage:nil];
-//    }
+    if (gsObj.images.count>0) {
+        [menuViewController.shopImageView setImageWithURL:[NSURL URLWithString:((FoodImage*)[[gsObj.images allObjects] objectAtIndex:0]).high_res_image] placeholderImage:[UIImage imageNamed:@"placeholder"]];
+    }else{
+        [menuViewController.shopImageView setImage:nil];
+    }
     
     UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
     if (orientation == UIInterfaceOrientationLandscapeLeft||orientation == UIInterfaceOrientationLandscapeRight) {
@@ -1274,23 +1332,30 @@
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
+    if (scrollView == self.instructionScroll) {
+        return;
+    }
     
     for (UITableViewCell* tablecell in [((UITableView*)scrollView) visibleCells]) {
         [tablecell setNeedsLayout];
     }
 }
--(BOOL)scrollViewShouldScrollToTop:(UIScrollView *)scrollView  {
-    NSLog(@"shoudl scroll to top");
-    return YES;
-}
+
 
 -(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
+    if (scrollView == self.instructionScroll) {
+        if (self.instructionScroll.contentOffset.x > 1035.0f)
+            [self clearInstructions];
+        return;
+    }
     [self scrollViewDidEndDecelerating:scrollView];
 }
 -(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
     //TODO: animate pin here!
+    if (scrollView == self.instructionScroll)
+        return;
     [self animatePin];
     
 }
@@ -1447,7 +1512,7 @@
                                 dispatch_async(dispatch_get_main_queue(), ^{
                                     [SVProgressHUD dismiss];
                                 });
-                                UIAlertView* alert = [[UIAlertView alloc]initWithTitle:@"Sorry!" message:[NSString stringWithFormat:@"We couldn't find %@",searchaddress] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                                UIAlertView* alert = [[UIAlertView alloc]initWithTitle:@"Sorry!" message:[NSString stringWithFormat:@"We couldn't find %@",searchaddress] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
                                 [alert show];
                                 
                             }
@@ -1613,14 +1678,28 @@
                 
             }
             [searchView addSubview:self.searchTextField];
+            if (self.searchTextField.text.length>0) {
+                UIButton* resetButton = [UIButton buttonWithType:UIButtonTypeCustom];
+                [resetButton setBackgroundColor:[UIColor whiteColor]];
+                [resetButton setBackgroundImage:[UIImage imageNamed:@"cross.png"] forState:UIControlStateNormal];
+                [resetButton setFrame:CGRectMake(300-88, 0, 44, 44)];
+                [resetButton addTarget:self action:@selector(cancelSearch:) forControlEvents:UIControlEventTouchUpInside];
+                [resetButton addTarget:self action:@selector(setBgColorForButton:) forControlEvents:UIControlEventTouchDown];
+                [resetButton addTarget:self action:@selector(clearBgColorForButton:) forControlEvents:UIControlEventTouchDragExit];
+                [searchView addSubview:resetButton];                
+            }
             
-            UIButton* resetButton = [UIButton buttonWithType:UIButtonTypeCustom];
-            [resetButton setBackgroundColor:[UIColor whiteColor]];
-            [resetButton setBackgroundImage:[UIImage imageNamed:@"BarMap@2x.png"] forState:UIControlStateNormal];
-            [resetButton setFrame:CGRectMake(300-44, 0, 44, 44)];
-            [resetButton addTarget:self action:@selector(cancelSearch:) forControlEvents:UIControlEventTouchUpInside];
-            [resetButton addTarget:self action:@selector(setBgColorForButton:) forControlEvents:UIControlEventTouchDown];
-            [searchView addSubview:resetButton];
+            
+            UIButton* mapButton = [UIButton buttonWithType:UIButtonTypeCustom];
+            [mapButton setBackgroundColor:[UIColor whiteColor]];
+            [mapButton setBackgroundImage:[UIImage imageNamed:@"BarMap@2x.png"] forState:UIControlStateNormal];
+            [mapButton setFrame:CGRectMake(300-44, 0, 44, 44)];
+            [mapButton addTarget:self action:@selector(showMap:) forControlEvents:UIControlEventTouchUpInside];
+            [mapButton addTarget:self action:@selector(setBgColorForButton:) forControlEvents:UIControlEventTouchDown];
+            [mapButton addTarget:self action:@selector(clearBgColorForButton:) forControlEvents:UIControlEventTouchDragExit];
+            
+            [searchView addSubview:mapButton];
+
             [headerView addSubview:searchView];
             
             return headerView;
@@ -1750,7 +1829,7 @@
             cell = [[RotatingTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:FromCellIdentifier];
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
             cell.mainContainer = [[touchScrollView alloc]initWithFrame:CGRectMake(0, 0, cell.bounds.size.width, gsObj.cell_height.intValue)];
-           
+
             [cell.mainContainer setScrollsToTop:NO];
             [cell.mainContainer setContentSize:CGSizeMake(960, gsObj.cell_height.intValue)];
             [cell.mainContainer setContentOffset:CGPointMake(320, 0)];
@@ -1788,6 +1867,9 @@
             cell.ratingStarView.GSdataSerialQueue = GSdataSerialQueue;
             [cell.ratingStarView setUserInteractionEnabled:NO];
             
+            UIImageView* resultGrayStars = [[UIImageView alloc]initWithFrame:CGRectMake(kStarLeftPadding,10 + s.height + 5,80,14.75f)];
+            [resultGrayStars setImage:[UIImage imageNamed:@"5starsgray.png"]];
+            
             [cell.mainTitleView setBackgroundColor:[UIColor clearColor]];
             
             cell.mainCellView = [[UIView alloc]initWithFrame:CGRectMake(kCellPaddingLeft, kCellPaddingTop, cell.bounds.size.width-2*kCellPaddingLeft, gsObj.cell_height.intValue-kCellPaddingTop*2)];
@@ -1803,14 +1885,31 @@
             [cell.titleLabel setFont:kMainFont];
             [cell.titleLabel setNumberOfLines:0];
             cell.titleLabel.shadowColor = [UIColor blackColor];
-            cell.titleLabel.shadowOffset = CGSizeMake(1, 1);
+            cell.titleLabel.shadowOffset = CGSizeMake(1,1);
             
             
             cell.starview = [[HHStarView alloc]initWithFrame:CGRectMake(kStarLeftPadding,20,300-(kStarLeftPadding*2),41.66f) andRating:00 withLabel:NO animated:NO];
-            [cell.starview setCenter:CGPointMake(160, gsObj.cell_height.intValue/2)];
+            [cell.starview setCenter:CGPointMake(160, gsObj.cell_height.intValue/2+15)];
             cell.starview.context = [((AppDelegate*)[UIApplication sharedApplication].delegate) dataManagedObjectContext];
             cell.starview.GSdataSerialQueue = GSdataSerialQueue;
             [cell.starview addObserver:cell.ratingStarView forKeyPath:@"userRating" options:0 context:nil];
+
+            cell.rateLabel = [[RateLabel alloc]initWithFrame:CGRectMake(0, 0, 200, 20)];
+            [cell.rateLabel setCenter:CGPointMake(160, gsObj.cell_height.intValue/2-25)];
+            [cell.rateLabel setText:@"Touch To Rate"];
+            [cell.rateLabel setFont:[UIFont systemFontOfSize:20.0f]];
+            [cell.rateLabel setShadowColor:[UIColor blackColor]];
+            [cell.rateLabel setShadowOffset:CGSizeMake(0.4, 0.4)];
+            [cell.rateLabel setTextAlignment:NSTextAlignmentCenter];
+            [cell.rateLabel setBackgroundColor:[UIColor clearColor]];
+            [cell.rateLabel setTextColor:[UIColor whiteColor]];
+            [cell.starview addObserver:cell.rateLabel forKeyPath:@"userRating" options:0 context:nil];            
+            
+            UIImageView* grayStars = [[UIImageView alloc]initWithFrame:CGRectMake(kStarLeftPadding,20,300-(kStarLeftPadding*2),41.66f)];
+            [grayStars setCenter:CGPointMake(160, gsObj.cell_height.intValue/2+15)];
+            [grayStars setImage:[UIImage imageNamed:@"5starsgray.png"]];
+           
+            
             cell.mainTitleView = [[UIView alloc]initWithFrame:CGRectMake(320, 0, cell.bounds.size.width, gsObj.cell_height.intValue)];
             
             
@@ -1844,26 +1943,44 @@
             [cell.mainContainer addSubview:cell.ratingView];
             [cell.ratingView addSubview:cell.mainRatingBackgroundCellView];
             [cell.mainRatingBackgroundCellView addSubview:cell.mainRatingCellView];
-            [cell.mainRatingBackgroundCellView addSubview:cell.starview];            
+            [cell.mainRatingBackgroundCellView addSubview:grayStars];
+            [cell.mainRatingBackgroundCellView addSubview:cell.starview];
+            [cell.mainRatingBackgroundCellView addSubview:cell.rateLabel];
             
             [cell.mainContainer addSubview:cell.mainTitleView];
             [cell.mainTitleView addSubview:cell.mainCellView];
             [cell.mainTitleView addSubview:cell.distanceColorBarView];
             [cell.mainTitleView addSubview:cell.colorBarView];
+            [cell.mainTitleView addSubview:resultGrayStars];
             [cell.mainTitleView addSubview:cell.ratingStarView];
             [cell.mainTitleView addSubview:cell.titleLabel];
             [cell.mainTitleView addSubview:cell.distanceIcon];
             [cell.mainTitleView addSubview:cell.distanceLabel];
             [cell.mainTitleView addSubview:cell.subTitleLabel];
+            
+            
+            UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(didTapCell:)];
+            [tap setNumberOfTapsRequired:1];
+            [cell.mainTitleView addGestureRecognizer:tap];
         }
         
-        
+        [cell.mainContainer setTag:indexPath.row];
         cell.titleLabel.text = gsObj.title;
         cell.starview.foodplace = gsObj;
         cell.ratingStarView.foodplace = gsObj;
+
         if (gsObj.images.count >= cell.buttonImagesArray.count) {
             for (int i=0; i<cell.buttonImagesArray.count; i++) {
-                [((UIImageView*)[cell.buttonImagesArray objectAtIndex:i]) setImageWithURL:[NSURL URLWithString:((FoodImage*)[[gsObj.images allObjects] objectAtIndex:i]).high_res_image]];
+                [((UIImageView*)[cell.buttonImagesArray objectAtIndex:i]) setImageWithURL:[NSURL URLWithString:((FoodImage*)[[gsObj.images allObjects] objectAtIndex:i]).high_res_image] placeholderImage:[UIImage imageNamed:@"placeholder"]];
+                ((UIImageView*)[cell.buttonImagesArray objectAtIndex:i]).userInteractionEnabled = YES;
+                UITapGestureRecognizer* imageTap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(didSelectImage:)];
+                [imageTap setNumberOfTapsRequired:1];
+                [((UIImageView*)[cell.buttonImagesArray objectAtIndex:i]) addGestureRecognizer:imageTap];
+
+            }
+        }else{
+            for (int i=0; i<cell.buttonImagesArray.count; i++) {
+                [((UIImageView*)[cell.buttonImagesArray objectAtIndex:i]) setImage:nil];
             }
         }
         
@@ -1873,7 +1990,7 @@
             FoodRating* foundRating = nil;
             if ([filteredSet count] > 0) {
                 foundRating = [[filteredSet allObjects] objectAtIndex:0];
-                [cell.ratingStarView starViewSetRating:foundRating.score.intValue isUser:NO];
+                [cell.ratingStarView starViewSetRating:gsObj.current_rating.intValue isUser:NO];
                 [cell.starview removeObserver:cell.ratingStarView forKeyPath:@"userRating"];
                 [cell.starview starViewSetRating:foundRating.score.intValue isUser:YES];
                 [cell.starview addObserver:cell.ratingStarView forKeyPath:@"userRating" options:0 context:nil];
@@ -1898,20 +2015,21 @@
         }else if (gsObj.distance_in_meters.intValue>100000) {
             cell.distanceLabel.text = [NSString stringWithFormat:@""];
         }
+        
+        
+        NSMutableArray* buttonArray = cell.buttonImagesArray;
+        RotatingTableCell * __weak weakSelf = cell;
         HHStarView* leftStarView = cell.starview;
         [((touchScrollView*)cell.mainContainer)setLeftRefresh:^
         {
             [leftStarView deleteUserRatingsForStall];
         }];
-        NSMutableArray* buttonArray = cell.buttonImagesArray;
-        RotatingTableCell * __weak weakSelf = cell;
         [((touchScrollView*)cell.mainContainer)setRightRefresh:^
          {
-             NSLog(@"right refreshing , %@",gsObj.title);
-             
+             NSLog(@"right refreshing");
              if (gsObj.images.count >= weakSelf.currentImageIndex + buttonArray.count) {
                  for (int i=0; i<buttonArray.count; i++) {
-                     [((UIImageView*)[buttonArray objectAtIndex:i]) setImageWithURL:[NSURL URLWithString:((FoodImage*)[[gsObj.images allObjects] objectAtIndex:((weakSelf.currentImageIndex+i+buttonArray.count)%[gsObj.images allObjects].count)]).high_res_image]];
+                     [((UIImageView*)[buttonArray objectAtIndex:i]) setImageWithURL:[NSURL URLWithString:((FoodImage*)[[gsObj.images allObjects] objectAtIndex:((weakSelf.currentImageIndex+i+buttonArray.count)%[gsObj.images allObjects].count)]).high_res_image] placeholderImage:[UIImage imageNamed:@"placeholder"]];
                  }
 
              }
@@ -1920,6 +2038,9 @@
                  weakSelf.currentImageIndex=0;
              }
          }];
+        
+        
+        
         cell.mainImagesCellView.alpha = self.alphaValue;
         cell.mainImagesCellView.backgroundColor = [UIColor blackColor];
         
@@ -1938,9 +2059,19 @@
     
 }
 
+-(void)didTapCell:(UITapGestureRecognizer*)sender
+{
+    //NSLog(@"did tap with sender = %d",sender.view.superview.tag);
+    NSIndexPath* indexPath = [NSIndexPath indexPathForRow:sender.view.superview.tag inSection:0];
+    
+    //NSIndexPath* indexPath = [NSIndexPath indexPathForItem:sender.view.superview.tag inSection:0];
+    [self tableView:self.tableView didSelectRowAtIndexPath:indexPath];
+    
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"didselect");
+    NSLog(@"didselect row %d",indexPath.row);
  
     if (tableView == self.imageTableView) {
 //        if ([self.imageTableView cellForRowAtIndexPath:indexPath].imageView.image != nil) {
@@ -1971,10 +2102,15 @@
             selectedGSObj   = [self.GSObjectArray objectAtIndex:indexPath.row-1];
         }
 
+//        NSLog(@"gsobj array = %@",self.GSObjectArray);
+        NSLog(@"selected gs title = %@",selectedGSObj);
         
 
             FoodPlaceViewController* foodplaceViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"FoodPlace"];
             foodplaceViewController.foodplace = selectedGSObj;
+            foodplaceViewController.userLocation = self.userLocation;
+            foodplaceViewController.GSdataSerialQueue = GSdataSerialQueue;
+            foodplaceViewController.dataContext = [self dataManagedObjectContext];
             [self.navigationController pushViewController:foodplaceViewController animated:YES];
 
 //        RotatingTableCell* thatCell = ((RotatingTableCell*)[tableView cellForRowAtIndexPath:indexPath]);
@@ -2094,7 +2230,15 @@
 
 -(void)dismissSelf:(UIButton*) sender
 {
-    [sender removeFromSuperview];
+    [UIView animateWithDuration:0.3
+                          delay:0.0
+                        options: UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         sender.alpha = 0.0f;
+                     }
+                     completion:^(BOOL finished){
+                         [sender removeFromSuperview];
+                     }];
 }
 
 -(BOOL)shouldAutorotate{
@@ -2139,9 +2283,11 @@
 
 -(void)animatePin
 {
+    NSString *version = [[UIDevice currentDevice] systemVersion];
+    if ([version floatValue]>5.1) {
     MKMapView* underMapView = ((MKMapView*)((UnderMapViewController*)self.slidingViewController.underRightViewController).mapView);
     for (id annote in underMapView.annotations) {
-        if ([annote isKindOfClass:[FoodItem class]]) { //should only have one
+        if ([annote isKindOfClass:[FoodPlace class]]) { //should only have one
             MKAnnotationView*annView = [underMapView viewForAnnotation:annote];
             [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
                 CATransform3D zRotation;
@@ -2190,55 +2336,66 @@
             
         }
     }
+        
+    }
 }
 
 -(void)hintLeft
 {
-    double delayInSeconds = 1.5;
-    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-        CGRect slideViewFinalFrame = CGRectMake(15, 0, self.view.bounds.size.width,  self.view.bounds.size.height);
-        CGRect slideViewReturnFrame = CGRectMake(00, 0, self.view.bounds.size.width,  self.view.bounds.size.height);
-        [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-            self.slidingViewController.topViewController.view.frame = slideViewFinalFrame;
-        } completion:^(BOOL finished) {
-            [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-                self.slidingViewController.topViewController.view.frame = slideViewReturnFrame;
-            } completion:^(BOOL finished) {
-                
-            }];
-        }];
-    });
+//    double delayInSeconds = 1.5;
+//    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+//    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+//        CGRect slideViewFinalFrame = CGRectMake(15, 0, self.view.bounds.size.width,  self.view.bounds.size.height);
+//        CGRect slideViewReturnFrame = CGRectMake(00, 0, self.view.bounds.size.width,  self.view.bounds.size.height);
+//        [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+//            self.slidingViewController.topViewController.view.frame = slideViewFinalFrame;
+//        } completion:^(BOOL finished) {
+//            [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+//                self.slidingViewController.topViewController.view.frame = slideViewReturnFrame;
+//            } completion:^(BOOL finished) {
+//                
+//            }];
+//        }];
+//    });
     
 }
 -(void)hintRight
 {
     
-    double delayInSeconds = 1.5;
-    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-        CGRect slideViewFinalFrame = CGRectMake(-15, 0, self.view.bounds.size.width,  self.view.bounds.size.height);
-        CGRect slideViewReturnFrame = CGRectMake(00, 0, self.view.bounds.size.width,  self.view.bounds.size.height);
-        [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-            self.slidingViewController.topViewController.view.frame = slideViewFinalFrame;
-        } completion:^(BOOL finished) {
-            [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-                self.slidingViewController.topViewController.view.frame = slideViewReturnFrame;
-            } completion:^(BOOL finished) {
-                
-            }];
-        }];
-    });
-    
+//    double delayInSeconds = 1.5;
+//    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+//    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+//        CGRect slideViewFinalFrame = CGRectMake(-15, 0, self.view.bounds.size.width,  self.view.bounds.size.height);
+//        CGRect slideViewReturnFrame = CGRectMake(00, 0, self.view.bounds.size.width,  self.view.bounds.size.height);
+//        [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+//            self.slidingViewController.topViewController.view.frame = slideViewFinalFrame;
+//        } completion:^(BOOL finished) {
+//            [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+//                self.slidingViewController.topViewController.view.frame = slideViewReturnFrame;
+//            } completion:^(BOOL finished) {
+//                
+//            }];
+//        }];
+//    });
+//    
+}
+-(void)clearBgColorForButton:(UIButton*)sender
+{
+    NSLog(@"changing background color");
+    [sender setBackgroundColor:[UIColor whiteColor]];
 }
 -(void)setBgColorForButton:(UIButton*)sender
 {
     NSLog(@"changing background color");
     [sender setBackgroundColor:[UIColor lightGrayColor]];
 }
+-(void)showMap:(UIButton*)sender
+{
+     [self.slidingViewController anchorTopViewTo:ECLeft];
+}
 -(void)cancelSearch:(UIButton*)sender
 {
-    [self.slidingViewController anchorTopViewTo:ECLeft];
+   
     dispatch_async(dispatch_get_main_queue(), ^{
             [SVProgressHUD showWithStatus:@"Loading" maskType:SVProgressHUDMaskTypeGradient];
     });
@@ -2261,7 +2418,21 @@
 
 -(void)getDirectionsToSelectedGSObj
 {
-    
+    UIAlertView* alert = [[UIAlertView alloc]initWithTitle:@"Directions" message:@"This will open maps app on your phone" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:@"Cancel", nil];
+    alert.delegate = self;
+    [alert show];
+}
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 0)
+    {
+        [self showDirectionsViaRedirect];
+    }
+    else
+    {
+    }
+}
+-(void)showDirectionsViaRedirect{
     NSString* saddr = @"Current+Locaton";
     NSString* daddr = @"";
     
@@ -2348,4 +2519,47 @@
     return [format stringFromDate:gmtDate];
 }
 
+
+
+-(void)clearInstructions
+{
+    CGRect slideViewFinalFrame = CGRectMake(-320, 0, 320, self.view.bounds.size.height);
+    [UIView animateWithDuration:0.3
+                          delay:0.2
+                        options: UIViewAnimationOptionCurveEaseOut
+                     animations:^{
+                         self.instructionScroll.frame = slideViewFinalFrame;
+                         self.instructionBack.alpha = 0.0f;
+                     } 
+                     completion:^(BOOL finished){
+                         [self.instructionScroll removeFromSuperview];
+                         [self.instructionBack removeFromSuperview];
+                     }];
+}
+-(void)didSelectImage:(id)sender
+{
+    if (((UIImageView*)((UITapGestureRecognizer*)sender).view).image != nil) {
+        CGRect startRect = [((UIImageView*)((UITapGestureRecognizer*)sender).view) convertRect:self.view.bounds toView:nil];
+        self.fullscreenButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [self.fullscreenButton setBackgroundColor:[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.9]];
+        [self.fullscreenButton setFrame:CGRectMake(startRect.origin.x, startRect.origin.y, ((UITapGestureRecognizer*)sender).view.bounds.size.height, ((UITapGestureRecognizer*)sender).view.bounds.size.height)];
+        UIImageView* newImageView = [[UIImageView alloc]initWithFrame:self.fullscreenButton.bounds];
+        [newImageView setImage:((UIImageView*)((UITapGestureRecognizer*)sender).view).image];
+        [newImageView setContentMode:UIViewContentModeScaleAspectFit];
+        [newImageView setUserInteractionEnabled:NO];
+        [self.fullscreenButton addSubview:newImageView];
+        [self.view addSubview:self.fullscreenButton];
+        [UIView animateWithDuration:0.3
+                              delay:0.0
+                            options: UIViewAnimationOptionCurveEaseOut
+                         animations:^{
+                             self.fullscreenButton.frame = self.view.bounds;
+                             newImageView.frame = self.view.bounds;
+                         }
+                         completion:^(BOOL finished){
+                             [self.fullscreenButton addTarget:self action:@selector(dismissSelf:) forControlEvents:UIControlEventTouchUpInside];
+                         }];
+    }
+    
+}
 @end
