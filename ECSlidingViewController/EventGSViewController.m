@@ -57,20 +57,25 @@
 
 -(void)didRefreshTable:(id)sender
 {
-    //retrieve food places and rating
-    
+    //
     dispatch_async(GSdataSerialQueue, ^{
         [self getEventBriteEvents];
     });
+    
+    
     dispatch_async(GSdataSerialQueue, ^{
         [self prepareData];
     });
+    
+    
     dispatch_async(GSdataSerialQueue, ^{
         [self prepareDataForDisplay];
         self.canSearch = YES;
     });
     
 }
+
+//Fetching data from the core data store
 -(void)prepareData
 {
     NSError *error;
@@ -90,15 +95,21 @@
     [self.loadedGSObjectArray addObjectsFromArray:fetchedObjects];
     
 }
+
+//Draws dots on map , arranges tableviewcells, sorting
 -(void)prepareDataForDisplay
 {
     [super prepareDataForDisplay];
 }
 
+
+
+
+
+//This method gets the latest updated event objects and updates/adds to the persistant store with the new data from api.
+//Edit this method to prepare shippedDB for an alternate scope (ie. not 1000km within San Francisco)
 -(void)getEventBriteEvents
 {
-
-
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.eventbrite.com/json/event_search?app_key=IYCRWB5UMZJS6BLRL6&city=San+Francisco&within=1000&within_unit=K&date_modified=Today&count_only=1"]];
     NSURLRequest *request = [NSURLRequest requestWithURL:url cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:600.0f];
     NSLog(@"url = %@",url);
@@ -125,7 +136,7 @@
                 NSArray* eventsArray = [JSON objectForKey:@"events"];
                 if (eventsArray.count>0) {
                     //first entry in array is always summary , lets print it out
-                    //NSLog(@"Request completed with summary = %@",[eventsArray objectAtIndex:0]);
+                    NSLog(@"Request completed with summary = %@",[eventsArray objectAtIndex:0]);
                 }
                 dispatch_async(GSdataSerialQueue, ^{
                     NSError *error;

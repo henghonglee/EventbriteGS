@@ -917,8 +917,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/ECSlidingViewController\"",
-					"\"$(SRCROOT)/ECSlidingViewController/Mobclix SDK\"",
-					"\"$(SRCROOT)/../../../Downloads/Flurry iPhone SDK v4.1.0/Flurry\"",
 					"\"$(SRCROOT)\"",
 				);
 				OTHER_LDFLAGS = (
@@ -957,8 +955,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/ECSlidingViewController\"",
-					"\"$(SRCROOT)/ECSlidingViewController/Mobclix SDK\"",
-					"\"$(SRCROOT)/../../../Downloads/Flurry iPhone SDK v4.1.0/Flurry\"",
 					"\"$(SRCROOT)\"",
 				);
 				OTHER_LDFLAGS = (

@@ -12,7 +12,7 @@
 #import "GeoScrollViewController.h"
 #import "MapSlidingViewController.h"
 #import "MapNavViewController.h"
-#import "TBAPIClient.h"
+
 
 #define VERSION 1.0
 #define APP_NAME [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"]
