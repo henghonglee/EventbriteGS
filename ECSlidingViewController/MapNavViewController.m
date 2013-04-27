@@ -6,9 +6,11 @@
 //
 //
 
+
+// Comments: This is the toplayer container for the undermapviewcontroller and geoscrollviewcontroller
+
 #import "MapNavViewController.h"
 #import "ECSlidingViewController.h"
-#import "MenuViewController.h"
 @interface MapNavViewController ()
 
 @end
@@ -50,9 +52,9 @@
 }
 -(void)viewWillAppear:(BOOL)animated
 {
-    if (![self.slidingViewController.underLeftViewController isKindOfClass:[UINavigationController class]]) {
-        self.slidingViewController.underLeftViewController  = [self.storyboard instantiateViewControllerWithIdentifier:@"Menu"];
-    }
+//    if (![self.slidingViewController.underLeftViewController isKindOfClass:[UINavigationController class]]) {
+//        self.slidingViewController.underLeftViewController  = [self.storyboard instantiateViewControllerWithIdentifier:@"Menu"];
+//    }
 }
 -(BOOL)shouldAutorotate{
     return NO;

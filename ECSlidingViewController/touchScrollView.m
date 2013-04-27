@@ -46,10 +46,14 @@
 	
     if (view.side == PullRefreshLeft) {
         NSLog(@"didTriggerRefreshLeft");
-        self.leftRefresh();
+        if (self.leftRefresh) {
+            self.leftRefresh();
+        }
+        
     }else{
-
-        self.rightRefresh();
+        if (self.rightRefresh) {
+            self.rightRefresh();
+        }
     }
 }
 -(BOOL)dataIsLoading:(RefreshView *)view

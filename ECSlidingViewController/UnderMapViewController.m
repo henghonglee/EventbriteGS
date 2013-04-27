@@ -1,17 +1,14 @@
-#import "CircleLayout.h"
+#import "Event.h"
 #import <SDWebImage/UIImageView+WebCache.h>
 #import <UIKit/UIKit.h>
-#import "GScursor.h"
 
 #import "UnderMapViewController.h"
 
 #import "GeoScrollViewController.h"
-#import "ShopDetailViewController.h"
 #import "MapSlidingViewController.h"
 #import <SDWebImage/UIImageView+WebCache.h>
 #import "SVWebViewController.h"
 
-#import "FoodPlaceViewController.h"
 
 #define kCalloutShadowRadius 10.0f
 #define kCalloutShadowOpacity 0.9f
@@ -48,6 +45,9 @@ static dispatch_once_t onceToken;
     UIBezierPath *path = [UIBezierPath bezierPathWithRect:self.locationButtonView.bounds];
     self.locationButtonView.layer.shadowPath = path.CGPath;
     
+    
+    [self.resetTopViewButton setFrame:CGRectMake(0, 0, self.resetTopViewButton.bounds.size.width,self.resetTopViewButton.bounds.size.height)];
+    
     self.InfoPanelView.layer.shadowColor = [UIColor blackColor].CGColor;
     self.InfoPanelView.layer.shadowOpacity = 0.3;
     self.InfoPanelView.layer.shadowOffset = CGSizeMake(-1.0f, -1.0f);
@@ -82,14 +82,6 @@ static dispatch_once_t onceToken;
 }
 - (void)viewDidUnload {
     [self setLocationButton:nil];
-    [self setAllButton:nil];
-    [self setCategoryButtons:nil];
-    [self setCategorySelectionButton:nil];
-    [self setShop1:nil];
-    [self setShop1:nil];
-    [self setShop2:nil];
-    [self setShop1LoadingIndicator:nil];
-    [self setShop2LoadingIndicator:nil];
     [self setInfoPanelView:nil];
     [self setShopButton:nil];
     [self setShopLabel:nil];
@@ -161,7 +153,7 @@ static dispatch_once_t onceToken;
     if ([annotation isKindOfClass:[MKUserLocation class]])
         return nil;
 
-    if ([annotation isKindOfClass:[FoodPlace class]]){
+    if ([annotation isKindOfClass:[Event class]]){
         static NSString* pinIdentifier = @"pinIdentifierString";
         MKAnnotationView* pinView =(MKAnnotationView *)
         [mapView dequeueReusableAnnotationViewWithIdentifier:pinIdentifier];
@@ -169,8 +161,6 @@ static dispatch_once_t onceToken;
         {
             MKAnnotationView *customPinView = [[MKAnnotationView alloc] initWithAnnotation:annotation
                                                                            reuseIdentifier:pinIdentifier];
-            
-            
             customPinView.image = [UIImage imageNamed:@"pin.png"];
             customPinView.layer.anchorPoint = CGPointMake(0.5, 1.0);
             customPinView.centerOffset = CGPointMake(0,0);
@@ -187,29 +177,7 @@ static dispatch_once_t onceToken;
         }
         return pinView;
     }
-    if ([annotation isKindOfClass:[GScursor class]]){
-        static NSString* cursorIdentifier = @"cursorIdentifierString";
-        MKAnnotationView* cursorView =(MKAnnotationView *)
-        [mapView dequeueReusableAnnotationViewWithIdentifier:cursorIdentifier];
-        if (!cursorView)
-        {
-            MKAnnotationView *customPinView = [[MKAnnotationView alloc] initWithAnnotation:annotation
-                                                                            reuseIdentifier:cursorIdentifier];
-            
-            
-
-            [customPinView setUserInteractionEnabled:YES];
-            customPinView.image = self.cursorImage;
-            customPinView.centerOffset = CGPointMake(0,0);
-            customPinView.canShowCallout = NO;
-            return customPinView;
-        }
-        else
-        {
-            cursorView.annotation = annotation;
-        }
-        return cursorView;
-    }
+    
     return nil;
 }
 
@@ -237,16 +205,7 @@ static dispatch_once_t onceToken;
 - (void)mapView:(MKMapView *)mapView
 didAddAnnotationViews:(NSArray *)annotationViews
 {
-    if (shouldShowPinAnimation) {
-    for (MKAnnotationView *annView in annotationViews)
-    {
-        if ([annView.annotation isKindOfClass:[GScursor class]])
-            return;
-        [self.mapView bringSubviewToFront:annView];
-
-
-        }
-    }
+    
 }
 
 
@@ -273,7 +232,7 @@ didAddAnnotationViews:(NSArray *)annotationViews
 - (IBAction)zoomToLoc:(id)sender
 {
 //    [self.mapView setUserTrackingMode:MKUserTrackingModeFollowWithHeading];
-    if (self.mapView.userLocation) {
+    if (self.mapView.userLocationVisible) {
         MKCoordinateRegion region;
         region.center.latitude = [self.mapView userLocation].coordinate.latitude;
         region.center.longitude = [self.mapView userLocation].coordinate.longitude;
@@ -286,9 +245,6 @@ didAddAnnotationViews:(NSArray *)annotationViews
 
 - (IBAction)zoomToAll:(id)sender
 {
-    
-
-    
 }
 
 - (IBAction)backAction:(id)sender
@@ -296,70 +252,15 @@ didAddAnnotationViews:(NSArray *)annotationViews
     [[NSNotificationCenter defaultCenter]removeObserver:self.slidingViewController.topViewController];
     [self.navigationController popViewControllerAnimated:YES];
 }
-
-- (IBAction)showWebView:(id)sender
-{
-    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"iPhone"
-                                                             bundle: nil];
-    FoodPlaceViewController* foodplaceViewController = [mainStoryboard instantiateViewControllerWithIdentifier:@"FoodPlace"];
-    foodplaceViewController.foodplace = self.gsObjSelected;
-    [self.navigationController pushViewController:foodplaceViewController animated:YES];
-}
-- (IBAction)selectCategory:(UIButton*)sender
-{
-    if (sender.tag==0) {
-        
-    }else{
-        GeoScrollViewController* topVC = ((GeoScrollViewController*)self.slidingViewController.topViewController);
-        
-                ((MapSlidingViewController*)self.slidingViewController).category = sender.tag;
-                
-                [topVC.loadedGSObjectArray removeAllObjects];
-                [topVC.GSObjectArray removeAllObjects];
-                [topVC LoadData];
-              
-        
-    }
-}
-- (IBAction)showCategoryButtons:(id)sender
-{
-    if(!_categoriesShown){
-        
-   
-    for (UIButton* btn in _categoryButtons) {
-        CGRect slideViewFinalFrame = CGRectMake(270, 130+(btn.tag*45), 45, 45);
-                [UIView animateWithDuration:0.3
-                          delay:0.2
-                        options: UIViewAnimationOptionCurveEaseOut
-                     animations:^{
-                         btn.frame = slideViewFinalFrame;
-                     } 
-                     completion:^(BOOL finished){
-                        _categoriesShown = YES;
-                     }];
-        }
-    }else{
-        for (UIButton* btn in _categoryButtons) {
-            CGRect slideViewFinalFrame = CGRectMake(270,405, 45, 45);
-            [UIView animateWithDuration:0.3
-                                  delay:0.2
-                                options: UIViewAnimationOptionCurveEaseOut
-                             animations:^{
-                                 btn.frame = slideViewFinalFrame;
-                             }
-                             completion:^(BOOL finished){
-                                  _categoriesShown = NO;
-                             }];
-        }
-       
-    }
-}
-
-
--(void)resetOverlay
+-(void)showWebView:(id)sender
 {
     
+    NSURL *URL = [NSURL URLWithString:[NSString stringWithFormat:@"%@",self.gsObjSelected.url]];
+    SVWebViewController *webViewController = [[SVWebViewController alloc] initWithURL:URL];
+    
+    [self.navigationController pushViewController:webViewController animated:YES];
 }
+
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
 {
     return YES;
@@ -372,25 +273,8 @@ didAddAnnotationViews:(NSArray *)annotationViews
 {
     return YES;
 }
-- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
-{
-    
-}
--(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:@"mycell"];
-    cell.imageView.image = [UIImage imageNamed:@"buttonBlue.png"];
-    return cell;
-}
 
--(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    return 136;
-}
--(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
-    return 5;
-}
+
 -(BOOL)shouldAutorotate{
     return NO;
 }

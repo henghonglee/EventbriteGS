@@ -5,12 +5,12 @@
 //  Created by Michael Enriquez on 1/23/12.
 //  Copyright (c) 2012 EdgeCase. All rights reserved.
 //
-#import "FoodPlace.h"
-#import "FoodItem.h"
+
+
 #import <UIKit/UIKit.h>
 #import "ECSlidingViewController.h"
 #import <MapKit/MapKit.h>
-
+#import "Event.h"
 #import "CrumbPath.h"
 #import "CrumbPathView.h"
 #import <SDWebImage/UIImageView+WebCache.h>
@@ -46,10 +46,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *locationButton;
 @property (weak, nonatomic) IBOutlet UIImageView *shop1;
 @property (weak, nonatomic) IBOutlet UIImageView *shop2;
-@property (nonatomic,strong) FoodPlace* gsObjSelected;
-- (IBAction)selectCategory:(id)sender;
-
--(void)hideCategoryButtons;
+@property (nonatomic,strong) Event* gsObjSelected;
 - (IBAction)showGeoscroll:(id)sender;
 
 @end

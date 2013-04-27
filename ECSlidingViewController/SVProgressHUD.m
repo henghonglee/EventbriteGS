@@ -591,7 +591,7 @@ CGFloat SVProgressHUDRingThickness = 6;
         hudView.layer.cornerRadius = 10;
         
         // UIAppearance is used when iOS >= 5.0
-		hudView.backgroundColor = self.hudBackgroundColor;
+		hudView.backgroundColor = [UIColor clearColor];
         
         hudView.autoresizingMask = (UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleTopMargin |
                                     UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleLeftMargin);
@@ -642,18 +642,19 @@ CGFloat SVProgressHUDRingThickness = 6;
 - (UIImageView *)spinnerView {
     if (spinnerView == nil) {
 
-        int numberOfFrames = 8;
+        int numberOfFrames = 4;
         NSMutableArray *imagesArray = [NSMutableArray arrayWithCapacity:numberOfFrames];
         for (int i=1; numberOfFrames >= i; ++i)
         {
             [imagesArray addObject:[UIImage imageNamed:
-                                    [NSString stringWithFormat:@"pinLoad-%d (dragged).tiff", i]]];
+                                    [NSString stringWithFormat:@"pinLoad-%d (dragged).tif", i]]];
         }
         
         
         spinnerView = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,50,50)];
         spinnerView.bounds = CGRectMake(0, 0, 50 ,50);
         [self.hudView addSubview:spinnerView];
+        [self.hudView setBackgroundColor:[UIColor clearColor]];
         spinnerView.animationImages = imagesArray;
         spinnerView.animationDuration = 0.5;
         // [anImageView startAnimating];

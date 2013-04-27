@@ -20,7 +20,7 @@ static NSTimeInterval const kMCDurationHightLimit = 0.1; // Highest duration whe
 #import "GeoScrollViewController.h"
 @implementation RotatingTableCell
 
-@synthesize mainCellView,colorBarView,rateLabel,starview,distanceLabel,distanceIcon ,sourceLabel;
+@synthesize mainCellView,colorBarView,distanceLabel,distanceIcon ,sourceLabel;
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
